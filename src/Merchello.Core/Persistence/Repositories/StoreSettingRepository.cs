@@ -22,7 +22,7 @@
     /// <summary>
     /// Represents the Store Settings Repository
     /// </summary>
-    internal class StoreSettingRepository : MerchelloPetaPocoRepositoryBase<IStoreSetting>, IStoreSettingRepository
+    internal class StoreSettingRepository : MerchelloMSPetaPocoRepositoryBase<IStoreSetting>, IStoreSettingRepository
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="StoreSettingRepository"/> class.
@@ -48,11 +48,11 @@
         /// <param name="validate">Function to execute to validate the next number</param>
         /// <param name="invoicesCount">The number of invoices needing invoice numbers.  Useful when saving multiple new invoices.</param>
         /// <returns>The next invoice number</returns>
-        public int GetNextInvoiceNumber(Guid storeSettingKey, Func<int> validate, int invoicesCount = 1)
+        public int GetNextInvoiceNumber(Guid storeSettingKey, int domainRootStructureID, Func<int> validate, int invoicesCount = 1)
         {
             Mandate.ParameterCondition(1 <= invoicesCount, "invoicesCount");
 
-            var setting = Get(storeSettingKey);
+            var setting = Get(storeSettingKey, domainRootStructureID);
             if (string.IsNullOrEmpty(setting.Value)) setting.Value = "1";
             var nextInvoiceNumber = int.Parse(setting.Value);
             var max = validate();
@@ -74,11 +74,11 @@
         /// <param name="validate">Function to execute to validate the next number</param>
         /// <param name="ordersCount">The number of orders needing invoice orders.  Useful when saving multiple new orders.</param>
         /// <returns>The next order number</returns>
-        public int GetNextOrderNumber(Guid storeSettingKey, Func<int> validate, int ordersCount = 1)
+        public int GetNextOrderNumber(Guid storeSettingKey, int domainRootStructureID, Func<int> validate, int ordersCount = 1)
         {
             Mandate.ParameterCondition(1 >= ordersCount, "ordersCount");
 
-            var setting = Get(storeSettingKey);
+            var setting = Get(storeSettingKey, domainRootStructureID);
             if (string.IsNullOrEmpty(setting.Value)) setting.Value = "1";
             var max = validate();
             if (max == 0) max++;
@@ -100,11 +100,11 @@
         /// <param name="validate">Function to execute to validate the next number</param>
         /// <param name="shipmentsCount">The number of shipments needing invoice orders.  Useful when saving multiple new shipments.</param>
         /// <returns>The next shipment number</returns>
-        public int GetNextShipmentNumber(Guid storeSettingKey, Func<int> validate, int shipmentsCount = 1)
+        public int GetNextShipmentNumber(Guid storeSettingKey, int domainRootStructureID, Func<int> validate, int shipmentsCount = 1)
         {
             Mandate.ParameterCondition(1 >= shipmentsCount, "shipmentsCount");
 
-            var setting = Get(storeSettingKey);
+            var setting = Get(storeSettingKey, domainRootStructureID);
             if (string.IsNullOrEmpty(setting.Value)) setting.Value = "1";
             var max = validate();
             if (max == 0) max++;
@@ -129,6 +129,53 @@
         {
             var dtos = Database.Fetch<TypeFieldDto>("SELECT * FROM merchTypeField");
             return dtos.Select(dto => new TypeField(dto.Alias, dto.Name, dto.Key));
+        }
+
+        protected override IStoreSetting PerformGet(Guid key, int domainRootStructureID)
+        {
+            var sql = GetBaseQuery(false)
+               .Where(GetBaseMSWhereClause(), new { Key = key, domainRootStructureID });
+
+            var dto = Database.Fetch<StoreSettingDto>(sql).FirstOrDefault();
+
+            if (dto == null)
+                return null;
+
+            var factory = new StoreSettingFactory();
+
+            var setting = factory.BuildEntity(dto);
+
+            return setting;
+        }
+
+        protected override IEnumerable<IStoreSetting> PerformGetAll(int domainRootStructureID, params Guid[] keys)
+        {
+            var dtos = new List<StoreSettingDto>();
+
+            if (keys.Any())
+            {
+                // This is to get around the WhereIn max limit of 2100 parameters and to help with performance of each WhereIn query
+                var keyLists = keys.Split(400).ToList();
+
+                // Loop the split keys and get them
+                foreach (var keyList in keyLists)
+                {
+                    dtos.AddRange(Database.Fetch<StoreSettingDto>(GetBaseQuery(false)
+                        .Where("domainRootStructureID = @domainRootStructureID", new { domainRootStructureID })
+                        .WhereIn<StoreSettingDto>(x => x.Key, keyList, SqlSyntax)));
+                }
+            }
+            else
+            {
+                dtos = Database.Fetch<StoreSettingDto>(GetBaseQuery(false)
+                    .Where("domainRootStructureID = @domainRootStructureID", new { domainRootStructureID }));
+            }
+
+            var factory = new StoreSettingFactory();
+            foreach (var dto in dtos)
+            {
+                yield return factory.BuildEntity(dto);
+            }
         }
 
         /// <summary>
@@ -241,6 +288,11 @@
         protected override string GetBaseWhereClause()
         {
             return "merchStoreSetting.pk = @Key";
+        }
+
+        protected override string GetBaseMSWhereClause()
+        {
+            return "merchStoreSetting.pk = @Key AND domainRootStructureID = @domainRootStructureID";
         }
 
         /// <summary>

@@ -18,12 +18,12 @@
 	/// </summary>
 	/// <typeparam name="TEntity">The type of entity</typeparam>    
     internal abstract class MerchelloPetaPocoRepositoryBase<TEntity> : MerchelloRepositoryBase<TEntity>
-		where TEntity : class, IEntity
+        where TEntity : class, IEntity
     {
         /// <summary>
         /// The sql syntax.
         /// </summary>
-        private readonly ISqlSyntaxProvider _sqlSyntax;     	
+        private readonly ISqlSyntaxProvider _sqlSyntax;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MerchelloPetaPocoRepositoryBase{TEntity}"/> class.
@@ -38,7 +38,7 @@
         /// The SQL Syntax.
         /// </param>
         protected MerchelloPetaPocoRepositoryBase(IDatabaseUnitOfWork work, ILogger logger, ISqlSyntaxProvider sqlSyntax)
-			: base(work, logger)
+            : base(work, logger)
         {
             Mandate.ParameterNotNull(sqlSyntax, "sqlSyntax");
 
@@ -60,20 +60,20 @@
 		/// Gets the database Unit of Work added to the repository
 		/// </summary>
 		protected internal new IDatabaseUnitOfWork UnitOfWork
-		{
-			get { return (IDatabaseUnitOfWork)base.UnitOfWork; }
-		}
+        {
+            get { return (IDatabaseUnitOfWork)base.UnitOfWork; }
+        }
 
         /// <summary>
         /// Gets the database.
         /// </summary>
         protected UmbracoDatabase Database
-		{
-			get { return UnitOfWork.Database; }			
-		}
+        {
+            get { return UnitOfWork.Database; }
+        }
 
 
-		#region Abstract Methods
+        #region Abstract Methods
 
         /// <summary>
         /// The get base query.
@@ -118,7 +118,7 @@
         /// </param>
         protected abstract override void PersistUpdatedItem(TEntity entity);
 
-		#endregion
+        #endregion
 
         /// <summary>
         /// The perform exists.
@@ -130,12 +130,12 @@
         /// The <see cref="bool"/>.
         /// </returns>
         protected override bool PerformExists(Guid key)
-		{
-			var sql = GetBaseQuery(true);
-			sql.Where(GetBaseWhereClause(), new { Key = key});
-			var count = Database.ExecuteScalar<int>(sql);
-			return count == 1;
-		}
+        {
+            var sql = GetBaseQuery(true);
+            sql.Where(GetBaseWhereClause(), new { Key = key });
+            var count = Database.ExecuteScalar<int>(sql);
+            return count == 1;
+        }
 
         /// <summary>
         /// The perform count.
@@ -147,13 +147,13 @@
         /// The <see cref="int"/> count.
         /// </returns>
         protected override int PerformCount(IQuery<TEntity> query)
-		{
-			var sqlClause = GetBaseQuery(true);
-			var translator = new SqlTranslator<TEntity>(sqlClause, query);
-			var sql = translator.Translate();
+        {
+            var sqlClause = GetBaseQuery(true);
+            var translator = new SqlTranslator<TEntity>(sqlClause, query);
+            var sql = translator.Translate();
 
-			return Database.ExecuteScalar<int>(sql);
-		}
+            return Database.ExecuteScalar<int>(sql);
+        }
 
         /// <summary>
         /// The persist deleted item.
@@ -162,12 +162,12 @@
         /// The entity to be deleted.
         /// </param>
         protected override void PersistDeletedItem(TEntity entity)
-		{
-			var deletes = GetDeleteClauses();
-			foreach (var delete in deletes)
-			{
-				Database.Execute(delete, new {Key = entity.Key});
-            }		    
+        {
+            var deletes = GetDeleteClauses();
+            foreach (var delete in deletes)
+            {
+                Database.Execute(delete, new { Key = entity.Key });
+            }
         }
-	}
+    }
 }

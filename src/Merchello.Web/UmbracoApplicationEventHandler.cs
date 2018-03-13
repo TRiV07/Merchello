@@ -519,8 +519,9 @@
         {
             LogHelper.Info<UmbracoApplicationEventHandler>("Verifying Merchello Version.");
             var manager = new WebMigrationManager();
-            manager.Upgraded += MigrationManagerOnUpgraded;
+            //manager.Upgraded += MigrationManagerOnUpgraded;
             manager.EnsureMerchelloVersion();
+            manager.EnsureMerchelloMSVersion();
         }
 
 

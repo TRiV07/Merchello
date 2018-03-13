@@ -17,8 +17,7 @@
         /// Gets or sets the key.
         /// </summary>
         [Column("pk")]
-        [PrimaryKeyColumn(AutoIncrement = false)]
-        [Constraint(Default = "newid()")]
+        [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_merchStoreSetting", OnColumns = "pk, domainRootStructureID")]
         public Guid Key { get; set; }
 
         /// <summary>
@@ -51,6 +50,10 @@
         /// </summary>
         [Column("createDate")]
         [Constraint(Default = "getdate()")]
-        public DateTime CreateDate { get; set; }         
+        public DateTime CreateDate { get; set; }   
+
+        [Column("domainRootStructureID")]
+        [Constraint(Default = "0")]
+        public int DomainRootStructureID { get; set; }      
     }
 }

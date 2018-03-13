@@ -20,6 +20,7 @@
     using Umbraco.Core.Events;
     using Umbraco.Core.Logging;
     using Umbraco.Core.Persistence.SqlSyntax;
+    using Umbraco.Core.Services;
 
     /// <summary>
     /// Represents the Store Settings Service
@@ -37,7 +38,12 @@
         /// The locker.
         /// </summary>
         private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
-        
+
+        /// <summary>
+        /// The order service.
+        /// </summary>
+        private readonly IDomainService _domainService;
+
         #endregion
 
         #region Constructors
@@ -124,6 +130,7 @@
         public StoreSettingService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory)
             : base(provider, repositoryFactory, logger, eventMessagesFactory)
         {
+            _domainService = ApplicationContext.Current.Services.DomainService;
         }
 
         #endregion
@@ -250,7 +257,8 @@
             {
                 Name = name,
                 Value = value,
-                TypeName = typeName
+                TypeName = typeName,
+                DomainRootStructureID = _domainService.CurrentDomain()?.RootContentId ?? 0
             };
 
             if (raiseEvents)
@@ -349,7 +357,7 @@
         {
             using (var repository = RepositoryFactory.CreateStoreSettingRepository(UowProvider.GetUnitOfWork()))
             {
-                return repository.Get(key);
+                return repository.Get(key, _domainService.CurrentDomain()?.RootContentId ?? 0);
             }
         }
 
@@ -363,7 +371,7 @@
         {
             using (var repository = RepositoryFactory.CreateStoreSettingRepository(UowProvider.GetUnitOfWork()))
             {
-                return repository.GetAll();
+                return repository.GetAll(_domainService.CurrentDomain()?.RootContentId ?? 0);
             }
         }
 
@@ -386,7 +394,7 @@
                 {
                     using (var validationRepository = RepositoryFactory.CreateInvoiceRepository(uow))
                     { 
-                        invoiceNumber = repository.GetNextInvoiceNumber(Core.Constants.StoreSetting.NextInvoiceNumberKey, validationRepository.GetMaxDocumentNumber, invoicesCount);
+                        invoiceNumber = repository.GetNextInvoiceNumber(Core.Constants.StoreSetting.NextInvoiceNumberKey, _domainService.CurrentDomain()?.RootContentId ?? 0, validationRepository.GetMaxDocumentNumber, invoicesCount);
                     }
 
                     uow.Commit();
@@ -415,7 +423,7 @@
                 {
                     using (var validationRepository = RepositoryFactory.CreateOrderRepository(uow))
                     {
-                        orderNumber = repository.GetNextOrderNumber(Core.Constants.StoreSetting.NextOrderNumberKey, validationRepository.GetMaxDocumentNumber, ordersCount);
+                        orderNumber = repository.GetNextOrderNumber(Core.Constants.StoreSetting.NextOrderNumberKey, _domainService.CurrentDomain()?.RootContentId ?? 0, validationRepository.GetMaxDocumentNumber, ordersCount);
                     }
 
                     uow.Commit();
@@ -444,7 +452,7 @@
                 {
                     using (var validationRepository = RepositoryFactory.CreateShipmentRepository(uow))
                     {
-                        shipmentNumber = repository.GetNextShipmentNumber(Core.Constants.StoreSetting.NextShipmentNumberKey, validationRepository.GetMaxDocumentNumber, shipmentsCount);
+                        shipmentNumber = repository.GetNextShipmentNumber(Core.Constants.StoreSetting.NextShipmentNumberKey, _domainService.CurrentDomain()?.RootContentId ?? 0, validationRepository.GetMaxDocumentNumber, shipmentsCount);
                     }
 
                     uow.Commit();

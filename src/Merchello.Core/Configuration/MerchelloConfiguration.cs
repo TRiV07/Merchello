@@ -40,6 +40,11 @@ namespace Merchello.Core.Configuration
         public const string MerchelloMigrationName = "Merchello";
 
         /// <summary>
+        /// Gets the merchello multi store migration name.
+        /// </summary>
+        public const string MerchelloMSMigrationName = "MerchelloMS";
+
+        /// <summary>
         /// The lazy loaded configuration section
         /// </summary>
         private static readonly Lazy<MerchelloConfiguration> Lazy = new Lazy<MerchelloConfiguration>(() => new MerchelloConfiguration());
@@ -88,6 +93,25 @@ namespace Merchello.Core.Configuration
         }
 
         /// <summary>
+        /// Gets or sets the multi store configuration status. This will return the version number of the currently installed merchello multi store instance.
+        /// </summary>
+        /// <value>The multi store configuration status.</value>
+        public static string MSConfigurationStatus
+        {
+            get
+            {
+                return ConfigurationManager.AppSettings.Cast<object>().Any(x => (string)x == "merchelloMSConfigurationStatus")
+                    ? ConfigurationManager.AppSettings["merchelloMSConfigurationStatus"]
+                    : "0.0.0";
+            }
+
+            set
+            {
+                SaveAppSetting("merchelloMSConfigurationStatus", value);
+            }
+        }
+
+        /// <summary>
         /// Gets the configuration status version.
         /// </summary>
         public static Version ConfigurationStatusVersion
@@ -95,7 +119,18 @@ namespace Merchello.Core.Configuration
            get
            {
                return new Version(ConfigurationStatus);
-           }   
+           }
+        }
+
+        /// <summary>
+        /// Gets the multi store configuration status version.
+        /// </summary>
+        public static Version MSConfigurationStatusVersion
+        {
+            get
+            {
+                return new Version(MSConfigurationStatus);
+            }
         }
 
 

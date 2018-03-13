@@ -31,6 +31,11 @@
         /// </summary>
         private string _typeName;
 
+        /// <summary>
+        /// The domain root structure ID.
+        /// </summary>
+        private int _domainRootStructureID;
+
         /// <inheritdoc/>
         [DataMember]
         public string Name
@@ -76,6 +81,21 @@
             }
         }
 
+        /// <inheritdoc/>
+        [DataMember]
+        public int DomainRootStructureID
+        {
+            get
+            {
+                return _domainRootStructureID;
+            }
+
+            set
+            {
+                SetPropertyValueAndDetectChanges(value, ref _domainRootStructureID, _ps.Value.TypeNameSelector);
+            }
+        }
+
         /// <summary>
         /// The property selectors.
         /// </summary>
@@ -95,6 +115,11 @@
             /// The type name selector.
             /// </summary>
             public readonly PropertyInfo TypeNameSelector = ExpressionHelper.GetPropertyInfo<StoreSetting, string>(x => x.TypeName);
+
+            /// <summary>
+            /// The domain root structure ID selector.
+            /// </summary>
+            public readonly PropertyInfo DomainRootStructureIDSelector = ExpressionHelper.GetPropertyInfo<StoreSetting, int>(x => x.DomainRootStructureID);
         }
     }
 }

@@ -24,5 +24,10 @@
         /// Gets or sets the type of the store setting
         /// </summary>
         string TypeName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the DomainRootStructureID of the store setting
+        /// </summary>
+        int DomainRootStructureID { get; set; }
     }
 }

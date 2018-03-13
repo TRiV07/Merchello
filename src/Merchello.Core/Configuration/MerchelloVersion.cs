@@ -9,10 +9,6 @@
     /// </summary>
     public class MerchelloVersion
     {
-        /// <summary>
-        /// The version.
-        /// </summary>
-        private static readonly Version Version = new Version("2.7.0");
 
         /// <summary>
         /// Gets the current version of Merchello.
@@ -21,10 +17,15 @@
         /// <remarks>
         /// CURRENT MERCHELLO VERSION ID.
         /// </remarks>
-        public static Version Current
-        {
-            get { return Version; }
-        }
+        public static Version Current { get; } = new Version("2.7.0");
+
+        /// <summary>
+        /// Gets the current version of Merchello multi store.
+        /// <remarks>
+        /// CURRENT MERCHELLO MULTI STORE VERSION ID.
+        /// </remarks>
+        /// </summary>
+        public static Version CurrentMS { get; } = new Version("1.0.0");
 
         /// <summary>
         /// Gets the version comment (like beta or RC).

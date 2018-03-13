@@ -14,7 +14,8 @@ namespace Merchello.Core.Persistence.Factories
                 Value = dto.Value,
                 TypeName = dto.TypeName,
                 CreateDate = dto.CreateDate,
-                UpdateDate = dto.UpdateDate
+                UpdateDate = dto.UpdateDate,
+                DomainRootStructureID = dto.DomainRootStructureID
             };
 
             entity.ResetDirtyProperties();
@@ -31,7 +32,8 @@ namespace Merchello.Core.Persistence.Factories
                 Value = entity.Value,
                 TypeName = entity.TypeName,
                 CreateDate = entity.CreateDate,
-                UpdateDate = entity.UpdateDate
+                UpdateDate = entity.UpdateDate,
+                DomainRootStructureID = entity.DomainRootStructureID
             };
         }
     }

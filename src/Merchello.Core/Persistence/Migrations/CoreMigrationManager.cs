@@ -11,7 +11,7 @@
     using Merchello.Core.Models.Rdbms;
     using Merchello.Core.Persistence.Migrations.Analytics;
     using Merchello.Core.Persistence.Migrations.Initial;
-
+    using Semver;
     using Umbraco.Core;
     using Umbraco.Core.Logging;
     using Umbraco.Core.Persistence;
@@ -130,6 +130,28 @@
             }
         }
 
+        /// <summary>
+        /// Checks the binary version against the web.config configuration status version.
+        /// </summary>
+        public void EnsureMerchelloMSVersion()
+        {
+            if (MerchelloConfiguration.MSConfigurationStatusVersion != MerchelloVersion.CurrentMS)
+            {
+                _logger.Info<CoreMigrationManager>(
+                    "Merchello multi store Versions did not match - initializing upgrade.");
+
+                if (UpgradeMerchelloMultiStore(_database))
+                {
+                    _logger.Info<CoreMigrationManager>("Upgrade completed successfully.");
+                    EnsureMSSettings();
+                }
+            }
+            else
+            {
+                _logger.Debug<CoreMigrationManager>("Merchello multi store Version Verified - no upgrade required.");
+            }
+        }
+
 
         /// <summary>
         /// Ensures the Merchello database has been installed.
@@ -165,6 +187,30 @@
             // TODO clear cache
 
             return false;
+        }
+
+        private void EnsureMSSettings()
+        {
+            var domainRootStructureIDs = _database.Query<int>("SELECT DISTINCT [domainRootStructureID] FROM umbracoDomains").ToList();
+
+            foreach(var id in domainRootStructureIDs)
+            {
+                _database.Insert("merchStoreSetting", "Key", new StoreSettingDto() { Key = Constants.StoreSetting.CurrencyCodeKey, Name = "currencyCode", Value = "USD", TypeName = "System.String", CreateDate = DateTime.Now, UpdateDate = DateTime.Now, DomainRootStructureID = id });
+                _database.Insert("merchStoreSetting", "Key", new StoreSettingDto() { Key = Constants.StoreSetting.NextOrderNumberKey, Name = "nextOrderNumber", Value = "1", TypeName = "System.Int32", CreateDate = DateTime.Now, UpdateDate = DateTime.Now, DomainRootStructureID = id });
+                _database.Insert("merchStoreSetting", "Key", new StoreSettingDto() { Key = Constants.StoreSetting.NextInvoiceNumberKey, Name = "nextInvoiceNumber", Value = "1", TypeName = "System.Int32", CreateDate = DateTime.Now, UpdateDate = DateTime.Now, DomainRootStructureID = id });
+                _database.Insert("merchStoreSetting", "Key", new StoreSettingDto() { Key = Constants.StoreSetting.NextShipmentNumberKey, Name = "nextShipmentNumber", Value = "1", TypeName = "System.Int32", CreateDate = DateTime.Now, UpdateDate = DateTime.Now, DomainRootStructureID = id });
+                _database.Insert("merchStoreSetting", "Key", new StoreSettingDto() { Key = Constants.StoreSetting.DateFormatKey, Name = "dateFormat", Value = "dd-MM-yyyy", TypeName = "System.String", CreateDate = DateTime.Now, UpdateDate = DateTime.Now, DomainRootStructureID = id });
+                _database.Insert("merchStoreSetting", "Key", new StoreSettingDto() { Key = Constants.StoreSetting.TimeFormatKey, Name = "timeFormat", Value = "am-pm", TypeName = "System.String", CreateDate = DateTime.Now, UpdateDate = DateTime.Now, DomainRootStructureID = id });
+                _database.Insert("merchStoreSetting", "Key", new StoreSettingDto() { Key = Constants.StoreSetting.UnitSystemKey, Name = "unitSystem", Value = "Imperial", TypeName = "System.String", CreateDate = DateTime.Now, UpdateDate = DateTime.Now, DomainRootStructureID = id });
+                _database.Insert("merchStoreSetting", "Key", new StoreSettingDto() { Key = Constants.StoreSetting.GlobalShippableKey, Name = "globalShippable", Value = "true", TypeName = "System.Boolean", CreateDate = DateTime.Now, UpdateDate = DateTime.Now, DomainRootStructureID = id });
+                _database.Insert("merchStoreSetting", "Key", new StoreSettingDto() { Key = Constants.StoreSetting.GlobalTaxableKey, Name = "globalTaxable", Value = "true", TypeName = "System.Boolean", CreateDate = DateTime.Now, UpdateDate = DateTime.Now, DomainRootStructureID = id });
+                _database.Insert("merchStoreSetting", "Key", new StoreSettingDto() { Key = Constants.StoreSetting.GlobalTrackInventoryKey, Name = "globalTrackInventory", Value = "false", TypeName = "System.Boolean", CreateDate = DateTime.Now, UpdateDate = DateTime.Now, DomainRootStructureID = id });
+                _database.Insert("merchStoreSetting", "Key", new StoreSettingDto() { Key = Constants.StoreSetting.GlobalShippingIsTaxableKey, Name = "globalShippingIsTaxable", Value = "false", TypeName = "System.Boolean", CreateDate = DateTime.Now, UpdateDate = DateTime.Now, DomainRootStructureID = id });
+                _database.Insert("merchStoreSetting", "Key", new StoreSettingDto() { Key = Constants.StoreSetting.MigrationKey, Name = "migration", Value = Guid.NewGuid().ToString(), TypeName = "System.Guid", CreateDate = DateTime.Now, UpdateDate = DateTime.Now, DomainRootStructureID = id });
+                _database.Insert("merchStoreSetting", "Key", new StoreSettingDto() { Key = Constants.StoreSetting.GlobalTaxationApplicationKey, Name = "globalTaxationApplication", Value = "Invoice", TypeName = "System.String", CreateDate = DateTime.Now, UpdateDate = DateTime.Now, DomainRootStructureID = id });
+                _database.Insert("merchStoreSetting", "Key", new StoreSettingDto() { Key = Core.Constants.StoreSetting.DefaultExtendedContentCulture, Name = "defaultExtendedContentCulture", Value = "en-US", TypeName = "System.String", CreateDate = DateTime.Now, UpdateDate = DateTime.Now, DomainRootStructureID = id });
+                _database.Insert("merchStoreSetting", "Key", new StoreSettingDto() { Key = Core.Constants.StoreSetting.HasDomainRecordKey, Name = "hasDomainRecord", Value = false.ToString(), TypeName = "System.Boolean", CreateDate = DateTime.Now, UpdateDate = DateTime.Now, DomainRootStructureID = id });
+            }
         }
 
         /// <summary>
@@ -246,6 +292,60 @@
             MerchelloConfiguration.ConfigurationStatus = MerchelloVersion.Current.ToString();
 
             return true;
+        }
+
+        /// <summary>
+        /// Executes the mulsti store Migration runner.
+        /// </summary>
+        /// <param name="database">
+        /// The database.
+        /// </param>
+        /// <returns>
+        /// A value indicating whether or not the migration was successful.
+        /// </returns>
+        private bool UpgradeMerchelloMultiStore(Database database)
+        {
+            var currentVersion = new SemVersion(0, 0, 0);
+
+            // get all migrations for "Merchello Multi Shop" already executed
+            var migrations = ApplicationContext.Current.Services.MigrationEntryService.GetAll(MerchelloConfiguration.MerchelloMSMigrationName);
+
+            // get the latest migration for "Merchello Multi Shop" executed
+            var latestMigration = migrations.OrderByDescending(x => x.Version).FirstOrDefault();
+
+            if (latestMigration != null)
+                currentVersion = latestMigration.Version;
+
+            var targetVersion = new SemVersion(MerchelloVersion.CurrentMS);
+            if (targetVersion == currentVersion)
+                return false;
+
+            var migrationsRunner = new MigrationRunner(
+              ApplicationContext.Current.Services.MigrationEntryService,
+              ApplicationContext.Current.ProfilingLogger.Logger,
+              currentVersion,
+              targetVersion,
+              MerchelloConfiguration.MerchelloMSMigrationName);
+
+            var upgraded = true;
+
+            try
+            {
+                migrationsRunner.Execute(database);
+                LogHelper.Info<CoreMigrationManager>($"[UpgradeMerchelloMultiStore] DB migrated.");
+            }
+            catch (Exception e)
+            {
+                upgraded = false;
+                LogHelper.Error<CoreMigrationManager>("[UpgradeMerchelloMultiStore] Error running migration", e);
+            }
+
+            if (upgraded)
+            {
+                MerchelloConfiguration.MSConfigurationStatus = MerchelloVersion.CurrentMS.ToString();
+            }
+
+            return upgraded;
         }
 
         /// <summary>
