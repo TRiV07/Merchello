@@ -7,9 +7,9 @@
     using System.Net.Http.Formatting;
     using Core.Configuration;
     using Core.Configuration.Outline;
-
     using Merchello.Core.EntityCollections;
     using Merchello.Core.EntityCollections.Providers;
+    using Merchello.Core.MultiStore;
     using Merchello.Web.Models.ContentEditing.Collections;
     using Merchello.Web.Reporting;
     using Merchello.Web.Trees.Actions;
@@ -39,6 +39,9 @@
         /// The text service.
         /// </summary>
         private readonly ILocalizedTextService _textService;
+
+        private readonly IDomainService _domainService;
+        private readonly IContentService _contentService;
 
         /// <summary>
         /// The <see cref="CultureInfo"/>.
@@ -89,6 +92,8 @@
 
             //// http://issues.merchello.com/youtrack/issue/M-732
             _textService = ApplicationContext.Services.TextService;
+            _domainService = ApplicationContext.Services.DomainService;
+            _contentService = ApplicationContext.Services.ContentService;
 
             _culture = LocalizationHelper.GetCultureFromUser(context.Security.CurrentUser);
 
@@ -109,18 +114,42 @@
         /// </returns>
         protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
         {
-            var collection = new TreeNodeCollection();         
-            var currentTree = _rootTrees.FirstOrDefault(x => x.Id == id && x.Visible);
-            var splitId = new SplitRoutePath(id);
+            var collection = new TreeNodeCollection();
 
-            collection.AddRange(
-                currentTree != null
-                    ? InitializeTree(currentTree, splitId, queryStrings)
-                    : InitializeTree(splitId, queryStrings));
+            if (id == "-1")
+            {
+                var storesTree = _contentService.GetAllStores(_domainService.GetAllFromCache())
+                .Select(x =>
+                    CreateTreeNode($"store_{x.Id}",
+                    null,
+                    queryStrings,
+                    $"{x.Name} ({x.Domain})",
+                    "icon-shopping-basket-alt",
+                    true,
+                    $"merchello/merchello/settings/{x.Id}"));
+
+                collection.AddRange(storesTree);
+            }
+            else
+            {
+                //if (id.StartsWith("store-"))
+                //{
+                //    var qs = queryStrings.ReadAsNameValueCollection();
+                //    qs.Add("storeId", id.Replace("store-", ""));
+                //    new FormDataCollection(qs.ToDictionary());
+                //}
+                var currentTree = _rootTrees.FirstOrDefault(x => x.Id == id && x.Visible);
+                var splitId = new SplitRoutePath(id);
+
+                collection.AddRange(
+                    currentTree != null
+                        ? InitializeTree(currentTree, splitId, queryStrings)
+                        : InitializeTree(splitId, queryStrings));
+            }
 
             return collection;
         }
-        
+
         /// <summary>
         /// The get menu for node.
         /// </summary>
@@ -135,10 +164,11 @@
         /// </returns>
         protected override MenuItemCollection GetMenuForNode(string id, FormDataCollection queryStrings)
         {
-            var menu = new MenuItemCollection(); 
+            var menu = new MenuItemCollection();
+            var splitId = new SplitRoutePath(id);
 
             // Products
-            if (id == "products")
+            if (splitId.CollectionId == "products")
             {
                 menu.Items.Add<NewCollectionAction>(
                     _textService.Localize("merchelloVariant/newProduct", _culture),
@@ -146,7 +176,7 @@
                     .LaunchDialogView(
                         DialogsPath + "product.add.html",
                         _textService.Localize("merchelloVariant/newProduct", _culture));
-                    //.NavigateToRoute("merchello/merchello/productedit/create");
+                //.NavigateToRoute("merchello/merchello/productedit/create");
 
                 menu.Items.Add<NewProductContentTypeAction>(
                     _textService.Localize("merchelloDetachedContent/associateContentType", _culture),
@@ -155,14 +185,14 @@
 
             }
 
-            if (id == "customers")
+            if (splitId.CollectionId == "customers")
             {
                 menu.Items.Add<NewCollectionAction>(
                     _textService.Localize("merchelloCustomers/newCustomer", _culture), false)
                     .LaunchDialogView(DialogsPath + "customer.newcustomer.html", _textService.Localize("merchelloCustomers/newCustomer", _culture));
             }
 
-            if (id == "marketing")
+            if (splitId.CollectionId == "marketing")
             {
                 menu.Items.Add<NewOfferSettingsAction>(
                     _textService.Localize("merchelloMarketing/newOffer", _culture),
@@ -174,26 +204,26 @@
 
             //// child nodes will have an id separated with a hypen and key
             //// e.g.  products_[GUID]
-            var splitId = new SplitRoutePath(id);
+            //var splitId = new SplitRoutePath(id);
 
             if (_collectiontrees.Contains(splitId.CollectionId) && !id.EndsWith("_resolved"))
             {
                 menu.Items.Add<NewCollectionAction>(
                     _textService.Localize(string.Format("merchelloCollections/{0}", NewCollectionAction.Instance.Alias), _culture),
-                    _collectiontrees.Contains(id),
+                    _collectiontrees.Contains(splitId.CollectionId),
                     new Dictionary<string, object>()
                         {
                             { "dialogData", new { entityType = splitId.CollectionId, parentKey = splitId.CollectionKey } }
                         }).LaunchDialogView(DialogsPath + "create.staticcollection.html", _textService.Localize(string.Format("merchelloCollections/{0}", NewCollectionAction.Instance.Alias), _culture));
 
-                if (!_collectiontrees.Contains(id)) // don't show this on root nodes
-                menu.Items.Add<ManageEntitiesAction>(
-                    _textService.Localize(string.Format("merchelloCollections/{0}", ManageEntitiesAction.Instance.Alias), _culture),
-                    false,
-                    new Dictionary<string, object>()
-                        {
+                if (!_collectiontrees.Contains(splitId.CollectionId)) // don't show this on root nodes
+                    menu.Items.Add<ManageEntitiesAction>(
+                        _textService.Localize(string.Format("merchelloCollections/{0}", ManageEntitiesAction.Instance.Alias), _culture),
+                        false,
+                        new Dictionary<string, object>()
+                            {
                             { "dialogData", new { entityType = splitId.CollectionId, collectionKey = splitId.CollectionKey } }
-                        }).LaunchDialogView(DialogsPath + "manage.staticcollection.html", _textService.Localize(string.Format("merchelloCollections/{0}", ManageEntitiesAction.Instance.Alias), _culture));
+                            }).LaunchDialogView(DialogsPath + "manage.staticcollection.html", _textService.Localize(string.Format("merchelloCollections/{0}", ManageEntitiesAction.Instance.Alias), _culture));
 
                 menu.Items.Add<SortCollectionAction>(
                     _textService.Localize("actions/sort", _culture),
@@ -201,24 +231,24 @@
                     new Dictionary<string, object>()
                         {
                              { "dialogData", new { entityType = splitId.CollectionId, parentKey = splitId.CollectionKey } }
-                        }).LaunchDialogView(DialogsPath + "sort.staticcollection.html", _textService.Localize(string.Format("merchelloCollections/{0}", SortCollectionAction.Instance.Alias), _culture));                
+                        }).LaunchDialogView(DialogsPath + "sort.staticcollection.html", _textService.Localize(string.Format("merchelloCollections/{0}", SortCollectionAction.Instance.Alias), _culture));
 
                 if (splitId.IsChildCollection)
                 {
                     // add the delete button
                     menu.Items.Add<DeleteCollectionAction>(
-                        _textService.Localize("actions/delete", _culture), 
+                        _textService.Localize("actions/delete", _culture),
                         false,
                         new Dictionary<string, object>()
                             {
                                 { "dialogData", new { entityType = splitId.CollectionId, collectionKey = splitId.CollectionKey } }
                             })
                         .LaunchDialogView(DialogsPath + "delete.staticcollection.html", _textService.Localize("actions/delete", _culture));
-                }                
+                }
             }
 
-            menu.Items.Add<RefreshNode, ActionRefresh>(_textService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias), _culture), id != "gateways" && !id.EndsWith("_resolved"));
-            
+            menu.Items.Add<RefreshNode, ActionRefresh>(_textService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias), _culture), splitId.CollectionId != "gateways" && !id.EndsWith("_resolved"));
+
             return menu;
         }
 
@@ -229,6 +259,9 @@
         /// <param name="collectionId">
         /// The collection id.
         /// </param>
+        /// <param name="storeId">
+        /// The store Id.
+        /// </param>
         /// <param name="collectionKey">
         /// Constructs the route path id for collection nodes.
         /// The collection key.
@@ -236,11 +269,11 @@
         /// <returns>
         /// The <see cref="string"/>.
         /// </returns>
-        private static string MakeCollectionRoutePathId(string collectionId, string collectionKey)
+        private static string MakeCollectionRoutePathId(string collectionId, string storeId, string collectionKey)
         {
             return collectionKey.IsNullOrWhiteSpace()
-                       ? collectionId
-                       : string.Format("{0}_{1}", collectionId, collectionKey);
+                       ? $"{collectionId}_{storeId}"
+                       : $"{collectionId}_{storeId}_{collectionKey}";
         }
 
         /// <summary>
@@ -332,24 +365,24 @@
                                   ? info.ManagedCollections.Where(x => x.ParentKey == null).OrderBy(x => x.SortOrder)
                                   : info.ManagedCollections.Where(x => x.ParentKey == splitId.CollectionKeyAsGuid())
                                         .OrderBy(x => x.SortOrder);
-            
-            var treeNodes = collections.Any() ? 
+
+            var treeNodes = collections.Any() ?
 
                 collections.Select(
                         collection =>
                         CreateTreeNode(
-                            MakeCollectionRoutePathId(collectionId, collection.Key.ToString()),
+                            MakeCollectionRoutePathId(collectionId, splitId.StoreId, collection.Key.ToString()),
                             parentRouteId,
                             queryStrings,
                             collection.Name,
                             "icon-list",
                             info.ManagedCollections.Any(x => x.ParentKey == collection.Key),
-                            string.Format("/merchello/merchello/{0}/{1}", info.ViewName, collection.Key))).ToArray() :
+                            string.Format("/merchello/merchello/{0}/{1}?storeId={2}", info.ViewName, collection.Key, splitId.StoreId))).ToArray() :
 
                 new TreeNode[] { };
 
             if (!treeNodes.Any()) return treeNodes;
-            
+
 
             //// need to tag these nodes so that they can be filtered by the directive to select which 
             //// collections entities can be assigned to via the back office
@@ -402,7 +435,7 @@
                 !currentTree.SelfManagedEntityCollectionProviderCollections.EntityCollectionProviders().Any(x => x.Visible))
                 return treeNodes;
 
-            return this.GetTreeNodeForConfigurationEntityCollectionProviders(currentTree, collectionId, info, queryStrings, parentRouteId);
+            return this.GetTreeNodeForConfigurationEntityCollectionProviders(currentTree, collectionId, info, splitId, queryStrings, parentRouteId);
         }
 
         /// <summary>
@@ -424,7 +457,7 @@
         /// <returns>
         /// The <see cref="IEnumerable{TreeNode}"/>.
         /// </returns>
-        private IEnumerable<TreeNode> GetTreeNodeForConfigurationEntityCollectionProviders(TreeElement tree, string collectionId, CollectionProviderInfo info, FormDataCollection queryStrings, string parentRouteId)
+        private IEnumerable<TreeNode> GetTreeNodeForConfigurationEntityCollectionProviders(TreeElement tree, string collectionId, CollectionProviderInfo info, SplitRoutePath splitId, FormDataCollection queryStrings, string parentRouteId)
         {
             // get the self managed providers
             var grouping = new List<Tuple<EntityCollectionProviderElement, EntityCollectionProviderDisplay>>();
@@ -462,13 +495,13 @@
 
                 treeNodes.Add(
                     this.CreateTreeNode(
-                        MakeCollectionRoutePathId(collectionId, collection.Key.ToString()) + "_resolved",
+                        MakeCollectionRoutePathId(collectionId, splitId.StoreId, collection.Key.ToString()) + "_resolved",
                         parentRouteId,
                         queryStrings,
                         provider.LocalizedNameKey.IsNullOrWhiteSpace() ? provider.Name : this._textService.Localize(provider.LocalizedNameKey, this._culture),
                         element.Icon,
                         false,
-                        string.Format("/merchello/merchello/{0}/{1}", info.ViewName, collection.Key)));
+                        string.Format("/merchello/merchello/{0}/{1}?storeId={2}", info.ViewName, collection.Key, splitId.StoreId)));
             }
 
             return treeNodes;
@@ -489,7 +522,7 @@
         /// <returns>
         /// The <see cref="TreeNode"/>.
         /// </returns>
-        private TreeNode GetTreeNodeFromConfigurationElement(TreeElement tree, FormDataCollection queryStrings, TreeElement parentTree = null)
+        private TreeNode GetTreeNodeFromConfigurationElement(TreeElement tree, SplitRoutePath splitId, FormDataCollection queryStrings, TreeElement parentTree = null)
         {
             var hasSubs = tree.SubTree != null && tree.SubTree.GetTrees().Any();
 
@@ -499,17 +532,19 @@
 
             if (_attributetrees.Contains(tree.Id))
             {
-               hasSubs = GetAttributeDefinedTrees(queryStrings).Any();
+                hasSubs = GetAttributeDefinedTrees(queryStrings).Any();
             }
 
             return CreateTreeNode(
-                tree.Id,
+                MakeCollectionRoutePathId(tree.Id, splitId.StoreId, null),
                 parentTree == null ? string.Empty : parentTree.Id,
                 queryStrings,
                 this.LocalizeTitle(tree),
                 tree.Icon,
                 hasSubs,
-                tree.RoutePath);
+                tree.RoutePath.Contains("?")
+                    ? $"{tree.RoutePath}&storeId={splitId.StoreId}"
+                    : $"{tree.RoutePath}?storeId={splitId.StoreId}");
         }
 
         /// <summary>
@@ -545,7 +580,7 @@
             if (!types.Any()) return new TreeNode[] { };
 
             var atts = types.Select(x => x.GetCustomAttribute<BackOfficeTreeAttribute>(true)).Where(x => x != null).OrderBy(x => x.SortOrder);
-            
+
             // TODO RSS refactor
             return
                 atts.Select(
@@ -622,7 +657,7 @@
             {
                 return this.GetTreeNodesForCollections(
                     splitId.CollectionId,
-                    MakeCollectionRoutePathId(splitId.CollectionId, splitId.CollectionKey),
+                    MakeCollectionRoutePathId(splitId.CollectionId, splitId.StoreId, splitId.CollectionKey),
                     queryStrings);
             }
 
@@ -633,7 +668,7 @@
 
             return currentTree.SubTree.GetTrees()
                     .Where(x => x.Visible)
-                    .Select(tree => GetTreeNodeFromConfigurationElement(tree, queryStrings, currentTree));
+                    .Select(tree => GetTreeNodeFromConfigurationElement(tree, splitId, queryStrings, currentTree));
         }
 
         /// <summary>
@@ -656,7 +691,7 @@
             {
                 return this.GetTreeNodesForCollections(
                     splitId.CollectionId,
-                    MakeCollectionRoutePathId(splitId.CollectionId, splitId.CollectionKey),
+                    MakeCollectionRoutePathId(splitId.CollectionId, splitId.StoreId, splitId.CollectionKey),
                     queryStrings,
                     false);
             }
@@ -668,7 +703,7 @@
 
             return backoffice.GetTrees()
                         .Where(x => x.Visible)
-                        .Select(tree => GetTreeNodeFromConfigurationElement(tree, queryStrings));
+                        .Select(tree => GetTreeNodeFromConfigurationElement(tree, splitId, queryStrings));
         }
 
 
@@ -685,20 +720,28 @@
             /// </param>
             public SplitRoutePath(string routePath)
             {
-                IsChildCollection = routePath.IndexOf('_') > 0;
-                CollectionId = IsChildCollection ? routePath.Split('_')[0] : routePath;
-                CollectionKey = IsChildCollection ? routePath.Split('_')[1] : string.Empty;
+                var tokens = routePath.Split('_');
+                IsChildCollection = tokens.Length > 2;
+
+                CollectionId = tokens.Length > 1 ? tokens[0] : routePath;
+                StoreId = tokens.Length > 1 ? tokens[1] : string.Empty;
+                CollectionKey = IsChildCollection ? tokens[2] : string.Empty;
             }
 
             /// <summary>
             /// Gets a value indicating whether is child collection.
             /// </summary>
             public bool IsChildCollection { get; private set; }
-            
+
             /// <summary>
             /// Gets the collection id.
             /// </summary>
             public string CollectionId { get; private set; }
+
+            /// <summary>
+            /// Gets the store id.
+            /// </summary>
+            public string StoreId { get; private set; }
 
             /// <summary>
             /// Gets the collection key.
@@ -730,7 +773,7 @@
             /// <summary>
             /// Gets or sets the managed collections.
             /// </summary>
-            public IEnumerable<EntityCollectionDisplay> ManagedCollections { get; set; } 
+            public IEnumerable<EntityCollectionDisplay> ManagedCollections { get; set; }
         }
     }
 }

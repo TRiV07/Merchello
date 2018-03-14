@@ -14,8 +14,8 @@
 
     // watches
     grunt.registerTask('watch-css', ['sass:dev', 'copy:assets', 'copy:vs']);
-    grunt.registerTask('watch-js', ['jshint:dev', 'concat', 'copy:app', 'copy:vs', 'karma:unit']);
-    grunt.registerTask('watch-test', ['jshint:dev', 'karma:unit']);
+    grunt.registerTask('watch-js', [/*'jshint:dev', */'concat', 'copy:app', 'copy:vs', 'karma:unit']);
+    grunt.registerTask('watch-test', [/*'jshint:dev', */'karma:unit']);
     grunt.registerTask('watch-html', ['copy:views', 'copy:vs']);
 
     // Print a timestamp (useful for when watching)
@@ -29,7 +29,7 @@
         distdir: 'build/App_Plugins/Merchello',
         transformdir: 'build/transforms',
         bowerfiles: 'bower_components',
-        vsdir: '../Merchello.FastTrack.UI/App_Plugins/Merchello',
+        vsdir: 'D:/SC/bitbucket.org/VJ/Umbraco.Plugins/umCommerce.StalkAndBean/App_Plugins/Merchello',
         appdir: '../Merchello.FastTrack.UI',
         pkg: grunt.file.readJSON('package.json'),
 
@@ -118,7 +118,7 @@
                     { dest: '<%= vsdir %>/assets', src: '**', expand: true, cwd: '<%= distdir %>/assets' },
                     { dest: '<%= vsdir %>/js', src: '**', expand: true, cwd: '<%= distdir %>/js' },
                     { dest: '<%= vsdir %>/lib', src: '**', expand: true, cwd: '<%= distdir %>/lib' },
-                    { dest: '<%= vsdir %>/config', src: '**', expand: true, cwd: '<%= distdir %>/config' },
+                    //{ dest: '<%= vsdir %>/config', src: '**', expand: true, cwd: '<%= distdir %>/config' },
                     { dest: '<%= vsdir %>/lang', src: '**', expand: true, cwd: '<%= distdir %>/lang' },
                     { dest: '<%= vsdir %>/lib', src: '**', expand: true, cwd: '<%= distdir %>/lib' },
                     { dest: '<%= vsdir %>/Backoffice/Merchello', src: '**', expand: true, cwd: '<%= distdir %>/views/sales' },
@@ -137,7 +137,7 @@
                     { dest: '<%= vsdir %>/Backoffice/Merchello/dialogs', src: '**', expand: true, cwd: '<%= distdir %>/views/common/dialogs' },
                     { dest: '<%= vsdir %>/Backoffice/Merchello/directives', src: '**', expand: true, cwd: '<%= distdir %>/views/directives' },
                     { dest: '<%= vsdir %>/propertyeditors', src: '**', expand: true, cwd: '<%= distdir %>/views/propertyeditors' },
-                    { dest: '<%= vsdir %>/views', src: '**', expand: true, cwd: '<%= distdir %>/partials' },
+                    //{ dest: '<%= vsdir %>/views', src: '**', expand: true, cwd: '<%= distdir %>/partials' },
                     { dest: '<%= appdir %>', src: '**', expand: true, cwd: '<%= transformdir %>' },
                     { dest: '<%= appdir %>/Config', src: '**', expand: true, cwd: '<%= transformdir %>/umbconfig' }
                 ]

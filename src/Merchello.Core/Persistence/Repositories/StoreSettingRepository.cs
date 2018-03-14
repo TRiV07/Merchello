@@ -9,7 +9,7 @@
     using Models.EntityBase;
     using Models.Rdbms;
     using Models.TypeFields;
-    using Querying;    
+    using Querying;
     using Umbraco.Core;
     using Umbraco.Core.Cache;
     using Umbraco.Core.Logging;
@@ -18,6 +18,7 @@
     using Umbraco.Core.Persistence.SqlSyntax;
 
     using UnitOfWork;
+    using static Umbraco.Core.Persistence.Database;
 
     /// <summary>
     /// Represents the Store Settings Repository
@@ -38,7 +39,7 @@
         /// </param>
         public StoreSettingRepository(IDatabaseUnitOfWork work, ILogger logger, ISqlSyntaxProvider sqlSyntax)
             : base(work, logger, sqlSyntax)
-        {            
+        {
         }
 
         /// <summary>
@@ -305,7 +306,7 @@
         {
             var list = new List<string>
             {
-                "DELETE FROM merchStoreSetting WHERE pk = @Key"
+                "DELETE FROM merchStoreSetting WHERE pk = @Key AND domainRootStructureID = @DomainRootStructureID"
             };
 
             return list;
@@ -345,8 +346,31 @@
             var factory = new StoreSettingFactory();
             var dto = factory.BuildDto(entity);
 
-            Database.Update(dto);
+            //Database.Update(dto);
+            Database.Delete<StoreSettingDto>("WHERE pk = @Key AND domainRootStructureID = @DomainRootStructureID", new { dto.Key, dto.DomainRootStructureID });
+            Database.Insert(dto);
 
+            //We need to do a special InsertOrUpdate here because we know that the PreviewXmlDto table has a composite key and thus
+            // a unique constraint which can be violated if 2+ threads try to execute the same insert sql at the same time.
+            //Database.Update(
+            //    //Since the table has a composite key, we need to specify an explit update statement
+            //    "SET name = @Name, value = @Value, typeName = @TypeName, updateDate = @UpdateDate WHERE pk=@Key AND domainRootStructureID=@DomainRootStructureID",
+            //    new
+            //    {
+            //        dto.Name,
+            //        dto.Value,
+            //        dto.TypeName,
+            //        dto.UpdateDate,
+            //        dto.Key,
+            //        dto.DomainRootStructureID
+            //    });
+
+            entity.ResetDirtyProperties();
+        }
+
+        protected override void PersistDeletedItem(IStoreSetting entity)
+        {
+            Database.Delete<StoreSettingDto>("WHERE pk = @Key AND domainRootStructureID = @DomainRootStructureID", new { entity.Key, entity.DomainRootStructureID });
             entity.ResetDirtyProperties();
         }
     }

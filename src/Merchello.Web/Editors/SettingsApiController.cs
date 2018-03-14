@@ -15,6 +15,7 @@
 
     using Merchello.Core.Configuration;
     using Merchello.Core.Logging;
+    using Merchello.Core.MultiStore;
     using Merchello.Core.Persistence.Migrations.Analytics;
     using Merchello.Web.Reporting;
     using Merchello.Web.Trees;
@@ -166,14 +167,17 @@
             return currencyList;
 		}
 
-		/// <summary>
-		/// Returns Product by id (key) 
-		/// GET /umbraco/Merchello/SettingsApi/GetAllSettings
-		/// </summary>
-		public SettingDisplay GetAllSettings()
+        /// <summary>
+        /// Returns settings for domain id
+        /// GET /umbraco/Merchello/SettingsApi/GetAllSettings
+        /// </summary>
+        
+        public SettingDisplay GetAllSettings(int? id)
 		{									
 			// TODO - why is this done this way?												   
-			var settings = _storeSettingService.GetAll();
+			var settings = id.HasValue
+                ? _storeSettingService.GetAll(id.Value)
+                : _storeSettingService.GetAll();
 			var settingDisplay = new SettingDisplay();
 
 			if (settings == null)
@@ -242,13 +246,13 @@
         /// </summary>
         /// <param name="setting">SettingDisplay object serialized from WebApi</param>
         [AcceptVerbs("POST", "PUT")]
-		public HttpResponseMessage PutSettings(SettingDisplay setting)
+		public HttpResponseMessage PutSettings(int id, SettingDisplay setting)
 		{
 			var response = Request.CreateResponse(HttpStatusCode.OK);
 
 			try
 			{
-				IEnumerable<IStoreSetting> merchSetting = setting.ToStoreSetting(_storeSettingService.GetAll());
+				IEnumerable<IStoreSetting> merchSetting = setting.ToStoreSetting(_storeSettingService.GetAll(id).ToList());
 				foreach(var s in merchSetting)
 				{
 					_storeSettingService.Save(s);
@@ -274,33 +278,33 @@
         [HttpPost]
         public async Task<HttpResponseMessage> RecordDomain(MigrationDomain record)
         {
-            var setting = _storeSettingService.GetByKey(Constants.StoreSetting.HasDomainRecordKey);
+            //var setting = _storeSettingService.GetByKey(Constants.StoreSetting.HasDomainRecordKey);
 
-            if (setting != null && setting.Value == "False")
-            {
-                try
-                {
-                    var migrationManager = new WebMigrationManager();
-                    var response = await migrationManager.PostDomainRecord(record);
+            //if (setting != null && setting.Value == "False")
+            //{
+            //    try
+            //    {
+            //        var migrationManager = new WebMigrationManager();
+            //        var response = await migrationManager.PostDomainRecord(record);
 
-                    if (response.StatusCode != HttpStatusCode.OK)
-                    {
-                        var ex = new Exception(response.ReasonPhrase);
-                        MultiLogHelper.Error<SettingsApiController>("Failed to record domain analytic", ex);
-                    }
+            //        if (response.StatusCode != HttpStatusCode.OK)
+            //        {
+            //            var ex = new Exception(response.ReasonPhrase);
+            //            MultiLogHelper.Error<SettingsApiController>("Failed to record domain analytic", ex);
+            //        }
 
-                    setting.Value = true.ToString();
-                    _storeSettingService.Save(setting);
+            //        setting.Value = true.ToString();
+            //        _storeSettingService.Save(setting);
 
-                    return response;
-                }
-                catch (Exception ex)
-                {
-                    // this is for analytics only and we don't want to throw
-                    MultiLogHelper.Error<SettingsApiController>("Failed to record analytics (Domain)", ex);
-                }
+            //        return response;
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //        // this is for analytics only and we don't want to throw
+            //        MultiLogHelper.Error<SettingsApiController>("Failed to record analytics (Domain)", ex);
+            //    }
 
-            }
+            //}
 
             return Request.CreateResponse(HttpStatusCode.OK);
         }

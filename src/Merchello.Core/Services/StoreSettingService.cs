@@ -13,6 +13,7 @@
     using Merchello.Core.Models;
     using Merchello.Core.Models.Interfaces;
     using Merchello.Core.Models.TypeFields;
+    using Merchello.Core.MultiStore;
     using Merchello.Core.Persistence;
     using Merchello.Core.Persistence.UnitOfWork;
 
@@ -372,6 +373,14 @@
             using (var repository = RepositoryFactory.CreateStoreSettingRepository(UowProvider.GetUnitOfWork()))
             {
                 return repository.GetAll(_domainService.CurrentDomain()?.RootContentId ?? 0);
+            }
+        }
+
+        public IEnumerable<IStoreSetting> GetAll(int id)
+        {
+            using (var repository = RepositoryFactory.CreateStoreSettingRepository(UowProvider.GetUnitOfWork()))
+            {
+                return repository.GetAll(id);
             }
         }
 

@@ -361,6 +361,7 @@
     <Compile Include="Configuration\Sections\IMerchelloCountriesSection.cs" />
     <Compile Include="Configuration\Sections\MerchelloCountriesSection.cs" />
     <Compile Include="Configuration\Sections\MerchelloSection.cs" />
+    <Compile Include="Constants.Cache.cs" />
     <Compile Include="Constants.CountryCodes.cs">
       <DependentUpon>Constants.cs</DependentUpon>
     </Compile>
@@ -447,7 +448,8 @@
     <Compile Include="Extensions.IDataModifierData.cs">
       <DependentUpon>Extensions.cs</DependentUpon>
     </Compile>
-    <Compile Include="Extensions.IDomainService.cs" />
+    <Compile Include="MultiStore\Extensions.IContentService.cs" />
+    <Compile Include="MultiStore\Extensions.IDomainService.cs" />
     <Compile Include="Extensions.IEntityCollection.cs">
       <DependentUpon>Extensions.cs</DependentUpon>
     </Compile>
@@ -523,6 +525,7 @@
     <Compile Include="Models\Interfaces\IDeepCloneable.cs" />
     <Compile Include="Models\Interfaces\IShallowClone.cs" />
     <Compile Include="Models\InvoiceAdjustmentResult.cs" />
+    <Compile Include="Models\MultiStore\StoreDisplay.cs" />
     <Compile Include="Models\Querying\QueryBuilderParameter.cs" />
     <Compile Include="Models\Querying\FieldMatchCondition.cs" />
     <Compile Include="Models\Rdbms\CountDto.cs" />

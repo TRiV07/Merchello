@@ -17,7 +17,7 @@
         /// Gets or sets the key.
         /// </summary>
         [Column("pk")]
-        [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_merchStoreSetting", OnColumns = "pk, domainRootStructureID")]
+        [PrimaryKeyColumn(AutoIncrement = false, Clustered = true, Name = "PK_merchStoreSetting", OnColumns = "pk, domainRootStructureID")]
         public Guid Key { get; set; }
 
         /// <summary>

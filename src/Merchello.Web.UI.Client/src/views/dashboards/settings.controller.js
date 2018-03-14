@@ -7,9 +7,9 @@
  * The controller for the settings management page
  */
 angular.module('merchello').controller('Merchello.Backoffice.SettingsController',
-    ['$scope', '$q', '$log', 'serverValidationManager', 'notificationsService', 'settingsResource', 'detachedContentResource', 'settingDisplayBuilder',
+    ['$scope', '$routeParams', '$q', '$log', 'serverValidationManager', 'notificationsService', 'settingsResource', 'detachedContentResource', 'settingDisplayBuilder',
         'currencyDisplayBuilder', 'countryDisplayBuilder',
-        function($scope, $q, $log, serverValidationManager, notificationsService, settingsResource, detachedContentResource, settingDisplayBuilder, currencyDisplayBuilder) {
+        function ($scope, $routeParams, $q, $log, serverValidationManager, notificationsService, settingsResource, detachedContentResource, settingDisplayBuilder, currencyDisplayBuilder) {
 
             $scope.loaded = true;
             $scope.preValuesLoaded = true;
@@ -31,7 +31,7 @@ angular.module('merchello').controller('Merchello.Backoffice.SettingsController'
                 var deferred = $q.defer();
                 $q.all([
                     detachedContentResource.getAllLanguages(),
-                    settingsResource.getAllCombined()
+                    settingsResource.getAllCombined($routeParams.id)
                 ]).then(function (data) {
                     deferred.resolve(data);
                 });
@@ -47,7 +47,7 @@ angular.module('merchello').controller('Merchello.Backoffice.SettingsController'
                     $scope.selectedCurrency = _.find($scope.currencies, function (currency) {
                         return currency.currencyCode === $scope.settingsDisplay.currencyCode;
                     });
-                    $scope.selectedLanguage = _.find($scope.languages, function(lang) {
+                    $scope.selectedLanguage = _.find($scope.languages, function (lang) {
                         return lang.isoCode === $scope.settingsDisplay.defaultExtendedContentCulture;
                     });
                     $scope.loaded = true;
@@ -59,28 +59,28 @@ angular.module('merchello').controller('Merchello.Backoffice.SettingsController'
                                 migrationKey: $scope.settingsDisplay.migrationKey,
                                 domainName: document.location.hostname
                             });
-                        } catch(err) {
+                        } catch (err) {
                             // catch the error so it does not display
                         }
                     }
 
                 }, function (reason) {
-                    otificationsService.error('Failed to load settings ' + reason);
+                    notificationsService.error('Failed to load settings ' + reason);
                 });
             }
-            function save () {
+            function save() {
                 $scope.preValuesLoaded = false;
 
                 notificationsService.info("Saving...", "");
                 $scope.savingStoreSettings = true;
-                $scope.$watch($scope.storeSettingsForm, function(value) {
-                    var promise = settingsResource.save($scope.settingsDisplay);
-                    promise.then(function(settingDisplay) {
+                $scope.$watch($scope.storeSettingsForm, function (value) {
+                    var promise = settingsResource.save($routeParams.id, $scope.settingsDisplay);
+                    promise.then(function (settingDisplay) {
                         notificationsService.success("Store Settings Saved", "");
                         $scope.savingStoreSettings = false;
                         $scope.settingDisplay = settingDisplayBuilder.transform(settingDisplay);
                         init();
-                    }, function(reason) {
+                    }, function (reason) {
                         notificationsService.error("Store Settings Save Failed", reason.message);
                     });
                 });
@@ -95,4 +95,4 @@ angular.module('merchello').controller('Merchello.Backoffice.SettingsController'
             }
 
             init();
-}]);
+        }]);

@@ -2266,11 +2266,11 @@ angular.module('merchello.resources').factory('salesOverTimeResource',
              *
              * @returns {object} an angularjs promise object
              */
-            save: function (storeSettings) {
+            save: function (id, storeSettings) {
 
-                _settingsCache.remove("AllSettings");
+                _settingsCache.remove("AllSettings_" + id);
 
-                var url = Umbraco.Sys.ServerVariables['merchelloUrls']['merchelloSettingsApiBaseUrl'] + 'PutSettings';
+                var url = Umbraco.Sys.ServerVariables['merchelloUrls']['merchelloSettingsApiBaseUrl'] + 'PutSettings/' + id;
                 return umbRequestHelper.resourcePromise(
                     $http.post(
                         url,
@@ -2290,14 +2290,17 @@ angular.module('merchello.resources').factory('salesOverTimeResource',
              *
              * @returns {object} an angularjs promise object
              */
-            getAllSettings: function () {
-                return getCachedOrApi("AllSettings", "GetAllSettings", "settings");
+            getAllSettings: function (id) {
+                return id
+                    ? getCachedOrApi("AllSettings_" + id, "GetAllSettings/" + id, "settings")
+                    : getCachedOrApi("AllSettings", "GetAllSettings", "settings");
+
             },
 
-            getAllCombined: function() {
+            getAllCombined: function(id) {
                 var deferred = $q.defer();
                 var promises = [
-                    this.getAllSettings(),
+                    this.getAllSettings(id),
                     this.getAllCurrencies(),
                     this.getAllCountries()
                 ];
@@ -2316,12 +2319,12 @@ angular.module('merchello.resources').factory('salesOverTimeResource',
                 return deferred.promise;
             },
 
-            getCurrentSettings: function() {
+            getCurrentSettings: function(id) {
                 var deferred = $q.defer();
 
                 var promiseArray = [];
 
-                promiseArray.push(this.getAllSettings());
+                promiseArray.push(this.getAllSettings(id));
 
                 var promise = $q.all(promiseArray);
                 promise.then(function (data) {
@@ -2348,12 +2351,12 @@ angular.module('merchello.resources').factory('salesOverTimeResource',
                 return getCachedOrApi("AllCurrency", "GetAllCurrencies", "settings");
             },
 
-            getCurrencySymbol: function () {
+            getCurrencySymbol: function (id) {
                 var deferred = $q.defer();
 
                 var promiseArray = [];
 
-                promiseArray.push(this.getAllSettings());
+                promiseArray.push(this.getAllSettings(id));
                 promiseArray.push(this.getAllCurrencies());
 
                 var promise = $q.all(promiseArray);
