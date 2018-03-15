@@ -14,8 +14,8 @@
 
     // watches
     grunt.registerTask('watch-css', ['sass:dev', 'copy:assets', 'copy:vs']);
-    grunt.registerTask('watch-js', [/*'jshint:dev', */'concat', 'copy:app', 'copy:vs', 'karma:unit']);
-    grunt.registerTask('watch-test', [/*'jshint:dev', */'karma:unit']);
+    grunt.registerTask('watch-js', [/*'jshint:dev', */'concat', 'copy:app', 'copy:vs', /*'karma:unit'*/]);
+    grunt.registerTask('watch-test', [/*'jshint:dev', 'karma:unit'*/]);
     grunt.registerTask('watch-html', ['copy:views', 'copy:vs']);
 
     // Print a timestamp (useful for when watching)

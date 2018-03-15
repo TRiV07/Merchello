@@ -17,6 +17,7 @@
     using umbraco.BusinessLogic.Actions;
 
     using Umbraco.Core;
+    using Umbraco.Core.Models;
     using Umbraco.Core.Services;
     using Umbraco.Web;
     using Umbraco.Web.Models.Trees;
@@ -118,17 +119,23 @@
 
             if (id == "-1")
             {
-                var storesTree = _contentService.GetAllStores(_domainService.GetAllFromCache())
-                .Select(x =>
-                    CreateTreeNode($"store_{x.Id}",
-                    null,
-                    queryStrings,
-                    $"{x.Name} ({x.Domain})",
-                    "icon-shopping-basket-alt",
-                    true,
-                    $"merchello/merchello/settings/{x.Id}"));
+                var storesTree = _contentService.GetAllStores(_domainService.GetAllFromCache());
 
-                collection.AddRange(storesTree);
+                var startNodeIds = Security.CurrentUser.CalculateContentStartNodeIds(Services.EntityService);
+                var hasAccessToRoot = startNodeIds.Contains(Constants.System.Root);
+
+                var treeNodes = storesTree
+                    .Where(x => hasAccessToRoot || startNodeIds.Contains(x.Id))
+                    .Select(x =>
+                        CreateTreeNode($"store_{x.Id}",
+                        null,
+                        queryStrings,
+                        $"{x.Name} ({x.Domain})",
+                        "icon-shopping-basket-alt",
+                        true,
+                        $"merchello/merchello/settings/manage/store/{x.Id}"));
+
+                collection.AddRange(treeNodes);
             }
             else
             {
@@ -377,7 +384,7 @@
                             collection.Name,
                             "icon-list",
                             info.ManagedCollections.Any(x => x.ParentKey == collection.Key),
-                            string.Format("/merchello/merchello/{0}/{1}?storeId={2}", info.ViewName, collection.Key, splitId.StoreId))).ToArray() :
+                            string.Format("/merchello/merchello/{0}/{1}/store/{2}", info.ViewName, collection.Key, splitId.StoreId))).ToArray() :
 
                 new TreeNode[] { };
 
@@ -501,7 +508,7 @@
                         provider.LocalizedNameKey.IsNullOrWhiteSpace() ? provider.Name : this._textService.Localize(provider.LocalizedNameKey, this._culture),
                         element.Icon,
                         false,
-                        string.Format("/merchello/merchello/{0}/{1}?storeId={2}", info.ViewName, collection.Key, splitId.StoreId)));
+                        string.Format("/merchello/merchello/{0}/{1}/store/{2}", info.ViewName, collection.Key, splitId.StoreId)));
             }
 
             return treeNodes;
@@ -532,7 +539,7 @@
 
             if (_attributetrees.Contains(tree.Id))
             {
-                hasSubs = GetAttributeDefinedTrees(queryStrings).Any();
+                hasSubs = GetAttributeDefinedTrees(queryStrings, splitId).Any();
             }
 
             return CreateTreeNode(
@@ -542,9 +549,7 @@
                 this.LocalizeTitle(tree),
                 tree.Icon,
                 hasSubs,
-                tree.RoutePath.Contains("?")
-                    ? $"{tree.RoutePath}&storeId={splitId.StoreId}"
-                    : $"{tree.RoutePath}?storeId={splitId.StoreId}");
+                $"{tree.RoutePath}/store/{splitId.StoreId}");
         }
 
         /// <summary>
@@ -574,7 +579,7 @@
         /// <returns>
         /// The <see cref="IEnumerable{TreeNode}"/>.
         /// </returns>
-        private IEnumerable<TreeNode> GetAttributeDefinedTrees(FormDataCollection queryStrings)
+        private IEnumerable<TreeNode> GetAttributeDefinedTrees(FormDataCollection queryStrings, SplitRoutePath splitId)
         {
             var types = ReportApiControllerResolver.Current.ResolvedTypesWithAttribute.ToArray();
             if (!types.Any()) return new TreeNode[] { };
@@ -592,7 +597,7 @@
                         att.Title,
                         att.Icon,
                         false,
-                        string.Format("{0}{1}", "/merchello/merchello/reports.viewreport/", att.RouteId)));
+                        string.Format("{0}{1}/store/{2}", "/merchello/merchello/reports.viewreport/", att.RouteId, splitId.StoreId)));
         }
 
         /// <summary>
@@ -663,7 +668,7 @@
 
             if (_attributetrees.Contains(splitId.CollectionId))
             {
-                return GetAttributeDefinedTrees(queryStrings);
+                return GetAttributeDefinedTrees(queryStrings, splitId);
             }
 
             return currentTree.SubTree.GetTrees()
@@ -698,7 +703,7 @@
 
             if (_attributetrees.Contains(splitId.CollectionId))
             {
-                return GetAttributeDefinedTrees(queryStrings);
+                return GetAttributeDefinedTrees(queryStrings, splitId);
             }
 
             return backoffice.GetTrees()

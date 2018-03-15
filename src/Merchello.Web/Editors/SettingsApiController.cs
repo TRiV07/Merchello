@@ -19,13 +19,16 @@
     using Merchello.Core.Persistence.Migrations.Analytics;
     using Merchello.Web.Reporting;
     using Merchello.Web.Trees;
-
+    using Merchello.Web.WebApi.Filters;
     using Models.ContentEditing;
 
     using Umbraco.Core.Logging;
+    using Umbraco.Core.Models;
     using Umbraco.Web;
     using Umbraco.Web.Mvc;
     using WebApi;
+
+    using UConstants = Umbraco.Core.Constants;
 
     /// <summary>
     /// The settings api controller.
@@ -171,11 +174,11 @@
         /// Returns settings for domain id
         /// GET /umbraco/Merchello/SettingsApi/GetAllSettings
         /// </summary>
-        
+        [EnsureUserPermissionForStore("id", true)]
         public SettingDisplay GetAllSettings(int? id)
-		{									
-			// TODO - why is this done this way?												   
-			var settings = id.HasValue
+		{
+            // TODO - why is this done this way?												   
+            var settings = id.HasValue
                 ? _storeSettingService.GetAll(id.Value)
                 : _storeSettingService.GetAll();
 			var settingDisplay = new SettingDisplay();
@@ -244,9 +247,11 @@
         ///
         /// PUT /umbraco/Merchello/SettingsApi/PutSettings
         /// </summary>
+        /// <param name="id">Store id</param>
         /// <param name="setting">SettingDisplay object serialized from WebApi</param>
         [AcceptVerbs("POST", "PUT")]
-		public HttpResponseMessage PutSettings(int id, SettingDisplay setting)
+        [EnsureUserPermissionForStore("id")]
+        public HttpResponseMessage PutSettings(int id, SettingDisplay setting)
 		{
 			var response = Request.CreateResponse(HttpStatusCode.OK);
 

@@ -1,6 +1,6 @@
 angular.module('merchello.models').factory('merchelloTabsFactory',
-    ['MerchelloTabCollection', 'merchelloListViewHelper',
-        function(MerchelloTabCollection, merchelloListViewHelper) {
+    ['MerchelloTabCollection', 'merchelloListViewHelper', '$routeParams',
+        function (MerchelloTabCollection, merchelloListViewHelper, $routeParams) {
 
             var Constructor = MerchelloTabCollection;
 
@@ -14,27 +14,27 @@ angular.module('merchello.models').factory('merchelloTabsFactory',
                 var settings = getCacheSettings(entityType);
                 var tabs = new Constructor();
                 if (settings.stickListingTab && settings.collectionKey !== '') {
-                    tabs.addTab('productlist', 'merchelloTabs_productListing', '#/merchello/merchello/productlist/' + settings.collectionKey);
+                    tabs.addTab('productlist', 'merchelloTabs_productListing', '#/merchello/merchello/productlist/' + settings.collectionKey + '/store/' + $routeParams.storeId);
                 } else {
-                    tabs.addTab('productlist', 'merchelloTabs_productListing', '#/merchello/merchello/productlist/manage');
+                    tabs.addTab('productlist', 'merchelloTabs_productListing', '#/merchello/merchello/productlist/manage' + '/store/' + $routeParams.storeId);
                 }
-                tabs.addTab('sharedoptions', 'merchelloTabs_sharedProductOptions', '#/merchello/merchello/sharedoptions/manage');
-                tabs.addTab('filtergroups', 'merchelloTabs_filterGroups', '#/merchello/merchello/productfiltergroups/manage');
-                tabs.addTab('contentTypeList', 'merchelloTabs_contentTypes', '#/merchello/merchello/productcontenttypelist/manage');
+                tabs.addTab('sharedoptions', 'merchelloTabs_sharedProductOptions', '#/merchello/merchello/sharedoptions/manage' + '/store/' + $routeParams.storeId);
+                tabs.addTab('filtergroups', 'merchelloTabs_filterGroups', '#/merchello/merchello/productfiltergroups/manage' + '/store/' + $routeParams.storeId);
+                tabs.addTab('contentTypeList', 'merchelloTabs_contentTypes', '#/merchello/merchello/productcontenttypelist/manage' + '/store/' + $routeParams.storeId);
                 return tabs;
             }
 
-           // creates tabs for the product editor page
+            // creates tabs for the product editor page
             function createNewProductEditorTabs() {
                 var entityType = 'Product';
                 var settings = getCacheSettings(entityType);
                 var tabs = new Constructor();
                 if (settings.stickListingTab && settings.collectionKey !== '') {
-                    tabs.addTab('productlist', 'merchelloTabs_productListing', '#/merchello/merchello/productlist/' + settings.collectionKey);
+                    tabs.addTab('productlist', 'merchelloTabs_productListing', '#/merchello/merchello/productlist/' + settings.collectionKey + '/store/' + $routeParams.storeId);
                 } else {
-                    tabs.addTab('productlist', 'merchelloTabs_productListing', '#/merchello/merchello/productlist/manage');
+                    tabs.addTab('productlist', 'merchelloTabs_productListing', '#/merchello/merchello/productlist/manage' + '/store/' + $routeParams.storeId);
                 }
-                tabs.addTab('createproduct', 'merchelloTabs_product', '#/merchello/merchello/productedit/');
+                tabs.addTab('createproduct', 'merchelloTabs_product', '#/merchello/merchello/productedit/new' + '/store/' + $routeParams.storeId);
                 return tabs;
             }
 
@@ -42,19 +42,18 @@ angular.module('merchello.models').factory('merchelloTabsFactory',
             function createProductEditorTabs(productKey, hasVariants) {
                 var entityType = 'Product';
                 var settings = getCacheSettings(entityType);
-                if (hasVariants !== undefined && hasVariants === true)
-                {
+                if (hasVariants !== undefined && hasVariants === true) {
                     return createProductEditorWithOptionsTabs(productKey);
                 }
                 var tabs = new Constructor();
                 if (settings.stickListingTab && settings.collectionKey !== '') {
-                    tabs.addTab('productlist', 'merchelloTabs_productListing', '#/merchello/merchello/productlist/' + settings.collectionKey);
+                    tabs.addTab('productlist', 'merchelloTabs_productListing', '#/merchello/merchello/productlist/' + settings.collectionKey + '/store/' + $routeParams.storeId);
                 } else {
-                    tabs.addTab('productlist', 'merchelloTabs_productListing', '#/merchello/merchello/productlist/manage');
+                    tabs.addTab('productlist', 'merchelloTabs_productListing', '#/merchello/merchello/productlist/manage' + '/store/' + $routeParams.storeId);
                 }
-                tabs.addTab('productedit', 'merchelloTabs_product', '#/merchello/merchello/productedit/' + productKey);
-                tabs.addTab('productcontent', 'merchelloTabs_detachedContent', '#/merchello/merchello/productdetachedcontent/' + productKey);
-                tabs.addTab('optionslist', 'merchelloTabs_productOptions', '#/merchello/merchello/productoptionsmanager/' + productKey);
+                tabs.addTab('productedit', 'merchelloTabs_product', '#/merchello/merchello/productedit/' + productKey + '/store/' + $routeParams.storeId);
+                tabs.addTab('productcontent', 'merchelloTabs_detachedContent', '#/merchello/merchello/productdetachedcontent/' + productKey + '/store/' + $routeParams.storeId);
+                tabs.addTab('optionslist', 'merchelloTabs_productOptions', '#/merchello/merchello/productoptionsmanager/' + productKey + '/store/' + $routeParams.storeId);
                 return tabs;
             }
 
@@ -70,31 +69,31 @@ angular.module('merchello.models').factory('merchelloTabsFactory',
                 var settings = getCacheSettings(entityType);
                 var tabs = new Constructor();
                 if (settings.stickListingTab && settings.collectionKey !== '') {
-                    tabs.addTab('productlist', 'merchelloTabs_productListing', '#/merchello/merchello/productlist/' + settings.collectionKey);
+                    tabs.addTab('productlist', 'merchelloTabs_productListing', '#/merchello/merchello/productlist/' + settings.collectionKey + '/store/' + $routeParams.storeId);
                 } else {
-                    tabs.addTab('productlist', 'merchelloTabs_productListing', '#/merchello/merchello/productlist/manage');
+                    tabs.addTab('productlist', 'merchelloTabs_productListing', '#/merchello/merchello/productlist/manage' + '/store/' + $routeParams.storeId);
                 }
                 tabs.addTab('productedit', 'merchelloTabs_product', '#/merchello/merchello/productedit/' + productKey);
-                tabs.addTab('productcontent', 'merchelloTabs_detachedContent', '#/merchello/merchello/productdetachedcontent/' + productKey);
-                tabs.addTab('variantlist', 'merchelloTabs_productVariants', '#/merchello/merchello/producteditwithoptions/' + productKey);
-                tabs.addTab('optionslist', 'merchelloTabs_productOptions', '#/merchello/merchello/productoptionsmanager/' + productKey);
+                tabs.addTab('productcontent', 'merchelloTabs_detachedContent', '#/merchello/merchello/productdetachedcontent/' + productKey + '/store/' + $routeParams.storeId);
+                tabs.addTab('variantlist', 'merchelloTabs_productVariants', '#/merchello/merchello/producteditwithoptions/' + productKey + '/store/' + $routeParams.storeId);
+                tabs.addTab('optionslist', 'merchelloTabs_productOptions', '#/merchello/merchello/productoptionsmanager/' + productKey + '/store/' + $routeParams.storeId);
                 return tabs;
             }
 
             // creates tabs for the product variant editor
-           function createProductVariantEditorTabs(productKey, productVariantKey) {
-               var entityType = 'Product';
-               var settings = getCacheSettings(entityType);
+            function createProductVariantEditorTabs(productKey, productVariantKey) {
+                var entityType = 'Product';
+                var settings = getCacheSettings(entityType);
                 var tabs = new Constructor();
-               if (settings.stickListingTab && settings.collectionKey !== '') {
-                   tabs.addTab('productlist', 'merchelloTabs_productListing', '#/merchello/merchello/productlist/' + settings.collectionKey);
-               } else {
-                   tabs.addTab('productlist', 'merchelloTabs_productListing', '#/merchello/merchello/productlist/manage');
-               }
-                tabs.addTab('productedit', 'merchelloTabs_product', '#/merchello/merchello/productedit/' + productKey);
-                tabs.addTab('variantlist', 'merchelloTabs_productVariants', '#/merchello/merchello/producteditwithoptions/' + productKey);
-                tabs.addTab('varianteditor', 'merchelloTabs_productVariantEditor', '#/merchello/merchello/productedit/' + productKey + '?variantid=' + productVariantKey);
-               tabs.addTab('productcontent', 'merchelloTabs_detachedContent', '#/merchello/merchello/productdetachedcontent/' + productKey + '?variantid=' + productVariantKey);
+                if (settings.stickListingTab && settings.collectionKey !== '') {
+                    tabs.addTab('productlist', 'merchelloTabs_productListing', '#/merchello/merchello/productlist/' + settings.collectionKey + '/store/' + $routeParams.storeId);
+                } else {
+                    tabs.addTab('productlist', 'merchelloTabs_productListing', '#/merchello/merchello/productlist/manage' + '/store/' + $routeParams.storeId);
+                }
+                tabs.addTab('productedit', 'merchelloTabs_product', '#/merchello/merchello/productedit/' + productKey + '/store/' + $routeParams.storeId);
+                tabs.addTab('variantlist', 'merchelloTabs_productVariants', '#/merchello/merchello/producteditwithoptions/' + productKey + '/store/' + $routeParams.storeId);
+                tabs.addTab('varianteditor', 'merchelloTabs_productVariantEditor', '#/merchello/merchello/productedit/' + productKey + '/store/' + $routeParams.storeId + '?variantid=' + productVariantKey);
+                tabs.addTab('productcontent', 'merchelloTabs_detachedContent', '#/merchello/merchello/productdetachedcontent/' + productKey + '/store/' + $routeParams.storeId + '?variantid=' + productVariantKey);
                 return tabs;
             }
 
@@ -105,9 +104,9 @@ angular.module('merchello.models').factory('merchelloTabsFactory',
                 var settings = getCacheSettings(entityType);
                 var tabs = new Constructor();
                 if (settings.stickListingTab && settings.collectionKey !== '') {
-                    tabs.addTab('saleslist', 'merchelloTabs_salesListing', '#/merchello/merchello/saleslist/' + settings.collectionKey);
+                    tabs.addTab('saleslist', 'merchelloTabs_salesListing', '#/merchello/merchello/saleslist/' + settings.collectionKey + '/store/' + $routeParams.storeId);
                 } else {
-                    tabs.addTab('saleslist', 'merchelloTabs_salesListing', '#/merchello/merchello/saleslist/manage');
+                    tabs.addTab('saleslist', 'merchelloTabs_salesListing', '#/merchello/merchello/saleslist/manage' + '/store/' + $routeParams.storeId);
                 }
 
                 return tabs;
@@ -119,13 +118,13 @@ angular.module('merchello.models').factory('merchelloTabsFactory',
                 var settings = getCacheSettings(entityType);
                 var tabs = new Constructor();
                 if (settings.stickListingTab && settings.collectionKey !== '') {
-                    tabs.addTab('saleslist', 'merchelloTabs_salesListing', '#/merchello/merchello/saleslist/' + settings.collectionKey);
+                    tabs.addTab('saleslist', 'merchelloTabs_salesListing', '#/merchello/merchello/saleslist/' + settings.collectionKey + '/store/' + $routeParams.storeId);
                 } else {
-                    tabs.addTab('saleslist', 'merchelloTabs_salesListing', '#/merchello/merchello/saleslist/manage');
+                    tabs.addTab('saleslist', 'merchelloTabs_salesListing', '#/merchello/merchello/saleslist/manage' + '/store/' + $routeParams.storeId);
                 }
-                tabs.addTab('overview', 'merchelloTabs_sales', '#/merchello/merchello/saleoverview/' + invoiceKey);
-                tabs.addTab('payments', 'merchelloTabs_payments', '#/merchello/merchello/invoicepayments/' + invoiceKey);
-                tabs.addTab('shipments', 'merchelloTabs_shipments', '#/merchello/merchello/ordershipments/' + invoiceKey);
+                tabs.addTab('overview', 'merchelloTabs_sales', '#/merchello/merchello/saleoverview/' + invoiceKey + '/store/' + $routeParams.storeId);
+                tabs.addTab('payments', 'merchelloTabs_payments', '#/merchello/merchello/invoicepayments/' + invoiceKey + '/store/' + $routeParams.storeId);
+                tabs.addTab('shipments', 'merchelloTabs_shipments', '#/merchello/merchello/ordershipments/' + invoiceKey + '/store/' + $routeParams.storeId);
                 return tabs;
             }
 
@@ -135,9 +134,9 @@ angular.module('merchello.models').factory('merchelloTabsFactory',
                 var settings = getCacheSettings(entityType);
                 var tabs = new Constructor();
                 if (settings.stickListingTab && settings.collectionKey !== '') {
-                    tabs.addTab('customerlist', 'merchelloTabs_customerListing', '#/merchello/merchello/customerlist/' + settings.collectionKey);
+                    tabs.addTab('customerlist', 'merchelloTabs_customerListing', '#/merchello/merchello/customerlist/' + settings.collectionKey + '/store/' + $routeParams.storeId);
                 } else {
-                    tabs.addTab('customerlist', 'merchelloTabs_customerListing', '#/merchello/merchello/customerlist/manage');
+                    tabs.addTab('customerlist', 'merchelloTabs_customerListing', '#/merchello/merchello/customerlist/manage' + '/store/' + $routeParams.storeId);
                 }
 
                 return tabs;
@@ -149,13 +148,13 @@ angular.module('merchello.models').factory('merchelloTabsFactory',
                 var settings = getCacheSettings(entityType);
                 var tabs = new Constructor();
                 if (settings.stickListingTab && settings.collectionKey !== '') {
-                    tabs.addTab('customerlist', 'merchelloTabs_customerListing', '#/merchello/merchello/customerlist/' + settings.collectionKey);
+                    tabs.addTab('customerlist', 'merchelloTabs_customerListing', '#/merchello/merchello/customerlist/' + settings.collectionKey + '/store/' + $routeParams.storeId);
                 } else {
-                    tabs.addTab('customerlist', 'merchelloTabs_customerListing', '#/merchello/merchello/customerlist/manage');
+                    tabs.addTab('customerlist', 'merchelloTabs_customerListing', '#/merchello/merchello/customerlist/manage' + '/store/' + $routeParams.storeId);
                 }
-                tabs.addTab('overview', 'merchelloTabs_customer', '#/merchello/merchello/customeroverview/' + customerKey);
-                if(hasAddresses) {
-                    tabs.addTab('addresses', 'merchelloTabs_customerAddresses', '#/merchello/merchello/customeraddresses/' + customerKey);
+                tabs.addTab('overview', 'merchelloTabs_customer', '#/merchello/merchello/customeroverview/' + customerKey + '/store/' + $routeParams.storeId);
+                if (hasAddresses) {
+                    tabs.addTab('addresses', 'merchelloTabs_customerAddresses', '#/merchello/merchello/customeraddresses/' + customerKey + '/store/' + $routeParams.storeId);
                 }
                 return tabs;
             }
@@ -163,11 +162,11 @@ angular.module('merchello.models').factory('merchelloTabsFactory',
             // creates the tabs for the gateway provider section
             function createGatewayProviderTabs() {
                 var tabs = new Constructor();
-                tabs.addTab('providers', 'merchelloTabs_gatewayProviders', '#/merchello/merchello/gatewayproviderlist/manage');
-                tabs.addTab('notification', 'merchelloTabs_notification', '#/merchello/merchello/notificationproviders/manage');
-                tabs.addTab('payment', 'merchelloTabs_payment', '#/merchello/merchello/paymentproviders/manage');
-                tabs.addTab('shipping', 'merchelloTabs_shipping', '#/merchello/merchello/shippingproviders/manage');
-                tabs.addTab('taxation', 'merchelloTabs_taxation', '#/merchello/merchello/taxationproviders/manage');
+                tabs.addTab('providers', 'merchelloTabs_gatewayProviders', '#/merchello/merchello/gatewayproviderlist/manage' + '/store/' + $routeParams.storeId);
+                tabs.addTab('notification', 'merchelloTabs_notification', '#/merchello/merchello/notificationproviders/manage' + '/store/' + $routeParams.storeId);
+                tabs.addTab('payment', 'merchelloTabs_payment', '#/merchello/merchello/paymentproviders/manage' + '/store/' + $routeParams.storeId);
+                tabs.addTab('shipping', 'merchelloTabs_shipping', '#/merchello/merchello/shippingproviders/manage' + '/store/' + $routeParams.storeId);
+                tabs.addTab('taxation', 'merchelloTabs_taxation', '#/merchello/merchello/taxationproviders/manage' + '/store/' + $routeParams.storeId);
                 return tabs;
             }
 
@@ -177,9 +176,9 @@ angular.module('merchello.models').factory('merchelloTabsFactory',
                 var settings = getCacheSettings(entityType);
                 var tabs = new Constructor();
                 if (settings.stickListingTab && settings.collectionKey !== '') {
-                    tabs.addTab('offers', 'merchelloTabs_offerListing', '#/merchello/merchello/offerslist/' + settings.collectionKey);
+                    tabs.addTab('offers', 'merchelloTabs_offerListing', '#/merchello/merchello/offerslist/' + settings.collectionKey + '/store/' + $routeParams.storeId);
                 } else {
-                    tabs.addTab('offers', 'merchelloTabs_offerListing', '#/merchello/merchello/offerslist/manage');
+                    tabs.addTab('offers', 'merchelloTabs_offerListing', '#/merchello/merchello/offerslist/manage' + '/store/' + $routeParams.storeId);
                 }
 
                 return tabs;
@@ -187,10 +186,10 @@ angular.module('merchello.models').factory('merchelloTabsFactory',
 
             function createReportsTabs() {
                 var tabs = new Constructor();
-                tabs.addTab('reportsdashboard', 'merchelloTabs_reports', '#/merchello/merchello/reportsdashboard/manage');
-                tabs.addTab('salesOverTime', 'merchelloTabs_salesOverTime', '#/merchello/merchello/salesOverTime/manage');
-                tabs.addTab("salesByItem", "merchelloTabs_salesByItem", '#/merchello/merchello/salesByItem/manage');
-                tabs.addTab("abandonedBasket", "merchelloTabs_abandonedBasket", '#/merchello/merchello/abandonedBasket/manage');
+                tabs.addTab('reportsdashboard', 'merchelloTabs_reports', '#/merchello/merchello/reportsdashboard/manage' + '/store/' + $routeParams.storeId);
+                tabs.addTab('salesOverTime', 'merchelloTabs_salesOverTime', '#/merchello/merchello/salesOverTime/manage' + '/store/' + $routeParams.storeId);
+                tabs.addTab("salesByItem", "merchelloTabs_salesByItem", '#/merchello/merchello/salesByItem/manage' + '/store/' + $routeParams.storeId);
+                tabs.addTab("abandonedBasket", "merchelloTabs_abandonedBasket", '#/merchello/merchello/abandonedBasket/manage' + '/store/' + $routeParams.storeId);
                 // throw event here:
 
                 return tabs;
@@ -217,4 +216,4 @@ angular.module('merchello.models').factory('merchelloTabsFactory',
                 createMarketingTabs: createMarketingTabs
             };
 
-}]);
+        }]);

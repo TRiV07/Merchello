@@ -31,7 +31,7 @@ angular.module('merchello').controller('Merchello.Backoffice.SettingsController'
                 var deferred = $q.defer();
                 $q.all([
                     detachedContentResource.getAllLanguages(),
-                    settingsResource.getAllCombined($routeParams.id)
+                    settingsResource.getAllCombined($routeParams.storeId)
                 ]).then(function (data) {
                     deferred.resolve(data);
                 });
@@ -74,7 +74,7 @@ angular.module('merchello').controller('Merchello.Backoffice.SettingsController'
                 notificationsService.info("Saving...", "");
                 $scope.savingStoreSettings = true;
                 $scope.$watch($scope.storeSettingsForm, function (value) {
-                    var promise = settingsResource.save($routeParams.id, $scope.settingsDisplay);
+                    var promise = settingsResource.save($routeParams.storeId, $scope.settingsDisplay);
                     promise.then(function (settingDisplay) {
                         notificationsService.success("Store Settings Saved", "");
                         $scope.savingStoreSettings = false;
