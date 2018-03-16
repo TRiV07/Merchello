@@ -76,7 +76,7 @@
         /// <returns>
         /// The <see cref="IProductVariant"/>.
         /// </returns>
-        IProductVariant GetBySku(string sku); 
+        IProductVariant GetBySku(string sku, int domainRootStructureID); 
 
         /// <summary>
         /// Gets list of <see cref="IProductVariant"/> objects given a list of Unique keys
@@ -108,6 +108,6 @@
         /// <returns>
         /// The <see cref="bool"/> indicating whether or not the SKU exists.
         /// </returns>
-        bool SkuExists(string sku);
+        bool SkuExists(string sku, int domainRootStructureID);
     }
 }

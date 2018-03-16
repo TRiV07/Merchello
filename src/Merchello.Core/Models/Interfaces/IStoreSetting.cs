@@ -5,7 +5,7 @@
     /// <summary>
     /// Represents a Merchello Store Setting
     /// </summary>
-    public interface IStoreSetting : IEntity
+    public interface IStoreSetting : IHasDomainRoot, IEntity
     {
         /// <summary>
         /// Gets or sets the name of the store setting
@@ -24,10 +24,5 @@
         /// Gets or sets the type of the store setting
         /// </summary>
         string TypeName { get; set; }
-
-        /// <summary>
-        /// Gets or sets the DomainRootStructureID of the store setting
-        /// </summary>
-        int DomainRootStructureID { get; set; }
     }
 }

@@ -21,6 +21,13 @@
         public Guid Key { get; set; }
 
         /// <summary>
+        /// Gets or sets domain root structure ID
+        /// </summary>
+        [Column("domainRootStructureID")]
+        [Constraint(Default = "-1")]
+        public int DomainRootStructureID { get; set; }
+
+        /// <summary>
         /// Gets or sets the update date.
         /// </summary>
         [Column("updateDate")]

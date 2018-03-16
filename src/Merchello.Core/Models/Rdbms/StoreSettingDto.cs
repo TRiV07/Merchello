@@ -21,6 +21,13 @@
         public Guid Key { get; set; }
 
         /// <summary>
+        /// Gets or sets domain root structure ID
+        /// </summary>
+        [Column("domainRootStructureID")]
+        [Constraint(Default = "-1")]
+        public int DomainRootStructureID { get; set; }
+
+        /// <summary>
         /// Gets or sets the name.
         /// </summary>
         [Column("name")]
@@ -50,10 +57,6 @@
         /// </summary>
         [Column("createDate")]
         [Constraint(Default = "getdate()")]
-        public DateTime CreateDate { get; set; }   
-
-        [Column("domainRootStructureID")]
-        [Constraint(Default = "0")]
-        public int DomainRootStructureID { get; set; }      
+        public DateTime CreateDate { get; set; }
     }
 }

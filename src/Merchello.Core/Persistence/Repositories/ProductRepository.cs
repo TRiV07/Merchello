@@ -34,6 +34,11 @@
         private readonly IProductOptionRepository _productOptionRepository;
 
         /// <summary>
+        /// The domain root structure ID.
+        /// </summary>
+        private readonly int _domainRootStructureID;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ProductRepository"/> class.
         /// </summary>
         /// <param name="work">
@@ -51,7 +56,10 @@
         /// <param name="productOptionRepository">
         /// The product option Repository.
         /// </param>
-        public ProductRepository(IDatabaseUnitOfWork work, ILogger logger, ISqlSyntaxProvider sqlSyntax, IProductVariantRepository productVariantRepository, IProductOptionRepository productOptionRepository)
+        /// <param name="domainRootStructureID">
+        /// The domain root structure ID.
+        /// </param>
+        public ProductRepository(IDatabaseUnitOfWork work, ILogger logger, ISqlSyntaxProvider sqlSyntax, IProductVariantRepository productVariantRepository, IProductOptionRepository productOptionRepository, int domainRootStructureID)
             : base(work, logger, sqlSyntax)
         {
             Mandate.ParameterNotNull(productVariantRepository, "productVariantRepository");
@@ -59,6 +67,7 @@
 
             _productVariantRepository = productVariantRepository;
             _productOptionRepository = productOptionRepository;
+            _domainRootStructureID = domainRootStructureID;
         }
 
 
@@ -1718,6 +1727,11 @@
                .InnerJoin<ProductVariantIndexDto>(SqlSyntax)
                .On<ProductVariantDto, ProductVariantIndexDto>(SqlSyntax, left => left.Key, right => right.ProductVariantKey)
                .Where<ProductVariantDto>(x => x.Master, SqlSyntax);
+
+            if (_domainRootStructureID != Constants.System.Root)
+            {
+                sql.Where<ProductDto>(x => x.DomainRootStructureID == _domainRootStructureID, SqlSyntax);
+            }
 
             return sql;
         }

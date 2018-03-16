@@ -18,6 +18,11 @@
     internal class Product : Entity, IProduct
     {
         /// <summary>
+        /// The domain root structure ID.
+        /// </summary>
+        private int _domainRootStructureID;
+
+        /// <summary>
         /// The property selectors.
         /// </summary>
         private static readonly Lazy<PropertySelectors> _ps = new Lazy<PropertySelectors>();
@@ -75,7 +80,21 @@
         }
 
         #region Overrides IProduct
-        
+
+        /// <inheritdoc/>
+        [DataMember]
+        public int DomainRootStructureID
+        {
+            get
+            {
+                return _domainRootStructureID;
+            }
+
+            set
+            {
+                SetPropertyValueAndDetectChanges(value, ref _domainRootStructureID, _ps.Value.DomainRootStructureIDSelector);
+            }
+        }
 
         /// <inheritdoc/>
         [IgnoreDataMember]
@@ -543,6 +562,11 @@
             /// The product variants changed selector.
             /// </summary>
             public readonly PropertyInfo ProductVariantsChangedSelector = ExpressionHelper.GetPropertyInfo<Product, ProductVariantCollection>(x => x.ProductVariants);
+
+            /// <summary>
+            /// The domain root structure ID selector.
+            /// </summary>
+            public readonly PropertyInfo DomainRootStructureIDSelector = ExpressionHelper.GetPropertyInfo<StoreSetting, int>(x => x.DomainRootStructureID);
         }
     }
 }

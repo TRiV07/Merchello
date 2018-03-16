@@ -102,6 +102,13 @@
         /// </returns>
         bool SkuExists(string sku);
 
+        /// <summary>
+        /// Gets an <see cref="IProduct"/> by it's unique SKU.
+        /// </summary>
+        /// <param name="sku">The product SKU.</param>
+        /// <returns><see cref="IProductVariant"/></returns>
+        IProductVariant GetBySku(string sku);
+
         ///// <summary>
         ///// The delete all detached content for culture.
         ///// </summary>

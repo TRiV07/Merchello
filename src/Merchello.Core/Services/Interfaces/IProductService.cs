@@ -10,7 +10,7 @@
     /// <summary>
     /// Defines the ProductService, which provides access to operations involving <see cref="IProduct"/>
     /// </summary>
-    public interface IProductService : IStaticCollectionService<IProduct>, IPageCachedService<IProduct>, IProductServicePortForward
+    public interface IProductService : IStaticCollectionService<IProduct>, IPageCachedMSService<IProduct>, IProductServicePortForward
     {
         /// <summary>
         /// Creates a Product without saving it to the database
@@ -30,7 +30,7 @@
         /// <returns>
         /// The <see cref="IProduct"/>.
         /// </returns>
-        IProduct CreateProduct(string name, string sku, decimal price, bool raiseEvents = true);
+        IProduct CreateProduct(string name, string sku, decimal price, int domainRootStructureID, bool raiseEvents = true);
 
         /// <summary>
         /// Creates a Product and saves it to the database
@@ -44,13 +44,16 @@
         /// <param name="price">
         /// The price.
         /// </param>
+        /// <param name="domainRootStructureID">
+        /// The domain root structure ID
+        /// </param>
         /// <param name="raiseEvents">
         /// Optional boolean indicating whether or not to raise events
         /// </param>
         /// <returns>
         /// The <see cref="IProduct"/>.
         /// </returns>
-        IProduct CreateProductWithKey(string name, string sku, decimal price, bool raiseEvents = true);
+        IProduct CreateProductWithKey(string name, string sku, decimal price, int domainRootStructureID, bool raiseEvents = true);
 
         /// <summary>
         /// Saves a single <see cref="IProductVariant"/> object
@@ -89,7 +92,7 @@
         /// <returns>
         /// The <see cref="IProduct"/>.
         /// </returns>
-        IProduct GetBySku(string sku);
+        IProduct GetBySku(string sku, int domainRootStructureID);
 
         /// <summary>
         /// Gets list of <see cref="IProduct"/> objects given a list of Unique keys
@@ -104,7 +107,7 @@
         /// <returns>
         /// The collection of all <see cref="IProduct"/>.
         /// </returns>
-        IEnumerable<IProduct> GetAll();
+        IEnumerable<IProduct> GetAll(int domainRootStructureID);
 
         /// <summary>
         /// The get product variants by product key.
@@ -137,7 +140,7 @@
         /// <returns>
         /// The <see cref="IProductVariant"/>.
         /// </returns>
-        IProductVariant GetProductVariantBySku(string sku);
+        IProductVariant GetProductVariantBySku(string sku, int domainRootStructureID);
 
         /// <summary>
         /// Returns the count of all products
@@ -145,14 +148,14 @@
         /// <returns>
         /// The count as an <see cref="int"/>.
         /// </returns>
-        int ProductsCount();
+        int ProductsCount(int domainRootStructureID);
 
         /// <summary>
         /// True/false indicating whether or not a SKU is already exists in the database
         /// </summary>
         /// <param name="sku">The SKU to be tested</param>
         /// <returns>A value indication whether or not the SKU exists</returns>
-        bool SkuExists(string sku);
+        bool SkuExists(string sku, int domainRootStructureID);
 
         #region Detached Content
 

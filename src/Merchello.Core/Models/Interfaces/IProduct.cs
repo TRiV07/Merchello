@@ -7,7 +7,7 @@
     /// <summary>
     /// The Product interface.
     /// </summary>
-    public interface IProduct : IProductBase, IEntity
+    public interface IProduct : IHasDomainRoot, IProductBase, IEntity
     {
         /// <summary>
         /// Gets the product variant key.

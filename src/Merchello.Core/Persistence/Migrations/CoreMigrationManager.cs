@@ -143,7 +143,6 @@
                 if (UpgradeMerchelloMultiStore(_database))
                 {
                     _logger.Info<CoreMigrationManager>("Upgrade completed successfully.");
-                    EnsureMSSettings();
                 }
             }
             else
@@ -189,29 +188,6 @@
             return false;
         }
 
-        private void EnsureMSSettings()
-        {
-            var domainRootStructureIDs = _database.Query<int>("SELECT DISTINCT [domainRootStructureID] FROM umbracoDomains").ToList();
-
-            foreach(var id in domainRootStructureIDs)
-            {
-                _database.Insert("merchStoreSetting", "Key", new StoreSettingDto() { Key = Constants.StoreSetting.CurrencyCodeKey, Name = "currencyCode", Value = "USD", TypeName = "System.String", CreateDate = DateTime.Now, UpdateDate = DateTime.Now, DomainRootStructureID = id });
-                _database.Insert("merchStoreSetting", "Key", new StoreSettingDto() { Key = Constants.StoreSetting.NextOrderNumberKey, Name = "nextOrderNumber", Value = "1", TypeName = "System.Int32", CreateDate = DateTime.Now, UpdateDate = DateTime.Now, DomainRootStructureID = id });
-                _database.Insert("merchStoreSetting", "Key", new StoreSettingDto() { Key = Constants.StoreSetting.NextInvoiceNumberKey, Name = "nextInvoiceNumber", Value = "1", TypeName = "System.Int32", CreateDate = DateTime.Now, UpdateDate = DateTime.Now, DomainRootStructureID = id });
-                _database.Insert("merchStoreSetting", "Key", new StoreSettingDto() { Key = Constants.StoreSetting.NextShipmentNumberKey, Name = "nextShipmentNumber", Value = "1", TypeName = "System.Int32", CreateDate = DateTime.Now, UpdateDate = DateTime.Now, DomainRootStructureID = id });
-                _database.Insert("merchStoreSetting", "Key", new StoreSettingDto() { Key = Constants.StoreSetting.DateFormatKey, Name = "dateFormat", Value = "dd-MM-yyyy", TypeName = "System.String", CreateDate = DateTime.Now, UpdateDate = DateTime.Now, DomainRootStructureID = id });
-                _database.Insert("merchStoreSetting", "Key", new StoreSettingDto() { Key = Constants.StoreSetting.TimeFormatKey, Name = "timeFormat", Value = "am-pm", TypeName = "System.String", CreateDate = DateTime.Now, UpdateDate = DateTime.Now, DomainRootStructureID = id });
-                _database.Insert("merchStoreSetting", "Key", new StoreSettingDto() { Key = Constants.StoreSetting.UnitSystemKey, Name = "unitSystem", Value = "Imperial", TypeName = "System.String", CreateDate = DateTime.Now, UpdateDate = DateTime.Now, DomainRootStructureID = id });
-                _database.Insert("merchStoreSetting", "Key", new StoreSettingDto() { Key = Constants.StoreSetting.GlobalShippableKey, Name = "globalShippable", Value = "true", TypeName = "System.Boolean", CreateDate = DateTime.Now, UpdateDate = DateTime.Now, DomainRootStructureID = id });
-                _database.Insert("merchStoreSetting", "Key", new StoreSettingDto() { Key = Constants.StoreSetting.GlobalTaxableKey, Name = "globalTaxable", Value = "true", TypeName = "System.Boolean", CreateDate = DateTime.Now, UpdateDate = DateTime.Now, DomainRootStructureID = id });
-                _database.Insert("merchStoreSetting", "Key", new StoreSettingDto() { Key = Constants.StoreSetting.GlobalTrackInventoryKey, Name = "globalTrackInventory", Value = "false", TypeName = "System.Boolean", CreateDate = DateTime.Now, UpdateDate = DateTime.Now, DomainRootStructureID = id });
-                _database.Insert("merchStoreSetting", "Key", new StoreSettingDto() { Key = Constants.StoreSetting.GlobalShippingIsTaxableKey, Name = "globalShippingIsTaxable", Value = "false", TypeName = "System.Boolean", CreateDate = DateTime.Now, UpdateDate = DateTime.Now, DomainRootStructureID = id });
-                _database.Insert("merchStoreSetting", "Key", new StoreSettingDto() { Key = Constants.StoreSetting.MigrationKey, Name = "migration", Value = Guid.NewGuid().ToString(), TypeName = "System.Guid", CreateDate = DateTime.Now, UpdateDate = DateTime.Now, DomainRootStructureID = id });
-                _database.Insert("merchStoreSetting", "Key", new StoreSettingDto() { Key = Constants.StoreSetting.GlobalTaxationApplicationKey, Name = "globalTaxationApplication", Value = "Invoice", TypeName = "System.String", CreateDate = DateTime.Now, UpdateDate = DateTime.Now, DomainRootStructureID = id });
-                _database.Insert("merchStoreSetting", "Key", new StoreSettingDto() { Key = Core.Constants.StoreSetting.DefaultExtendedContentCulture, Name = "defaultExtendedContentCulture", Value = "en-US", TypeName = "System.String", CreateDate = DateTime.Now, UpdateDate = DateTime.Now, DomainRootStructureID = id });
-                _database.Insert("merchStoreSetting", "Key", new StoreSettingDto() { Key = Core.Constants.StoreSetting.HasDomainRecordKey, Name = "hasDomainRecord", Value = false.ToString(), TypeName = "System.Boolean", CreateDate = DateTime.Now, UpdateDate = DateTime.Now, DomainRootStructureID = id });
-            }
-        }
 
         /// <summary>
         /// Executes the Migration runner.

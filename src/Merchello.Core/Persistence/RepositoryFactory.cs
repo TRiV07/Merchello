@@ -487,12 +487,18 @@
         /// <param name="uow">
         /// The database unit of work
         /// </param>
+        /// <param name="domainRootStructureID">
+        /// The domain root structure ID
+        /// </param>
         /// <returns>
         /// The <see cref="IProductRepository"/>.
         /// </returns>
-        internal virtual IProductRepository CreateProductRepository(IDatabaseUnitOfWork uow)
+        internal virtual IProductRepository CreateProductRepository(IDatabaseUnitOfWork uow, int domainRootStructureID)
         {
-            return new ProductRepository(uow, _logger, _sqlSyntax, CreateProductVariantRepository(uow), CreateProductOptionRepository(uow));
+            return new ProductRepository(uow, _logger, _sqlSyntax,
+                CreateProductVariantRepository(uow, domainRootStructureID),
+                CreateProductOptionRepository(uow, domainRootStructureID),
+                domainRootStructureID);
         }
 
         /// <summary>
@@ -504,9 +510,9 @@
         /// <returns>
         /// The <see cref="IProductOptionRepository"/>.
         /// </returns>
-        internal virtual IProductOptionRepository CreateProductOptionRepository(IDatabaseUnitOfWork uow)
+        internal virtual IProductOptionRepository CreateProductOptionRepository(IDatabaseUnitOfWork uow, int domainRootStructureID)
         {
-            return new ProductOptionRepository(uow, _logger, _sqlSyntax);
+            return new ProductOptionRepository(uow, _logger, _sqlSyntax, domainRootStructureID);
         }
 
         /// <summary>
@@ -518,9 +524,11 @@
         /// <returns>
         /// The <see cref="IProductVariantRepository"/>.
         /// </returns>
-        internal virtual IProductVariantRepository CreateProductVariantRepository(IDatabaseUnitOfWork uow)
+        internal virtual IProductVariantRepository CreateProductVariantRepository(IDatabaseUnitOfWork uow, int domainRootStructureID)
         {
-            return new ProductVariantRepository(uow, _logger, _sqlSyntax, CreateProductOptionRepository(uow));
+            return new ProductVariantRepository(uow, _logger, _sqlSyntax,
+                CreateProductOptionRepository(uow, domainRootStructureID),
+                domainRootStructureID);
         }
 
         /// <summary>

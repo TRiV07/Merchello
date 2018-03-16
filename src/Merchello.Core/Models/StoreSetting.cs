@@ -92,7 +92,7 @@
 
             set
             {
-                SetPropertyValueAndDetectChanges(value, ref _domainRootStructureID, _ps.Value.TypeNameSelector);
+                SetPropertyValueAndDetectChanges(value, ref _domainRootStructureID, _ps.Value.DomainRootStructureIDSelector);
             }
         }
 

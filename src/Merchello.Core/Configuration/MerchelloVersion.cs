@@ -25,7 +25,7 @@
         /// CURRENT MERCHELLO MULTI STORE VERSION ID.
         /// </remarks>
         /// </summary>
-        public static Version CurrentMS { get; } = new Version("1.0.0");
+        public static Version CurrentMS { get; } = new Version("1.0.1");
 
         /// <summary>
         /// Gets the version comment (like beta or RC).

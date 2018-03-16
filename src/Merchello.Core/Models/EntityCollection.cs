@@ -44,6 +44,11 @@
         private Guid? _parentKey;
 
         /// <summary>
+        /// The domain root structure ID.
+        /// </summary>
+        private int _domainRootStructureID;
+
+        /// <summary>
         /// The sort order.
         /// </summary>
         private int _sortOrder;
@@ -89,6 +94,22 @@
             set
             {
                 SetPropertyValueAndDetectChanges(value, ref _parentKey, _ps.Value.ParentKeySelector);
+            }
+        }
+
+
+        /// <inheritdoc/>
+        [DataMember]
+        public int DomainRootStructureID
+        {
+            get
+            {
+                return _domainRootStructureID;
+            }
+
+            set
+            {
+                SetPropertyValueAndDetectChanges(value, ref _domainRootStructureID, _ps.Value.DomainRootStructureIDSelector);
             }
         }
 
@@ -245,6 +266,11 @@
             /// The is filter selector.
             /// </summary>
             public readonly PropertyInfo IsFilterSelector = ExpressionHelper.GetPropertyInfo<EntityCollection, bool>(x => x.IsFilter);
+
+            /// <summary>
+            /// The domain root structure ID selector.
+            /// </summary>
+            public readonly PropertyInfo DomainRootStructureIDSelector = ExpressionHelper.GetPropertyInfo<StoreSetting, int>(x => x.DomainRootStructureID);
         }
     }
 }

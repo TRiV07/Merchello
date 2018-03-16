@@ -35,7 +35,7 @@
         /// Gets or sets the SKU.
         /// </summary>
         [Column("sku")]
-        [Index(IndexTypes.UniqueNonClustered, Name = "IX_merchProductVariantSku")]
+        [Index(IndexTypes.NonClustered, Name = "IX_merchProductVariantSku")]
         public string Sku { get; set; }
 
         /// <summary>

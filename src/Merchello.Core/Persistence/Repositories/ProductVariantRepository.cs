@@ -35,6 +35,11 @@
         private readonly IProductOptionRepository _productOptionRepository;
 
         /// <summary>
+        /// The domain root structure ID.
+        /// </summary>
+        private readonly int _domainRootStructureID;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ProductVariantRepository"/> class.
         /// </summary>
         /// <param name="work">
@@ -49,12 +54,13 @@
         /// <param name="productOptionRepository">
         /// The <see cref="IProductOptionRepository"/>.
         /// </param>
-        public ProductVariantRepository(IDatabaseUnitOfWork work, ILogger logger, ISqlSyntaxProvider sqlSyntax, IProductOptionRepository productOptionRepository)
+        public ProductVariantRepository(IDatabaseUnitOfWork work, ILogger logger, ISqlSyntaxProvider sqlSyntax, IProductOptionRepository productOptionRepository, int domainRootStructureID)
             : base(work, logger, sqlSyntax, () => new ProductVariantFactory())
         {
             Mandate.ParameterNotNull(productOptionRepository, "productOptionRepository");
 
             _productOptionRepository = productOptionRepository;
+            _domainRootStructureID = domainRootStructureID;
         }
 
         /// <summary>
@@ -154,12 +160,20 @@
         /// </returns>
         public bool SkuExists(string sku)
         {
-            var sql = new Sql();
-            sql.Select("*")
-               .From<ProductVariantDto>(SqlSyntax)
-               .Where<ProductVariantDto>(x => x.Sku == sku, SqlSyntax);
+            var sql = GetBaseQuery(false);
+            sql.Where<ProductVariantDto>(x => x.Sku == sku, SqlSyntax);
 
-            return Database.Fetch<ProductVariantDto>(sql).Any();
+            return Database.Fetch<ProductDto, ProductVariantDto, ProductVariantIndexDto>(sql).Any();
+        }
+
+        public IProductVariant GetBySku(string sku)
+        {
+            var sql = GetBaseQuery(false);
+            sql.Where<ProductVariantDto>(x => x.Sku == sku, SqlSyntax);
+
+            var dto = Database.Fetch<ProductDto, ProductVariantDto, ProductVariantIndexDto>(sql).FirstOrDefault();
+
+            return PerformGet(dto);
         }
 
         #region Bulk Operations
@@ -1189,6 +1203,11 @@
                 .On<ProductDto, ProductVariantDto>(SqlSyntax, left => left.Key, right => right.ProductKey)
                 .InnerJoin<ProductVariantIndexDto>(SqlSyntax)
                 .On<ProductVariantDto, ProductVariantIndexDto>(SqlSyntax, left => left.Key, right => right.ProductVariantKey);
+
+            if (_domainRootStructureID != Constants.System.Root)
+            {
+                sql.Where<ProductDto>(x => x.DomainRootStructureID == _domainRootStructureID, SqlSyntax);
+            }
 
             return sql;
         }

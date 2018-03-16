@@ -8,7 +8,7 @@
     /// <summary>
     /// The EntityCollection interface.
     /// </summary>
-    public interface IEntityCollection : IHasParent, IHasEntityTypeField, IHasExtendedData, IEntity
+    public interface IEntityCollection : IHasDomainRoot, IHasParent, IHasEntityTypeField, IHasExtendedData, IEntity
     {
         /// <summary>
         /// Gets or sets the parent key.
