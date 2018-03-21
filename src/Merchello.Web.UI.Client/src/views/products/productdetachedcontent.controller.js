@@ -62,7 +62,7 @@ angular.module('merchello').controller('Merchello.Backoffice.ProductDetachedCont
 
                 // extended content is not valid unless we have a product to attach it to
                 if (key === '' || key === undefined) {
-                    $location.url('/merchello/merchello/productlist/manage', true);
+                    $location.url('/merchello/merchello/productlist/manage' + '/store/' + $routeParams.storeId, true);
                 }
 
 
@@ -72,7 +72,7 @@ angular.module('merchello').controller('Merchello.Backoffice.ProductDetachedCont
 
                 var deferred = $q.defer();
                 $q.all([
-                    settingsResource.getAllSettings(),
+                    settingsResource.getAllSettings($routeParams.storeId),
                     detachedContentResource.getAllLanguages(),
                     localizationService.localize('merchelloTabs_render'),
                     localizationService.localize('merchelloDetachedContent_slug'),

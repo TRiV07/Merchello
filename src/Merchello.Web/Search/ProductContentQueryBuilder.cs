@@ -106,6 +106,7 @@
             {
                 Page = Page,
                 ItemsPerPage = ItemsPerPage,
+                DomainRootStructureID = DomainRootStructureID,
                 SortBy = sortBy,
                 SortDirection = SortDirection,
                 CollectionKeys = this.CollectionKeys,

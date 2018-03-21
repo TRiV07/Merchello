@@ -1,16 +1,16 @@
-    /**
-     * @ngdoc controller
-     * @name Merchello.Backoffice.ProductListController
-     * @function
-     *
-     * @description
-     * The controller for product list view controller
-     */
-    angular.module('merchello').controller('Merchello.Backoffice.ProductListController',
-        ['$scope', '$log', '$q', '$routeParams', '$location', '$filter', '$compile', 'localizationService', 'notificationsService', 'settingsResource', 'entityCollectionResource',
-            'merchelloTabsFactory', 'productResource', 'productDisplayBuilder',
-        function($scope, $log, $q, $routeParams, $location, $filter, $compile, localizationService, notificationsService, settingsResource, entityCollectionResource,
-                 merchelloTabsFactory, productResource, productDisplayBuilder) {
+/**
+ * @ngdoc controller
+ * @name Merchello.Backoffice.ProductListController
+ * @function
+ *
+ * @description
+ * The controller for product list view controller
+ */
+angular.module('merchello').controller('Merchello.Backoffice.ProductListController',
+    ['$scope', '$log', '$q', '$routeParams', '$location', '$filter', '$compile', 'localizationService', 'notificationsService', 'settingsResource', 'entityCollectionResource',
+        'merchelloTabsFactory', 'productResource', 'productDisplayBuilder',
+        function ($scope, $log, $q, $routeParams, $location, $filter, $compile, localizationService, notificationsService, settingsResource, entityCollectionResource,
+            merchelloTabsFactory, productResource, productDisplayBuilder) {
 
             $scope.productDisplayBuilder = productDisplayBuilder;
             $scope.load = load;
@@ -109,23 +109,23 @@
             function loadSettings() {
                 var deferred = $q.defer();
                 var promises = [
-                        settingsResource.getCurrencySymbol(),
-                        localizationService.localize('general_yes'),
-                        localizationService.localize('general_no'),
-                        localizationService.localize('merchelloGeneral_some'),
-                        productResource.getManufacturers()
-                    ];
-                $q.all(promises).then(function(data) {
+                    settingsResource.getCurrencySymbol($routeParams.storeId),
+                    localizationService.localize('general_yes'),
+                    localizationService.localize('general_no'),
+                    localizationService.localize('merchelloGeneral_some'),
+                    productResource.getManufacturers($routeParams.storeId)
+                ];
+                $q.all(promises).then(function (data) {
                     deferred.resolve(data);
                 });
-                deferred.promise.then(function(result) {
+                deferred.promise.then(function (result) {
                     $scope.currencySymbol = result[0];
                     yes = result[1];
                     no = result[2];
                     some = result[3];
 
                     // load the manufacturers
-                    var field = _.find($scope.filterOptions.fields, function(f) {
+                    var field = _.find($scope.filterOptions.fields, function (f) {
                         if (f.field === 'manufacturer') {
                             return f;
                         }
@@ -137,32 +137,32 @@
 
                     $scope.preValuesLoaded = true;
                     $scope.loaded = true;
-                }, function(reason) {
+                }, function (reason) {
                     notificationsService.error("Settings Load Failed", reason.message)
                 });
             }
 
             function getColumnValue(result, col) {
-               switch(col.name) {
-                   case 'name':
-                       return '<a href="' + getEditUrl(result) + '">' + result.name + '</a>';
-                   case 'available':
-                       return result.available ? yes : no;
-                   case 'shippable':
-                       return getShippableValue(result);
-                   case 'taxable':
-                       return getTaxableValue(result);
-                   case 'totalInventory':
-                       return '<span>' + result.totalInventory() + '</span>';
-                   case 'onSale':
-                       return getOnSaleValue(result);
-                   case 'price':
-                       return !result.hasVariants() ?
-                           $filter('currency')(result.price, $scope.currencySymbol) :
-                           $filter('currency')(result.variantsMinimumPrice(), $scope.currencySymbol) + ' - ' + $filter('currency')(result.variantsMaximumPrice(), $scope.currencySymbol);
-                   default:
-                       return result[col.name];
-               }
+                switch (col.name) {
+                    case 'name':
+                        return '<a href="' + getEditUrl(result) + '">' + result.name + '</a>';
+                    case 'available':
+                        return result.available ? yes : no;
+                    case 'shippable':
+                        return getShippableValue(result);
+                    case 'taxable':
+                        return getTaxableValue(result);
+                    case 'totalInventory':
+                        return '<span>' + result.totalInventory() + '</span>';
+                    case 'onSale':
+                        return getOnSaleValue(result);
+                    case 'price':
+                        return !result.hasVariants() ?
+                            $filter('currency')(result.price, $scope.currencySymbol) :
+                            $filter('currency')(result.variantsMinimumPrice(), $scope.currencySymbol) + ' - ' + $filter('currency')(result.variantsMaximumPrice(), $scope.currencySymbol);
+                    default:
+                        return result[col.name];
+                }
             }
 
             function getShippableValue(product) {
@@ -179,7 +179,7 @@
             }
 
             function getTaxableValue(product) {
-                if((product.hasVariants() && product.taxableVariants().length === product.productVariants.length) ||
+                if ((product.hasVariants() && product.taxableVariants().length === product.productVariants.length) ||
                     (product.hasVariants() && product.taxableVariants().length === 0) ||
                     (!product.hasVariants() && product.taxable)) {
                     return yes;
@@ -192,11 +192,11 @@
             }
 
             function getOnSaleValue(product) {
-                if((product.hasVariants() && !product.anyVariantsOnSale()) ||
+                if ((product.hasVariants() && !product.anyVariantsOnSale()) ||
                     (!product.hasVariants() && !product.onSale)) {
                     return no;
                 }
-                if(product.hasVariants() && product.anyVariantsOnSale()) {
+                if (product.hasVariants() && product.anyVariantsOnSale()) {
                     return $filter('currency')(product.variantsMinimumPrice(true), $scope.currencySymbol) + ' - ' +
                         $filter('currency')(product.variantsMaximumPrice(true), $scope.currencySymbol);
                 }
@@ -206,11 +206,11 @@
             }
 
             function getEditUrl(product) {
-               // if (product.hasVariants()) {
-               //     return '#/merchello/merchello/producteditwithoptions/' + product.key;
-               // } else {
-                    return "#/merchello/merchello/productedit/" + product.key;
-               // }
+                // if (product.hasVariants()) {
+                //     return '#/merchello/merchello/producteditwithoptions/' + product.key;
+                // } else {
+                return "#/merchello/merchello/productedit/" + product.key + '/store/' + $routeParams.storeId;
+                // }
             }
 
             function getField(filterOptions, fieldName) {

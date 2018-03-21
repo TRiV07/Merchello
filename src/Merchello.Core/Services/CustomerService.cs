@@ -1405,5 +1405,11 @@
             var payments = _paymentService.GetPaymentsByCustomerKey(customer.Key).ToArray();
             if (payments.Any()) _paymentService.Delete(payments);
         }
+
+        //TODOMS
+        public Page<ICustomer> GetPage(long page, long itemsPerPage, int domainRootStructureID, string sortBy = "", SortDirection sortDirection = SortDirection.Descending)
+        {
+            return this.GetPage(page, itemsPerPage, sortBy, sortDirection);
+        }
     }
 }

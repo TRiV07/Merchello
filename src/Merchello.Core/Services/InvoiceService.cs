@@ -2004,5 +2004,11 @@
 
             if (appliedPayments.Any()) _appliedPaymentService.Delete(appliedPayments);
         }
+
+        //TODOMS
+        public Page<IInvoice> GetPage(long page, long itemsPerPage, int domainRootStructureID, string sortBy = "", SortDirection sortDirection = SortDirection.Descending)
+        {
+            return this.GetPage(page, itemsPerPage, sortBy, sortDirection);
+        }
     }
 }

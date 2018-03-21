@@ -11,6 +11,8 @@
     using Umbraco.Core.Logging;
     using Umbraco.Core.Persistence.UnitOfWork;
 
+    using UConstants = Umbraco.Core.Constants;
+
     /// <summary>
     /// The product data service.
     /// </summary>
@@ -50,8 +52,8 @@
         public IEnumerable<IProduct> GetAll()
         {
             return MerchelloContext.HasCurrent
-                       ? MerchelloContext.Current.Services.ProductService.GetAll()
-                       : new ProductService().GetAll();
+                       ? MerchelloContext.Current.Services.ProductService.GetAll(UConstants.System.Root)
+                       : new ProductService().GetAll(UConstants.System.Root);
         }
 
         /// <summary>

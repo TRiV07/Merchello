@@ -33,7 +33,7 @@ namespace Merchello.Core.Persistence.Migrations.UpgradesMS.TargetVersionOneZeroO
             {
                 var dbIndexes = SqlSyntax.GetDefinedIndexesDefinitions(Context.Database);
                 if (dbIndexes.Any(x => x.IndexName.InvariantEquals("IX_merchProductVariantSku")) == true)
-                    Delete.Index("IX_merchProductVariantSku");
+                    Delete.Index("IX_merchProductVariantSku").OnTable("merchProductVariant");
 
                 Create.Index("IX_merchProductVariantSku")
                     .OnTable("merchProductVariant")
@@ -46,12 +46,12 @@ namespace Merchello.Core.Persistence.Migrations.UpgradesMS.TargetVersionOneZeroO
 
         public override void Down()
         {
-            if (_databaseSchemaHelper.TableExist("merchProduct"))
-            {
-                var dbIndexes = SqlSyntax.GetDefinedIndexesDefinitions(Context.Database);
-                if (dbIndexes.Any(x => x.IndexName.InvariantEquals("IX_merchProductVariantSku")) == true)
-                    Delete.Index("IX_merchProductVariantSku");
-            }
+            //if (_databaseSchemaHelper.TableExist("merchProductVariant"))
+            //{
+            //    var dbIndexes = SqlSyntax.GetDefinedIndexesDefinitions(Context.Database);
+            //    if (dbIndexes.Any(x => x.IndexName.InvariantEquals("IX_merchProductVariantSku")) == true)
+            //        Delete.Index("IX_merchProductVariantSku");
+            //}
         }
     }
 }

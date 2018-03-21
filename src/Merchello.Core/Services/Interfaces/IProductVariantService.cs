@@ -68,6 +68,13 @@
         IProductVariant GetByKey(Guid key);
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="productVariant"></param>
+        /// <returns></returns>
+        int GetDomainRootStructureId(IProductVariant productVariant);
+
+        /// <summary>
         /// Gets an <see cref="IProductVariant"/> object by it's unique SKU.
         /// </summary>
         /// <param name="sku">

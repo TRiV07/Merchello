@@ -203,7 +203,7 @@ namespace Merchello.Core.Services
         public IProduct CreateProduct(string name, string sku, decimal price, int domainRootStructureID, bool raiseEvents = true)
         {
             var templateVariant = new ProductVariant(name, sku, price);
-            var product = new Product(templateVariant);
+            var product = new Product(templateVariant, domainRootStructureID);
             if (Creating.IsRaisedEventCancelled(new Events.NewEventArgs<IProduct>(product), this))
             {
                 product.WasCancelled = true;
@@ -237,7 +237,7 @@ namespace Merchello.Core.Services
         public IProduct CreateProductWithKey(string name, string sku, decimal price, int domainRootStructureID, bool raiseEvents = true)
         {
             var templateVariant = new ProductVariant(name, sku, price);
-            var product = new Product(templateVariant);
+            var product = new Product(templateVariant, domainRootStructureID);
 
             if (raiseEvents)
             if (Creating.IsRaisedEventCancelled(new Events.NewEventArgs<IProduct>(product), this))

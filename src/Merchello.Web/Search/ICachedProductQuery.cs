@@ -37,7 +37,7 @@
         /// <returns>
         /// The <see cref="IProductContent"/>.
         /// </returns>
-        IProductContent TypedProductContentBySku(string sku);
+        IProductContent TypedProductContentBySku(string sku, int domainRootStructureID);
 
         /// <summary>
         /// Gets the <see cref="IProductContent"/> by it's slug.
@@ -48,7 +48,7 @@
         /// <returns>
         /// The <see cref="IProductContent"/>.
         /// </returns>
-        IProductContent TypedProductContentBySlug(string slug);
+        IProductContent TypedProductContentBySlug(string slug, int domainRootStructureID);
 
         /// <summary>
         /// Gets the typed <see cref="IProductContent"/> for a collection.
@@ -125,7 +125,7 @@
         /// <returns>
         /// The <see cref="IEnumerable{IProductContent}"/>.
         /// </returns>
-        IEnumerable<IProductContent> TypedProductContentSearch(long page, long itemsPerPage, string sortBy = "name", SortDirection sortDirection = SortDirection.Descending);
+        IEnumerable<IProductContent> TypedProductContentSearch(long page, long itemsPerPage, int domainRootStructureID, string sortBy = "name", SortDirection sortDirection = SortDirection.Descending);
 
         /// <summary>
         /// Search returning an <see cref="IProductContent"/> collection.
@@ -148,7 +148,7 @@
         /// <returns>
         /// The <see cref="IEnumerable{IProductContent}"/>.
         /// </returns>
-        IEnumerable<IProductContent> TypedProductContentSearch(string term, long page, long itemsPerPage, string sortBy = "name", SortDirection sortDirection = SortDirection.Ascending);
+        IEnumerable<IProductContent> TypedProductContentSearch(string term, long page, long itemsPerPage, int domainRootStructureID, string sortBy = "name", SortDirection sortDirection = SortDirection.Ascending);
 
         /// <summary>
         /// Search returning an <see cref="IProductContent"/> paged collection.
@@ -168,7 +168,7 @@
         /// <returns>
         /// The <see cref="PagedCollection"/>.
         /// </returns>
-        PagedCollection<IProductContent> TypedProductContentSearchPaged(long page, long itemsPerPage, string sortBy = "name", SortDirection sortDirection = SortDirection.Descending);
+        PagedCollection<IProductContent> TypedProductContentSearchPaged(long page, long itemsPerPage, int domainRootStructureID, string sortBy = "name", SortDirection sortDirection = SortDirection.Descending);
 
         /// <summary>
         /// Search returning an <see cref="IProductContent"/> paged collection.
@@ -191,7 +191,7 @@
         /// <returns>
         /// The <see cref="PagedCollection"/>.
         /// </returns>
-        PagedCollection<IProductContent> TypedProductContentSearchPaged(string term, long page, long itemsPerPage, string sortBy = "name", SortDirection sortDirection = SortDirection.Descending);
+        PagedCollection<IProductContent> TypedProductContentSearchPaged(string term, long page, long itemsPerPage, int domainRootStructureID, string sortBy = "name", SortDirection sortDirection = SortDirection.Descending);
 
         /// <summary>
         /// Gets a collection of typed product content by price range.
@@ -217,7 +217,7 @@
         /// <returns>
         /// The <see cref="PagedCollection"/>.
         /// </returns>
-        PagedCollection<IProductContent> TypedProductContentByPriceRange(decimal min, decimal max, long page, long itemsPerPage, string sortBy = "price", SortDirection sortDirection = SortDirection.Descending);
+        PagedCollection<IProductContent> TypedProductContentByPriceRange(decimal min, decimal max, long page, long itemsPerPage, int domainRootStructureID, string sortBy = "price", SortDirection sortDirection = SortDirection.Descending);
 
         ///// <summary>
         ///// Gets a collection of typed product content by price range including a search term.
@@ -607,7 +607,7 @@
         /// <returns>
         /// The <see cref="ProductDisplay"/>.
         /// </returns>
-        ProductDisplay GetBySku(string sku);
+        ProductDisplay GetBySku(string sku, int domainRootStructureID);
 
         /// <summary>
         /// The get by slug.
@@ -618,7 +618,7 @@
         /// <returns>
         /// The <see cref="ProductDisplay"/>.
         /// </returns>
-        ProductDisplay GetBySlug(string slug);
+        ProductDisplay GetBySlug(string slug, int domainRootStructureID);
 
         /// <summary>
         /// Gets a <see cref="ProductVariantDisplay"/> by it's key
@@ -640,7 +640,7 @@
         /// <returns>
         /// The <see cref="ProductVariantDisplay"/>.
         /// </returns>
-        ProductVariantDisplay GetProductVariantBySku(string sku);
+        ProductVariantDisplay GetProductVariantBySku(string sku, int domainRootStructureID);
 
         /// <summary>
         /// Searches all products
@@ -660,7 +660,7 @@
         /// <returns>
         /// The <see cref="QueryResultDisplay"/>.
         /// </returns>
-        QueryResultDisplay Search(long page, long itemsPerPage, string sortBy = "name", SortDirection sortDirection = SortDirection.Descending);
+        QueryResultDisplay Search(long page, long itemsPerPage, int domainRootStructureID, string sortBy = "name", SortDirection sortDirection = SortDirection.Descending);
 
 
         /// <summary>
@@ -684,7 +684,7 @@
         /// <returns>
         /// The <see cref="QueryResultDisplay"/>.
         /// </returns>
-        QueryResultDisplay Search(string term, long page, long itemsPerPage, string sortBy = "name", SortDirection sortDirection = SortDirection.Ascending);
+        QueryResultDisplay Search(string term, long page, long itemsPerPage, int domainRootStructureID, string sortBy = "name", SortDirection sortDirection = SortDirection.Ascending);
 
         /// <summary>
         /// Gets products with that have an option with name.
@@ -707,7 +707,7 @@
         /// <returns>
         /// The <see cref="QueryResultDisplay"/>.
         /// </returns>
-        QueryResultDisplay GetProductsWithOption(Guid optionKey, long page, long itemsPerPage, string sortBy = "", SortDirection sortDirection = SortDirection.Descending);
+        QueryResultDisplay GetProductsWithOption(Guid optionKey, long page, long itemsPerPage, int domainRootStructureID, string sortBy = "", SortDirection sortDirection = SortDirection.Descending);
 
 
         /// <summary>
@@ -734,7 +734,7 @@
         /// <returns>
         /// The <see cref="QueryResultDisplay"/>.
         /// </returns>
-        QueryResultDisplay GetProductsWithOption(string optionName, IEnumerable<string> choiceNames, long page, long itemsPerPage, string sortBy = "name", SortDirection sortDirection = SortDirection.Descending);
+        QueryResultDisplay GetProductsWithOption(string optionName, IEnumerable<string> choiceNames, long page, long itemsPerPage, int domainRootStructureID, string sortBy = "name", SortDirection sortDirection = SortDirection.Descending);
 
         /// <summary>
         /// Gets products with that have an option with name.
@@ -757,7 +757,7 @@
         /// <returns>
         /// The <see cref="QueryResultDisplay"/>.
         /// </returns>
-        QueryResultDisplay GetProductsWithOption(string optionName, long page, long itemsPerPage, string sortBy = "", SortDirection sortDirection = SortDirection.Descending);
+        QueryResultDisplay GetProductsWithOption(string optionName, long page, long itemsPerPage, int domainRootStructureID, string sortBy = "", SortDirection sortDirection = SortDirection.Descending);
 
         /// <summary>
         /// Gets products with that have an options with name and choice name
@@ -783,7 +783,7 @@
         /// <returns>
         /// The <see cref="QueryResultDisplay"/>.
         /// </returns>
-        QueryResultDisplay GetProductsWithOption(string optionName, string choiceName, long page, long itemsPerPage, string sortBy = "", SortDirection sortDirection = SortDirection.Descending);
+        QueryResultDisplay GetProductsWithOption(string optionName, string choiceName, long page, long itemsPerPage, int domainRootStructureID, string sortBy = "", SortDirection sortDirection = SortDirection.Descending);
 
         /// <summary>
         /// Gets products with that have an options with names
@@ -806,7 +806,7 @@
         /// <returns>
         /// The <see cref="QueryResultDisplay"/>.
         /// </returns>
-        QueryResultDisplay GetProductsWithOption(IEnumerable<string> optionNames, long page, long itemsPerPage, string sortBy = "", SortDirection sortDirection = SortDirection.Descending);
+        QueryResultDisplay GetProductsWithOption(IEnumerable<string> optionNames, long page, long itemsPerPage, int domainRootStructureID, string sortBy = "", SortDirection sortDirection = SortDirection.Descending);
 
         /// <summary>
         /// Get products that have prices within a price range
@@ -832,7 +832,7 @@
         /// <returns>
         /// The <see cref="QueryResultDisplay"/>.
         /// </returns>
-        QueryResultDisplay GetProductsInPriceRange(decimal min, decimal max, long page, long itemsPerPage, string sortBy = "", SortDirection sortDirection = SortDirection.Descending);
+        QueryResultDisplay GetProductsInPriceRange(decimal min, decimal max, long page, long itemsPerPage, int domainRootStructureID, string sortBy = "", SortDirection sortDirection = SortDirection.Descending);
 
         /// <summary>
         /// Get products that have prices within a price range allowing for a tax modifier
@@ -861,7 +861,7 @@
         /// <returns>
         /// The <see cref="QueryResultDisplay"/>.
         /// </returns>
-        QueryResultDisplay GetProductsInPriceRange(decimal min, decimal max, decimal taxModifier, long page, long itemsPerPage, string sortBy = "", SortDirection sortDirection = SortDirection.Descending);
+        QueryResultDisplay GetProductsInPriceRange(decimal min, decimal max, decimal taxModifier, long page, long itemsPerPage, int domainRootStructureID, string sortBy = "", SortDirection sortDirection = SortDirection.Descending);
 
         /// <summary>
         /// The get products by barcode.
@@ -884,7 +884,7 @@
         /// <returns>
         /// The <see cref="QueryResultDisplay"/>.
         /// </returns>
-        QueryResultDisplay GetProductsByBarcode(string barcode, long page, long itemsPerPage, string sortBy = "", SortDirection sortDirection = SortDirection.Descending);
+        QueryResultDisplay GetProductsByBarcode(string barcode, long page, long itemsPerPage, int domainRootStructureID, string sortBy = "", SortDirection sortDirection = SortDirection.Descending);
 
         /// <summary>
         /// The get products by barcode.
@@ -907,7 +907,7 @@
         /// <returns>
         /// The <see cref="QueryResultDisplay"/>.
         /// </returns>
-        QueryResultDisplay GetProductsByBarcode(IEnumerable<string> barcode, long page, long itemsPerPage, string sortBy = "", SortDirection sortDirection = SortDirection.Descending);
+        QueryResultDisplay GetProductsByBarcode(IEnumerable<string> barcode, long page, long itemsPerPage, int domainRootStructureID, string sortBy = "", SortDirection sortDirection = SortDirection.Descending);
 
         /// <summary>
         /// Gets products by manufacturer.
@@ -930,7 +930,7 @@
         /// <returns>
         /// The <see cref="QueryResultDisplay"/>.
         /// </returns>
-        QueryResultDisplay GetProductsByManufacturer(string manufacturer, long page, long itemsPerPage, string sortBy = "", SortDirection sortDirection = SortDirection.Descending);
+        QueryResultDisplay GetProductsByManufacturer(string manufacturer, long page, long itemsPerPage, int domainRootStructureID, string sortBy = "", SortDirection sortDirection = SortDirection.Descending);
 
         /// <summary>
         /// Get products for a list of manufacturers.
@@ -953,7 +953,7 @@
         /// <returns>
         /// The <see cref="QueryResultDisplay"/>.
         /// </returns>
-        QueryResultDisplay GetProductsByManufacturer(IEnumerable<string> manufacturer, long page, long itemsPerPage, string sortBy = "", SortDirection sortDirection = SortDirection.Descending);
+        QueryResultDisplay GetProductsByManufacturer(IEnumerable<string> manufacturer, long page, long itemsPerPage, int domainRootStructureID, string sortBy = "", SortDirection sortDirection = SortDirection.Descending);
 
         /// <summary>
         /// Gets products that are in stock or do not track inventory
@@ -976,7 +976,7 @@
         /// <returns>
         /// The <see cref="QueryResultDisplay"/>.
         /// </returns>
-        QueryResultDisplay GetProductsInStock(long page, long itemsPerPage, string sortBy = "", SortDirection sortDirection = SortDirection.Descending, bool includeAllowOutOfStockPurchase = false);
+        QueryResultDisplay GetProductsInStock(long page, long itemsPerPage, int domainRootStructureID, string sortBy = "", SortDirection sortDirection = SortDirection.Descending, bool includeAllowOutOfStockPurchase = false);
 
         /// <summary>
         /// Gets products that are marked on sale
@@ -996,6 +996,6 @@
         /// <returns>
         /// The <see cref="QueryResultDisplay"/>.
         /// </returns>
-        QueryResultDisplay GetProductsOnSale(long page, long itemsPerPage, string sortBy = "", SortDirection sortDirection = SortDirection.Descending);
+        QueryResultDisplay GetProductsOnSale(long page, long itemsPerPage, int domainRootStructureID, string sortBy = "", SortDirection sortDirection = SortDirection.Descending);
     }
 }

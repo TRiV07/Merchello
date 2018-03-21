@@ -71,5 +71,14 @@
             string sortBy,
             SortDirection sortDirection,
             IDictionary<string, string> args = null);
+
+        string GetPagedQueryCacheKey<TSender>(
+            string methodName,
+            long page,
+            long itemsPerPage,
+            int domainRootStructureID,
+            string sortBy,
+            SortDirection sortDirection,
+            IDictionary<string, string> args = null);
     }
 }

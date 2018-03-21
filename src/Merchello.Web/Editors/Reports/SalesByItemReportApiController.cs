@@ -177,7 +177,8 @@
             // ReSharper disable once LoopCanBeConvertedToQuery
             foreach (var dto in dtos)
             {
-                var variant = GetProductVariant(dto.Sku);
+                //TODOMS
+                var variant = GetProductVariant(dto.Sku, -1);
 
                 if (variant != null)
                 {
@@ -213,13 +214,13 @@
         /// <returns>
         /// The <see cref="ProductVariantDisplay"/>.
         /// </returns>
-        private ProductVariantDisplay GetProductVariant(string sku)
+        private ProductVariantDisplay GetProductVariant(string sku, int domainRootStructureID)
         {
-            var variant = _merchello.Query.Product.GetProductVariantBySku(sku);
+            var variant = _merchello.Query.Product.GetProductVariantBySku(sku, domainRootStructureID);
 
             if (variant != null) return variant;
 
-            var product = this._merchello.Query.Product.GetBySku(sku);
+            var product = this._merchello.Query.Product.GetBySku(sku, domainRootStructureID);
 
             return product != null ? product.AsMasterVariantDisplay() : null;
         }

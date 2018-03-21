@@ -8,7 +8,7 @@
     /// <summary>
     /// Defines the InvoiceService
     /// </summary>
-    public interface IInvoiceService : IStaticCollectionService<IInvoice>, IPageCachedService<IInvoice>
+    public interface IInvoiceService : IStaticCollectionService<IInvoice>, IPageCachedMSService<IInvoice>
     {
         /// <summary>
         /// Creates a <see cref="IInvoice"/> without saving it to the database

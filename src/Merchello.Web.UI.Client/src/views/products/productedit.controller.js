@@ -1,16 +1,16 @@
-    /**
-     * @ngdoc controller
-     * @name Merchello.Backoffice.ProductEditController
-     * @function
-     *
-     * @description
-     * The controller for product edit view
-     */
-    angular.module('merchello').controller('Merchello.Backoffice.ProductEditController',
-        ['$scope', '$routeParams', '$window', '$location', '$timeout', 'assetsService', 'notificationsService', 'dialogService', 'merchelloTabsFactory', 'dialogDataFactory',
-            'serverValidationManager', 'productResource', 'warehouseResource', 'settingsResource',
-            'productDisplayBuilder', 'productVariantDisplayBuilder', 'warehouseDisplayBuilder', 'settingDisplayBuilder', 'catalogInventoryDisplayBuilder',
-        function($scope, $routeParams, $window, $location, $timeout, assetsService, notificationsService, dialogService, merchelloTabsFactory, dialogDataFactory,
+/**
+ * @ngdoc controller
+ * @name Merchello.Backoffice.ProductEditController
+ * @function
+ *
+ * @description
+ * The controller for product edit view
+ */
+angular.module('merchello').controller('Merchello.Backoffice.ProductEditController',
+    ['$scope', '$routeParams', '$window', '$location', '$timeout', 'assetsService', 'notificationsService', 'dialogService', 'merchelloTabsFactory', 'dialogDataFactory',
+        'serverValidationManager', 'productResource', 'warehouseResource', 'settingsResource',
+        'productDisplayBuilder', 'productVariantDisplayBuilder', 'warehouseDisplayBuilder', 'settingDisplayBuilder', 'catalogInventoryDisplayBuilder',
+        function ($scope, $routeParams, $window, $location, $timeout, assetsService, notificationsService, dialogService, merchelloTabsFactory, dialogDataFactory,
             serverValidationManager, productResource, warehouseResource, settingsResource,
             productDisplayBuilder, productVariantDisplayBuilder, warehouseDisplayBuilder, settingDisplayBuilder, catalogInventoryDisplayBuilder) {
 
@@ -103,7 +103,7 @@
                 var promiseProduct = productResource.getByKey(key);
                 promiseProduct.then(function (product) {
                     $scope.product = productDisplayBuilder.transform(product);
-                    if(productVariantKey === '' || productVariantKey === undefined) {
+                    if (productVariantKey === '' || productVariantKey === undefined) {
                         // this is a product edit.
                         // we use the master variant context so that we can use directives associated with variants
                         $scope.productVariant = $scope.product.getMasterVariant();
@@ -112,8 +112,7 @@
                         if (!$scope.product.hasVariants()) {
                             $scope.tabs = merchelloTabsFactory.createProductEditorTabs(key);
                         }
-                        else
-                        {
+                        else {
                             $scope.tabs = merchelloTabsFactory.createProductEditorWithOptionsTabs(key);
                         }
 
@@ -124,7 +123,7 @@
                         $scope.context = 'varianteditor';
                         $scope.tabs = merchelloTabsFactory.createProductVariantEditorTabs(key, productVariantKey);
                     }
-                    
+
                     $scope.preValuesLoaded = true;
                     $scope.tabs.setActive($scope.context);
                 }, function (reason) {
@@ -141,8 +140,8 @@
              * Loads in store settings from server into the scope.  Called in init().
              */
             function loadSettings() {
-                var promiseSettings = settingsResource.getAllSettings();
-                promiseSettings.then(function(settings) {
+                var promiseSettings = settingsResource.getAllSettings($routeParams.storeId);
+                promiseSettings.then(function (settings) {
                     $scope.settings = settingDisplayBuilder.transform(settings);
                     $scope.loaded = true;
                 }, function (reason) {
@@ -165,7 +164,7 @@
             function save(thisForm) {
                 // TODO we should unbind the return click event
                 // so that we can quickly add the options and remove the following
-                if(thisForm === undefined) {
+                if (thisForm === undefined) {
                     return;
                 }
                 if (thisForm.$valid) {
@@ -202,16 +201,16 @@
              * Creates a product.  See comments below.
              */
             function createProduct() {
-                var promise = productResource.add($scope.product);
+                var promise = productResource.add($scope.product, $routeParams.storeId);
                 promise.then(function (product) {
                     notificationsService.success("Product Saved", "");
                     $scope.product = productDisplayBuilder.transform(product);
                     // short pause to make sure examine index has a chance to update
-                    $timeout(function() {
-                       if ($scope.product.hasVariants()) {
-                            $location.url("/merchello/merchello/producteditwithoptions/" + $scope.product.key, true);
+                    $timeout(function () {
+                        if ($scope.product.hasVariants()) {
+                            $location.url("/merchello/merchello/producteditwithoptions/" + $scope.product.key + '/store/' + $routeParams.storeId, true);
                         } else {
-                            $location.url("/merchello/merchello/productedit/" + $scope.product.key, true);
+                            $location.url("/merchello/merchello/productedit/" + $scope.product.key + '/store/' + $routeParams.storeId, true);
                         }
                     }, 400);
                     $scope.preValuesLoaded = true;
@@ -235,14 +234,14 @@
                     $scope.product = productDisplayBuilder.transform(product);
                     $scope.productVariant = $scope.product.getMasterVariant();
 
-                     //if ($scope.product.hasVariants()) {
+                    //if ($scope.product.hasVariants()) {
                     // short pause to make sure examine index has a chance to update
                     //$timeout(function() {
-                        //$location.url("/merchello/merchello/productedit/" + $scope.product.key, true);
-                        loadProduct($scope.product.key);
-                        //$route.reload();
+                    //$location.url("/merchello/merchello/productedit/" + $scope.product.key, true);
+                    loadProduct($scope.product.key);
+                    //$route.reload();
                     //}, 400);
-                     //}
+                    //}
 
                     $scope.preValuesLoaded = true;
                 }, function (reason) {
@@ -262,11 +261,11 @@
                 //var variant = $scope.productVariant.deepClone();
                 $scope.productVariant.removeInActiveInventories();
                 var variantPromise = productResource.saveVariant($scope.productVariant);
-                variantPromise.then(function(resultVariant) {
+                variantPromise.then(function (resultVariant) {
                     notificationsService.success("Product Variant Saved");
                     $scope.productVariant = productVariantDisplayBuilder.transform(resultVariant);
                     $scope.preValuesLoaded = true;
-                }, function(reason) {
+                }, function (reason) {
                     notificationsService.error("Product Variant Save Failed", reason.message);
                 });
             }
@@ -275,7 +274,8 @@
                 var dialogData = {
                     product: $scope.product,
                     name: '',
-                    sku: ''
+                    sku: '',
+                    storeId: $routeParams.storeId
                 };
                 dialogService.open({
                     template: '/App_Plugins/Merchello/Backoffice/Merchello/Dialogs/product.copy.html',
@@ -287,10 +287,10 @@
 
 
             function processCopyProduct(dialogData) {
-                productResource.copyProduct(dialogData.product, dialogData.name, dialogData.sku).then(function(result) {
+                productResource.copyProduct(dialogData.product, dialogData.name, dialogData.sku).then(function (result) {
                     notificationsService.success("Product copied");
-                    $timeout(function() {
-                        $location.url("/merchello/merchello/productedit/" + result.key, true);
+                    $timeout(function () {
+                        $location.url("/merchello/merchello/productedit/" + result.key + '/store/' + $routeParams.storeId, true);
                     }, 1000);
                 });
             }
@@ -307,7 +307,7 @@
                 var promiseDel = productResource.deleteProduct($scope.product);
                 promiseDel.then(function () {
                     notificationsService.success("Product Deleted", "");
-                    $location.url("/merchello/merchello/productlist/manage", true);
+                    $location.url("/merchello/merchello/productlist/manage" + '/store/' + $routeParams.storeId, true);
                 }, function (reason) {
                     notificationsService.error("Product Deletion Failed", reason.message);
                 });
@@ -337,4 +337,4 @@
 
             // Initialize the controller
             init();
-    }]);
+        }]);

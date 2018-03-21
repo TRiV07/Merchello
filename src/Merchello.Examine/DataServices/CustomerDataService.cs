@@ -49,8 +49,9 @@
         /// </returns>
         public IEnumerable<ICustomer> GetAll()
         {
+            //TODOMS
             return MerchelloContext.HasCurrent
-                       ? MerchelloContext.Current.Services.CustomerService.GetPage(1, 100).Items
+                       ? MerchelloContext.Current.Services.CustomerService.GetPage(1, 100, -1).Items
                        : new CustomerService(Logger.CreateWithDefaultLog4NetConfiguration()).GetPage(1, 100).Items;
         }
 

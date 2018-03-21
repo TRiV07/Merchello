@@ -69,7 +69,7 @@
 
             var merchello = new MerchelloHelper(GetMerchelloContext(), true);
 
-            return merchello.Query.Product.Search(0, int.MaxValue).Items.Select(x => (ProductDisplay)x);
+            return merchello.Query.Product.Search(0, int.MaxValue, -1).Items.Select(x => (ProductDisplay)x);
         }
 
         /// <summary>

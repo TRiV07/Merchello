@@ -10,24 +10,26 @@
 
     using Umbraco.Core.Persistence;
 
+    using UConstants = Umbraco.Core.Constants;
+
     /// <summary>
     /// Product service queries for used in the product query.
     /// </summary>
     public partial class ProductService : IProductServicePortForward
     {
         /// <inheritdoc/>
-        public IEnumerable<string> GetAllManufacturers()
+        public IEnumerable<string> GetAllManufacturers(int domainRootStructureID)
         {
-            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork(), domainRootStructureID))
             {
                 return repository.GetAllManufacturers();
             }
         }
 
         /// <inheritdoc/>
-        public PagedCollection<IProduct> GetRecentlyUpdatedProducts(long page, long itemsPerPage = 10)
+        public PagedCollection<IProduct> GetRecentlyUpdatedProducts(int domainRootStructureID, long page, long itemsPerPage = 10)
         {
-            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork(), domainRootStructureID))
             {
                 return repository.GetRecentlyUpdatedProducts(page, itemsPerPage);
             }
@@ -70,7 +72,7 @@
             string orderExpression,
             SortDirection sortDirection = SortDirection.Descending)
         {
-            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork(), UConstants.System.Root))
             {
                 return repository.GetKeysThatExistInAllCollections(collectionKeys, min, max, page, itemsPerPage, orderExpression, sortDirection);
             }
@@ -116,7 +118,7 @@
             string orderExpression,
             SortDirection sortDirection = SortDirection.Descending)
         {
-            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork(), UConstants.System.Root))
             {
                 return repository.GetKeysThatExistInAllCollections(collectionKeys, term, min, max, page, itemsPerPage, orderExpression, sortDirection);
             }   
@@ -158,7 +160,7 @@
             string orderExpression,
             SortDirection sortDirection = SortDirection.Descending)
         {
-            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork(), UConstants.System.Root))
             {
                 return repository.GetKeysNotInAnyCollections(collectionKeys, min, max, page, itemsPerPage, orderExpression, sortDirection);
             }
@@ -204,7 +206,7 @@
             string orderExpression,
             SortDirection sortDirection = SortDirection.Descending)
         {
-            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork(), UConstants.System.Root))
             {
                 return repository.GetKeysNotInAnyCollections(collectionKeys, term, min, max, page, itemsPerPage, orderExpression, sortDirection);
             }
@@ -246,7 +248,7 @@
             string orderExpression,
             SortDirection sortDirection = SortDirection.Descending)
         {
-            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork(), UConstants.System.Root))
             {
                 return repository.GetKeysThatExistInAnyCollections(collectionKeys, min, max, page, itemsPerPage, orderExpression, sortDirection);
             }
@@ -292,7 +294,7 @@
             string orderExpression,
             SortDirection sortDirection = SortDirection.Descending)
         {
-            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork(), UConstants.System.Root))
             {
                 return repository.GetKeysThatExistInAnyCollections(collectionKeys, term, min, max, page, itemsPerPage, orderExpression, sortDirection);
             }
@@ -306,10 +308,11 @@
             string manufacturer,
             long page,
             long itemsPerPage,
+            int domainRootStructureID,
             string orderExpression,
             SortDirection direction = SortDirection.Ascending)
         {
-            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork(), domainRootStructureID))
             {
                 return repository.GetByAdvancedSearch(collectionKey, includeFields, term, manufacturer, page, itemsPerPage, orderExpression, direction);
             }

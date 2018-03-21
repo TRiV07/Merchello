@@ -48,7 +48,7 @@
         /// <param name="enableDataModifiers">
         /// The enable data modifiers.
         /// </param>
-        protected CachedQueryableCollectionQueryBase(CacheHelper cacheHelper, IPageCachedService<TEntity> service, BaseIndexProvider indexProvider, BaseSearchProvider searchProvider, bool enableDataModifiers)
+        protected CachedQueryableCollectionQueryBase(CacheHelper cacheHelper, IPageCachedMSService<TEntity> service, BaseIndexProvider indexProvider, BaseSearchProvider searchProvider, bool enableDataModifiers)
             : base(cacheHelper, service, indexProvider, searchProvider, enableDataModifiers)
         {
         }

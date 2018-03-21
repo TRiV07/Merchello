@@ -38,7 +38,7 @@
         /// <summary>
         /// The Merchello core service service.
         /// </summary>
-        private readonly IPageCachedService<TEntity> _service;
+        private readonly IPageCachedMSService<TEntity> _service;
 
         /// <summary>
         /// The Examine Index provider.
@@ -75,7 +75,7 @@
         /// </param>
         protected CachedQueryBase(
             CacheHelper cacheHelper,
-            IPageCachedService<TEntity> service, 
+            IPageCachedMSService<TEntity> service, 
             BaseIndexProvider indexProvider, 
             BaseSearchProvider searchProvider, 
             bool enableDataModifiers)
@@ -113,7 +113,7 @@
         /// <summary>
         /// Gets the service.
         /// </summary>
-        protected IPageCachedService<TEntity> Service
+        protected IPageCachedMSService<TEntity> Service
         {
             get
             {

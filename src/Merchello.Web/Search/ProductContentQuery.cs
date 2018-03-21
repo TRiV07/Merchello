@@ -99,6 +99,8 @@
         /// </summary>
         public long ItemsPerPage { get; set; }
 
+        public int DomainRootStructureID { get; set; }
+
         /// <summary>
         /// Gets or sets the sort by field.
         /// </summary>
@@ -133,15 +135,15 @@
             if (!hasCollections && !HasPriceRange)
             {
                 return HasSearchTerm
-                  ? _query.TypedProductContentSearchPaged(SearchTerm, Page, ItemsPerPage, SortBy, SortDirection)
-                  : _query.TypedProductContentSearchPaged(Page, ItemsPerPage, SortBy, SortDirection);
+                  ? _query.TypedProductContentSearchPaged(SearchTerm, Page, ItemsPerPage, DomainRootStructureID, SortBy, SortDirection)
+                  : _query.TypedProductContentSearchPaged(Page, ItemsPerPage, DomainRootStructureID, SortBy, SortDirection);
             }
 
             if (!hasCollections && HasPriceRange)
             {
                 if (!HasSearchTerm)
                 {
-                    return _query.TypedProductContentByPriceRange(MinPrice, MaxPrice, Page, ItemsPerPage, SortBy, SortDirection);
+                    return _query.TypedProductContentByPriceRange(MinPrice, MaxPrice, Page, ItemsPerPage, DomainRootStructureID, SortBy, SortDirection);
                 }
                 
                 // don't have a price range with a search term filter.

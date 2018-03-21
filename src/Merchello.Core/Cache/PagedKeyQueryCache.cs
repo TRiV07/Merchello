@@ -118,6 +118,34 @@
             return string.Format("{0}{1}", GetPagedPrefix<TSender>(), sb.ToString());
         }
 
+        public string GetPagedQueryCacheKey<TSender>(
+            string methodName,
+            long page,
+            long itemsPerPage,
+            int domainRootStructureID,
+            string sortBy,
+            SortDirection sortDirection,
+            IDictionary<string, string> args = null)
+        {
+            var sb = new StringBuilder();
+            sb.Append(methodName)
+            .Append(page)
+            .Append(itemsPerPage)
+            .Append(domainRootStructureID)
+            .Append(sortBy)
+            .Append(sortDirection);
+
+            if (args != null)
+            {
+                foreach (var key in args.Keys)
+                {
+                    sb.Append(string.Format("{0}.{1}", key, args[key]));
+                }
+            }
+
+            return string.Format("{0}{1}", GetPagedPrefix<TSender>(), sb.ToString());
+        }
+
         /// <summary>
         /// Gets the paged prefix.
         /// </summary>

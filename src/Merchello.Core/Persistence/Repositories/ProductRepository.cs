@@ -210,10 +210,10 @@
         {
             var sql = new Sql();
             sql.Append("SELECT [merchProductVariant].[productKey]")
-                .Append("FROM [merchProductVariant]")
-                .Append(
-                    "JOIN [merchProductVariantDetachedContent] ON [merchProductVariant].[pk] = [merchProductVariantDetachedContent].[productVariantKey]")
-                .Append("WHERE [merchProductVariantDetachedContent].[slug] = @Sl", new { @Sl = slug });
+                .Append("FROM [merchProduct]")
+                .Append("INNER JOIN [merchProductVariant] ON [merchProduct].[pk] = [merchProductVariant].[productKey]")
+                .Append("INNER JOIN [merchProductVariantDetachedContent] ON [merchProductVariant].[pk] = [merchProductVariantDetachedContent].[productVariantKey]")
+                .Append("WHERE [merchProductVariantDetachedContent].[slug] = @Slug AND [merchProduct].[domainRootStructureID] = @DomainRootStructureID", new { @Slug = slug, @DomainRootStructureID = _domainRootStructureID });
 
             return Database.Fetch<Guid>(sql).FirstOrDefault();
         }
@@ -1924,8 +1924,7 @@
             var terms = invidualTerms.Where(x => !string.IsNullOrEmpty(x)).ToList();
 
 
-            var sql = new Sql();
-            sql.Select("*").From<ProductVariantDto>(SqlSyntax);
+            var sql = GetBaseQuery(false);
 
             if (terms.Any())
             {
@@ -1933,8 +1932,6 @@
 
                 sql.Where("sku LIKE @sku OR name LIKE @name", new { @sku = preparedTerms, @name = preparedTerms });
             }
-
-            sql.Where("master = @master", new { @master = true });
 
             return sql;
         }

@@ -85,6 +85,8 @@
         /// </summary>
         long ItemsPerPage { get; set; }
 
+        int DomainRootStructureID { get; set; }
+
         /// <summary>
         /// Gets or sets the search term.
         /// </summary>

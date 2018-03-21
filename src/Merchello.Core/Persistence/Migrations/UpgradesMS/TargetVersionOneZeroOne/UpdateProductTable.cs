@@ -14,7 +14,7 @@ namespace Merchello.Core.Persistence.Migrations.UpgradesMS.TargetVersionOneZeroO
     /// <summary>
     /// Updates product table
     /// </summary>
-    [Migration("1.0.1", 1, MerchelloConfiguration.MerchelloMSMigrationName)]
+    [Migration("1.0.1", 0, MerchelloConfiguration.MerchelloMSMigrationName)]
     public class UpdateProductTable : MigrationBase
     {
         private readonly DatabaseSchemaHelper _databaseSchemaHelper;

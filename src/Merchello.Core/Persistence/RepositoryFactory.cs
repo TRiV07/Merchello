@@ -497,7 +497,7 @@
         {
             return new ProductRepository(uow, _logger, _sqlSyntax,
                 CreateProductVariantRepository(uow, domainRootStructureID),
-                CreateProductOptionRepository(uow, domainRootStructureID),
+                CreateProductOptionRepository(uow),
                 domainRootStructureID);
         }
 
@@ -510,9 +510,9 @@
         /// <returns>
         /// The <see cref="IProductOptionRepository"/>.
         /// </returns>
-        internal virtual IProductOptionRepository CreateProductOptionRepository(IDatabaseUnitOfWork uow, int domainRootStructureID)
+        internal virtual IProductOptionRepository CreateProductOptionRepository(IDatabaseUnitOfWork uow)
         {
-            return new ProductOptionRepository(uow, _logger, _sqlSyntax, domainRootStructureID);
+            return new ProductOptionRepository(uow, _logger, _sqlSyntax);
         }
 
         /// <summary>
@@ -527,7 +527,7 @@
         internal virtual IProductVariantRepository CreateProductVariantRepository(IDatabaseUnitOfWork uow, int domainRootStructureID)
         {
             return new ProductVariantRepository(uow, _logger, _sqlSyntax,
-                CreateProductOptionRepository(uow, domainRootStructureID),
+                CreateProductOptionRepository(uow),
                 domainRootStructureID);
         }
 

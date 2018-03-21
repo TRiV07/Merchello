@@ -56,7 +56,7 @@
         /// </param>
         public CoreMigrationManager(ApplicationContext applicationContext)
             : this(applicationContext.DatabaseContext.Database, applicationContext.DatabaseContext.SqlSyntax, LoggerResolver.Current.Logger)
-        {            
+        {
         }
 
         /// <summary>
@@ -76,7 +76,7 @@
             Mandate.ParameterNotNull(database, "database");
             Mandate.ParameterNotNull(sqlSyntaxProvider, "sqlSyntaxProvider");
             Mandate.ParameterNotNull(logger, "logger");
-            
+
             _database = database;
             _sqlSyntaxProvider = sqlSyntaxProvider;
             _logger = logger;
@@ -165,7 +165,7 @@
             var databaseVersion = schemaResult.DetermineInstalledVersion();
 
             if (databaseVersion != new Version("0.0.0")) return true;
-            
+
             // install the database
             var schemaHelper = new MerchelloDatabaseSchemaHelper(this._database, this._logger, this._sqlSyntaxProvider);
             schemaHelper.CreateDatabaseSchema();
@@ -231,7 +231,7 @@
                         _logger.Error<CoreMigrationManager>("Merchello migration failed", ex);
                         upgraded = false;
                     }
-                    
+
 
                     _logger.Debug<CoreMigrationManager>("Merchello migration runner returned false.");
                 }
@@ -264,7 +264,7 @@
             this.OnUpgraded(record);
 
             _logger.Info<CoreMigrationManager>("Merchello Schema Migration completed successfully");
-  
+
             MerchelloConfiguration.ConfigurationStatus = MerchelloVersion.Current.ToString();
 
             return true;
@@ -292,7 +292,11 @@
             if (latestMigration != null)
                 currentVersion = latestMigration.Version;
 
-            var targetVersion = new SemVersion(MerchelloVersion.CurrentMS);
+            var targetVersion = new SemVersion(
+                MerchelloVersion.CurrentMS.Major,
+                MerchelloVersion.CurrentMS.Minor,
+                MerchelloVersion.CurrentMS.Build);
+
             if (targetVersion == currentVersion)
                 return false;
 
@@ -464,8 +468,8 @@
                 this.InsertMigrationKey(nullSettingKey);
             }
 
-            var migrationKey = migrationSetting != null ? 
-                string.IsNullOrEmpty(migrationSetting.Value) ? nullSettingKey : migrationSetting.Value : 
+            var migrationKey = migrationSetting != null ?
+                string.IsNullOrEmpty(migrationSetting.Value) ? nullSettingKey : migrationSetting.Value :
                 nullSettingKey;
 
             // Saves a previously saved migration key without a value
@@ -479,20 +483,20 @@
             }
 
             Guid validGuid;
-            if (Guid.TryParse(migrationKey, out validGuid))            
-            if (validGuid.Equals(Guid.Empty))
-            {
-                // reset the key
-                nullSettingKey = Guid.NewGuid().ToString();
-                var dto = migrationSetting;
-                if (dto != null)
+            if (Guid.TryParse(migrationKey, out validGuid))
+                if (validGuid.Equals(Guid.Empty))
                 {
-                    dto.Value = nullSettingKey;
-                    _database.Update(dto);
-                    migrationKey = nullSettingKey;
+                    // reset the key
+                    nullSettingKey = Guid.NewGuid().ToString();
+                    var dto = migrationSetting;
+                    if (dto != null)
+                    {
+                        dto.Value = nullSettingKey;
+                        _database.Update(dto);
+                        migrationKey = nullSettingKey;
+                    }
                 }
-            }
-                         
+
             return migrationKey;
         }
 

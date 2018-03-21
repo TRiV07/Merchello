@@ -2,8 +2,8 @@
 {
     using Merchello.Core;
     using Merchello.Core.Configuration;
+    using Merchello.Core.MultiStore;
     using Merchello.Web.Models.VirtualContent;
-
     using Umbraco.Web.Routing;
 
     /// <summary>
@@ -38,8 +38,12 @@
             // this can happen if there is a prefix configured in the merchello.config which does not exist in the Uri
             if (slug.IsNullOrWhiteSpace()) return false;
 
+            var domain = contentRequest.UmbracoDomain;
+
+            if (domain == null || !domain.RootContentId.HasValue) return false;
+
             // This may have a db fallback so we want this content finder to happen after Umbraco's content finders.
-            var content = Merchello.TypedProductContentBySlug(slug);
+            var content = Merchello.TypedProductContentBySlug(slug, domain.RootContentId.Value);
             if (content == null) return false;
             
             contentRequest.PublishedContent = content;

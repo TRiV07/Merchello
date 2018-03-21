@@ -4,7 +4,7 @@
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
-    using System.Linq;    
+    using System.Linq;
     using Core;
     using Core.Models;
     using Core.Services;
@@ -211,7 +211,7 @@
         private void ReIndexCustomers(IEnumerable<Guid> keys)
         {
             if (MerchelloContext.Current == null) return;
-            
+
             var customers = MerchelloContext.Current.Services.CustomerService.GetByKeys(keys);
 
             foreach (var customer in customers)
@@ -292,7 +292,7 @@
             if (customer != null && customer.HasIdentity) CustomerIndexer.DeleteCustomerFromIndex(customer);
         }
 
-#endregion
+        #endregion
 
         #region Invoice
 
@@ -471,7 +471,10 @@
         /// </summary>
         static void ProductVariantServiceCreated(IProductVariantService sender, Core.Events.NewEventArgs<IProductVariant> e)
         {
-            if (e.Entity.HasIdentity) IndexProductVariant(e.Entity);
+            if (e.Entity.HasIdentity)
+            {
+                IndexProductVariant(e.Entity, sender.GetDomainRootStructureId(e.Entity));
+            };
         }
 
         /// <summary>
@@ -481,8 +484,8 @@
         {
             foreach (var productVariant in e.SavedEntities)
             {
-                IndexProductVariant(productVariant);
-            }            
+                IndexProductVariant(productVariant, sender.GetDomainRootStructureId(productVariant));
+            }
         }
 
         /// <summary>
@@ -502,17 +505,17 @@
             ProductIndexer.AddProductToIndex(product);
         }
 
-        
-        private static void IndexProductVariant(IProductVariant productVariant)
+
+        private static void IndexProductVariant(IProductVariant productVariant, int domainRootStructureID)
         {
             var cache = new VirtualProductContentCache();
             cache.ClearVirtualCache(productVariant.ProductKey);
-            ProductIndexer.ReIndexNode(productVariant.SerializeToXml().Root, IndexTypes.ProductVariant);
+            ProductIndexer.ReIndexNode(productVariant.SerializeToXml(domainRootStructureID).Root, IndexTypes.ProductVariant);
         }
 
         private static void DeleteProductFromIndex(IProduct product)
         {
-            ProductIndexer.DeleteProductFromIndex(product);    
+            ProductIndexer.DeleteProductFromIndex(product);
         }
 
         private static void DeleteProductVariantFromIndex(IProductVariant productVariant)
@@ -522,6 +525,6 @@
             ProductIndexer.DeleteFromIndex(((ProductVariant)productVariant).ExamineId.ToString(CultureInfo.InvariantCulture));
         }
 
-#endregion
+        #endregion
     }
 }

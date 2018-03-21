@@ -348,6 +348,19 @@
         }
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="productVariant"></param>
+        /// <returns></returns>
+        public int GetDomainRootStructureId(IProductVariant productVariant)
+        {
+            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork(), Constants.System.Root))
+            {
+                return repository.Get(productVariant.ProductKey)?.DomainRootStructureID ?? 0;
+            }
+        }
+
+        /// <summary>
         /// Gets an <see cref="IProductVariant"/> object by it's unique SKU.
         /// </summary>
         /// <param name="sku">
@@ -392,6 +405,7 @@
             }
         }
 
+        //TODOMS
         /// <summary>
         /// Gets a collection of <see cref="IProductVariant"/> objects associated with a given warehouse 
         /// </summary>

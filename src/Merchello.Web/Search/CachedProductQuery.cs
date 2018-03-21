@@ -205,9 +205,9 @@
         /// <returns>
         /// The <see cref="IProductContent"/>.
         /// </returns>
-        public IProductContent TypedProductContentBySku(string sku)
+        public IProductContent TypedProductContentBySku(string sku, int domainRootStructureID)
         {
-            return _cache.GetBySku(sku, GetProductContentBySku);
+            return _cache.GetBySku(sku, domainRootStructureID, GetProductContentBySku);
         }
 
         /// <summary>
@@ -219,9 +219,9 @@
         /// <returns>
         /// The <see cref="IProductContent"/>.
         /// </returns>
-        public IProductContent TypedProductContentBySlug(string slug)
+        public IProductContent TypedProductContentBySlug(string slug, int domainRootStructureID)
         {
-            return _cache.GetBySlug(slug, GetProductContentBySlug);
+            return _cache.GetBySlug(slug, domainRootStructureID, GetProductContentBySlug);
         }
 
         /// <summary>
@@ -321,9 +321,9 @@
         /// <returns>
         /// The <see cref="IEnumerable{IProductContent}"/>.
         /// </returns>
-        public IEnumerable<IProductContent> TypedProductContentSearch(long page, long itemsPerPage, string sortBy = "name", SortDirection sortDirection = SortDirection.Descending)
+        public IEnumerable<IProductContent> TypedProductContentSearch(long page, long itemsPerPage, int domainRootStructureID, string sortBy = "name", SortDirection sortDirection = SortDirection.Descending)
         {
-            return TypedProductContentSearchPaged(page, itemsPerPage, sortBy, sortDirection).Items;
+            return TypedProductContentSearchPaged(page, itemsPerPage, domainRootStructureID, sortBy, sortDirection).Items;
         }
 
         /// <summary>
@@ -351,10 +351,11 @@
             string term,
             long page,
             long itemsPerPage,
+            int domainRootStructureID,
             string sortBy = "name",
             SortDirection sortDirection = SortDirection.Ascending)
         {
-            return TypedProductContentSearchPaged(term, page, itemsPerPage, sortBy, sortDirection).Items;
+            return TypedProductContentSearchPaged(term, page, itemsPerPage, domainRootStructureID, sortBy, sortDirection).Items;
         }
 
         /// <summary>
@@ -378,17 +379,18 @@
         public PagedCollection<IProductContent> TypedProductContentSearchPaged(
             long page,
             long itemsPerPage,
+            int domainRootStructureID,
             string sortBy = "name",
             SortDirection sortDirection = SortDirection.Descending)
         {
-            var cacheKey = PagedKeyCache.GetPagedQueryCacheKey<ICachedProductQuery>("Search", page, itemsPerPage, sortBy, sortDirection);
+            var cacheKey = PagedKeyCache.GetPagedQueryCacheKey<ICachedProductQuery>("Search", page, itemsPerPage, domainRootStructureID, sortBy, sortDirection);
             var pagedKeys = PagedKeyCache.GetPageByCacheKey(cacheKey);
 
             if (pagedKeys != null) return _cache.MapPagedCollection(pagedKeys, sortBy);
 
             return
                 _cache.GetPagedCollectionByCacheKey(
-                    PagedKeyCache.CachePage(cacheKey, _productService.GetPagedKeys(page, itemsPerPage, sortBy, sortDirection)), 
+                    PagedKeyCache.CachePage(cacheKey, _productService.GetPagedKeys(page, itemsPerPage, domainRootStructureID, sortBy, sortDirection)), 
                     sortBy);
         }
 
@@ -417,14 +419,15 @@
             string term,
             long page,
             long itemsPerPage,
+            int domainRootStructureID,
             string sortBy = "name",
             SortDirection sortDirection = SortDirection.Descending)
         {
-            var cacheKey = PagedKeyCache.GetPagedQueryCacheKey<ICachedProductQuery>("Search", page, itemsPerPage, sortBy, sortDirection, new Dictionary<string, string> { { "term", term } });
+            var cacheKey = PagedKeyCache.GetPagedQueryCacheKey<ICachedProductQuery>("Search", page, itemsPerPage, domainRootStructureID, sortBy, sortDirection, new Dictionary<string, string> { { "term", term } });
             var pagedKeys = PagedKeyCache.GetPageByCacheKey(cacheKey);
             return
                 _cache.GetPagedCollectionByCacheKey(
-                    pagedKeys ?? _productService.GetPagedKeys(term, page, itemsPerPage, sortBy, sortDirection),
+                    pagedKeys ?? _productService.GetPagedKeys(term, page, itemsPerPage, domainRootStructureID, sortBy, sortDirection),
                     sortBy);
         }
 
@@ -434,6 +437,7 @@
             decimal max,
             long page,
             long itemsPerPage,
+            int domainRootStructureID,
             string sortBy = "price",
             SortDirection sortDirection = SortDirection.Descending)
         {
@@ -441,6 +445,7 @@
                 "GetProductsInPriceRange",
                 page,
                 itemsPerPage,
+                domainRootStructureID,
                 sortBy,
                 sortDirection,
                 new Dictionary<string, string>
@@ -453,7 +458,7 @@
 
             return
                 _cache.GetPagedCollectionByCacheKey(
-                    pagedKeys ?? _productService.GetProductsKeysInPriceRange(min, max, page, itemsPerPage, sortBy, sortDirection),
+                    pagedKeys ?? _productService.GetProductsKeysInPriceRange(min, max, page, itemsPerPage, domainRootStructureID, sortBy, sortDirection),
                     sortBy);
         }
 
@@ -845,10 +850,12 @@
         /// <returns>
         /// The <see cref="ProductDisplay"/>.
         /// </returns>
-        public ProductDisplay GetBySku(string sku)
+        public ProductDisplay GetBySku(string sku, int domainRootStructureID)
         {
             var criteria = SearchProvider.CreateSearchCriteria();
-            criteria.Field("sku", sku).And().Field("master", "True");
+            criteria.Field("sku", sku)
+                .And().Range("domainRootStructureID", domainRootStructureID, domainRootStructureID)
+                .And().Field("master", "True");
 
 
             var displays = SearchProvider.Search(criteria).Select(PerformMapSearchResultToDisplayObject);
@@ -856,7 +863,7 @@
 
             if (display != null) return this.ModifyData(display);
 
-            var entity = _productService.GetBySku(sku);
+            var entity = _productService.GetBySku(sku, domainRootStructureID);
 
             if (entity == null) return null;
 
@@ -874,10 +881,12 @@
         /// <returns>
         /// The <see cref="ProductDisplay"/>.
         /// </returns>
-        public ProductDisplay GetBySlug(string slug)
+        public ProductDisplay GetBySlug(string slug, int domainRootStructureID)
         {
             var criteria = SearchProvider.CreateSearchCriteria();
-            criteria.Field("slugs", slug).And().Field("master", "True");
+            criteria.Field("slugs", slug)
+                .And().Range("domainRootStructureID", domainRootStructureID, domainRootStructureID)
+                .And().Field("master", "True");
 
             var displays = SearchProvider.Search(criteria).Select(PerformMapSearchResultToDisplayObject).ToArray();
 
@@ -886,7 +895,7 @@
             // Don't modifiy the data here as it would have been modified in the PerformMapSearchResultToDisplayObject
             if (display != null) return display;
 
-            var key = _productService.GetKeyForSlug(slug);
+            var key = _productService.GetKeyForSlug(slug, domainRootStructureID);
 
             return Guid.Empty.Equals(key) ? null : this.GetByKey(key);
         }
@@ -934,10 +943,12 @@
         /// <returns>
         /// The <see cref="ProductVariantDisplay"/>.
         /// </returns>
-        public ProductVariantDisplay GetProductVariantBySku(string sku)
+        public ProductVariantDisplay GetProductVariantBySku(string sku, int domainRootStructureID)
         {
             var criteria = SearchProvider.CreateSearchCriteria();
-            criteria.Field("sku", sku).Not().Field("master", "True");
+            criteria.Field("sku", sku)
+                .And().Range("domainRootStructureID", domainRootStructureID, domainRootStructureID)
+                .Not().Field("master", "True");
 
             var result = CachedSearch(criteria, ExamineDisplayExtensions.ToProductVariantDisplay).FirstOrDefault();
 
@@ -947,7 +958,7 @@
                 return this.ModifyData(result);
             }
 
-            var variant = _productService.GetProductVariantBySku(sku);
+            var variant = _productService.GetProductVariantBySku(sku, domainRootStructureID);
 
             if (variant != null)
             {
@@ -977,13 +988,13 @@
         /// <returns>
         /// The <see cref="QueryResultDisplay"/>.
         /// </returns>
-        public QueryResultDisplay Search(long page, long itemsPerPage, string sortBy = "name", SortDirection sortDirection = SortDirection.Descending)
+        public QueryResultDisplay Search(long page, long itemsPerPage, int domainRootStructureID, string sortBy = "name", SortDirection sortDirection = SortDirection.Descending)
         {
-            var cacheKey = PagedKeyCache.GetPagedQueryCacheKey<ICachedProductQuery>("Search", page, itemsPerPage, sortBy, sortDirection);
+            var cacheKey = PagedKeyCache.GetPagedQueryCacheKey<ICachedProductQuery>("Search", page, itemsPerPage, domainRootStructureID, sortBy, sortDirection);
             var pagedKeys = PagedKeyCache.GetPageByCacheKey(cacheKey);
             return GetQueryResultDisplay(
                 pagedKeys ??
-                PagedKeyCache.CachePage(cacheKey, _productService.GetPagedKeys(page, itemsPerPage, sortBy, sortDirection)));
+                PagedKeyCache.CachePage(cacheKey, _productService.GetPagedKeys(page, itemsPerPage, domainRootStructureID, sortBy, sortDirection)));
         }
 
         /// <summary>
@@ -1007,13 +1018,13 @@
         /// <returns>
         /// The <see cref="QueryResultDisplay"/>.
         /// </returns>
-        public QueryResultDisplay Search(string term, long page, long itemsPerPage, string sortBy = "name", SortDirection sortDirection = SortDirection.Ascending)
+        public QueryResultDisplay Search(string term, long page, long itemsPerPage, int domainRootStructureID, string sortBy = "name", SortDirection sortDirection = SortDirection.Ascending)
         {
-            var cacheKey = PagedKeyCache.GetPagedQueryCacheKey<ICachedProductQuery>("Search", page, itemsPerPage, sortBy, sortDirection, new Dictionary<string, string> { { "term", term } });
+            var cacheKey = PagedKeyCache.GetPagedQueryCacheKey<ICachedProductQuery>("Search", page, itemsPerPage, domainRootStructureID, sortBy, sortDirection, new Dictionary<string, string> { { "term", term } });
             var pagedKeys = PagedKeyCache.GetPageByCacheKey(cacheKey);
             return GetQueryResultDisplay(
                 pagedKeys ??
-                PagedKeyCache.CachePage(cacheKey, _productService.GetPagedKeys(term, page, itemsPerPage, sortBy, sortDirection)));
+                PagedKeyCache.CachePage(cacheKey, _productService.GetPagedKeys(term, page, itemsPerPage, domainRootStructureID, sortBy, sortDirection)));
         }
 
         /// <summary>
@@ -1041,6 +1052,7 @@
             Guid optionKey,
             long page,
             long itemsPerPage,
+            int domainRootStructureID,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Descending)
         {
@@ -1049,6 +1061,7 @@
                 "GetProductsWithOption",
                 page,
                 itemsPerPage,
+                domainRootStructureID,
                 sortBy,
                 sortDirection,
                 new Dictionary<string, string> { { "optionKey", optionKey.ToString() } });
@@ -1060,7 +1073,7 @@
                 pagedKeys ??
                 PagedKeyCache.CachePage(
                     cacheKey,
-                    _productService.GetProductsKeysWithOption(optionKey, page, itemsPerPage, sortBy, sortDirection)));
+                    _productService.GetProductsKeysWithOption(optionKey, page, itemsPerPage, domainRootStructureID, sortBy, sortDirection)));
         }
 
         /// <summary>
@@ -1092,6 +1105,7 @@
             IEnumerable<string> choiceNames,
             long page,
             long itemsPerPage,
+            int domainRootStructureID,
             string sortBy = "name",
             SortDirection sortDirection = SortDirection.Descending)
         {
@@ -1106,6 +1120,7 @@
                 "GetProductsWithOption",
                 page,
                 itemsPerPage,
+                domainRootStructureID,
                 sortBy,
                 sortDirection,
                 args);
@@ -1117,7 +1132,7 @@
                     pagedKeys ?? 
                     PagedKeyCache.CachePage(
                         cacheKey,
-                        _productService.GetProductsKeysWithOption(optionName, choices, page, itemsPerPage, sortBy, sortDirection)));
+                        _productService.GetProductsKeysWithOption(optionName, choices, page, itemsPerPage, domainRootStructureID, sortBy, sortDirection)));
         }
 
         /// <summary>
@@ -1145,6 +1160,7 @@
             string optionName,
             long page,
             long itemsPerPage,
+            int domainRootStructureID,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Descending)
         {
@@ -1152,6 +1168,7 @@
               "GetProductsWithOption",
               page,
               itemsPerPage,
+              domainRootStructureID,
               sortBy,
               sortDirection,
               new Dictionary<string, string> { { "optionName", optionName } });
@@ -1163,7 +1180,7 @@
                     pagedKeys
                     ?? PagedKeyCache.CachePage(
                         cacheKey,
-                        _productService.GetProductsKeysWithOption(optionName, page, itemsPerPage, sortBy, sortDirection)));
+                        _productService.GetProductsKeysWithOption(optionName, page, itemsPerPage, domainRootStructureID, sortBy, sortDirection)));
         }
 
         /// <summary>
@@ -1195,6 +1212,7 @@
             string choiceName,
             long page,
             long itemsPerPage,
+            int domainRootStructureID,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Descending)
         {
@@ -1202,6 +1220,7 @@
               "GetProductsWithOption",
               page,
               itemsPerPage,
+              domainRootStructureID,
               sortBy,
               sortDirection,
               new Dictionary<string, string>
@@ -1217,7 +1236,7 @@
                     pagedKeys ??
                     PagedKeyCache.CachePage(
                         cacheKey,
-                        _productService.GetProductsKeysWithOption(optionName, choiceName, page, itemsPerPage, sortBy, sortDirection)));
+                        _productService.GetProductsKeysWithOption(optionName, choiceName, page, itemsPerPage, domainRootStructureID, sortBy, sortDirection)));
         }
 
         /// <summary>
@@ -1245,6 +1264,7 @@
             IEnumerable<string> optionNames,
             long page,
             long itemsPerPage,
+            int domainRootStructureID,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Descending)
         {
@@ -1253,6 +1273,7 @@
               "GetProductsWithOption",
               page,
               itemsPerPage,
+              domainRootStructureID,
               sortBy,
               sortDirection,
               new Dictionary<string, string>
@@ -1267,7 +1288,7 @@
                     pagedKeys ??
                     PagedKeyCache.CachePage(
                         cacheKey,
-                        _productService.GetProductsKeysWithOption(names, page, itemsPerPage, sortBy, sortDirection)));
+                        _productService.GetProductsKeysWithOption(names, page, itemsPerPage, domainRootStructureID, sortBy, sortDirection)));
         }
 
         /// <summary>
@@ -1299,6 +1320,7 @@
             decimal max,
             long page,
             long itemsPerPage,
+            int domainRootStructureID,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Descending)
         {
@@ -1306,6 +1328,7 @@
                 "GetProductsInPriceRange",
                 page,
                 itemsPerPage,
+                domainRootStructureID,
                 sortBy,
                 sortDirection,
                 new Dictionary<string, string>
@@ -1321,7 +1344,7 @@
                     pagedKeys ??
                     PagedKeyCache.CachePage(
                         cacheKey,
-                        _productService.GetProductsKeysInPriceRange(min, max, page, itemsPerPage, sortBy, sortDirection)));
+                        _productService.GetProductsKeysInPriceRange(min, max, page, itemsPerPage, domainRootStructureID, sortBy, sortDirection)));
         }
 
         /// <summary>
@@ -1357,6 +1380,7 @@
             decimal taxModifier,
             long page,
             long itemsPerPage,
+            int domainRootStructureID,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Descending)
         {
@@ -1364,6 +1388,7 @@
                 "GetProductsInPriceRange",
                 page,
                 itemsPerPage,
+                domainRootStructureID,
                 sortBy,
                 sortDirection,
                 new Dictionary<string, string>
@@ -1380,7 +1405,7 @@
                     pagedKeys ??
                     PagedKeyCache.CachePage(
                         cacheKey,
-                        _productService.GetProductsKeysInPriceRange(min, max, taxModifier, page, itemsPerPage, sortBy, sortDirection)));
+                        _productService.GetProductsKeysInPriceRange(min, max, taxModifier, page, itemsPerPage, domainRootStructureID, sortBy, sortDirection)));
         }
 
         /// <summary>
@@ -1408,6 +1433,7 @@
             string barcode,
             long page,
             long itemsPerPage,
+            int domainRootStructureID,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Descending)
         {
@@ -1415,6 +1441,7 @@
                 "GetProductsByBarcode",
                 page,
                 itemsPerPage,
+                domainRootStructureID,
                 sortBy,
                 sortDirection,
                 new Dictionary<string, string> { { "barcode", barcode } });
@@ -1426,7 +1453,7 @@
                     pagedKeys ??
                     PagedKeyCache.CachePage(
                         cacheKey,
-                        _productService.GetProductsByBarcode(barcode, page, itemsPerPage, sortBy, sortDirection)));
+                        _productService.GetProductsByBarcode(barcode, page, itemsPerPage, domainRootStructureID, sortBy, sortDirection)));
         }
 
         /// <summary>
@@ -1454,6 +1481,7 @@
             IEnumerable<string> barcodes,
             long page,
             long itemsPerPage,
+            int domainRootStructureID,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Descending)
         {
@@ -1462,6 +1490,7 @@
                 "GetProductsByBarcode",
                 page,
                 itemsPerPage,
+                domainRootStructureID,
                 sortBy,
                 sortDirection,
                 new Dictionary<string, string>
@@ -1476,7 +1505,7 @@
                     pagedKeys ??
                     PagedKeyCache.CachePage(
                         cacheKey,
-                        _productService.GetProductsByBarcode(barcodesArray, page, itemsPerPage, sortBy, sortDirection)));
+                        _productService.GetProductsByBarcode(barcodesArray, page, itemsPerPage, domainRootStructureID, sortBy, sortDirection)));
         }
 
         /// <summary>
@@ -1504,6 +1533,7 @@
             string manufacturer,
             long page,
             long itemsPerPage,
+            int domainRootStructureID,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Descending)
         {
@@ -1511,6 +1541,7 @@
                 "GetProductsByManufacturer",
                 page,
                 itemsPerPage,
+                domainRootStructureID,
                 sortBy,
                 sortDirection,
                 new Dictionary<string, string> { { "manufacturer", manufacturer} });
@@ -1522,7 +1553,7 @@
                     pagedKeys ??
                     PagedKeyCache.CachePage(
                         cacheKey,
-                        _productService.GetProductsKeysByManufacturer(manufacturer, page, itemsPerPage, sortBy, sortDirection)));
+                        _productService.GetProductsKeysByManufacturer(manufacturer, page, itemsPerPage, domainRootStructureID, sortBy, sortDirection)));
         }
 
         /// <summary>
@@ -1550,6 +1581,7 @@
             IEnumerable<string> manufacturer,
             long page,
             long itemsPerPage,
+            int domainRootStructureID,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Descending)
         {
@@ -1558,6 +1590,7 @@
             "GetProductsByManufacturer",
             page,
             itemsPerPage,
+            domainRootStructureID,
             sortBy,
             sortDirection,
             new Dictionary<string, string> { { "manufacturer", string.Join(string.Empty, manufacturerArray.OrderBy(x => x)) } });
@@ -1569,7 +1602,7 @@
                     pagedKeys ??
                     PagedKeyCache.CachePage(
                         cacheKey,
-                        _productService.GetProductsKeysByManufacturer(manufacturerArray, page, itemsPerPage, sortBy, sortDirection)));
+                        _productService.GetProductsKeysByManufacturer(manufacturerArray, page, itemsPerPage, domainRootStructureID, sortBy, sortDirection)));
         }
 
         /// <summary>
@@ -1596,6 +1629,7 @@
         public QueryResultDisplay GetProductsInStock(
             long page,
             long itemsPerPage,
+            int domainRootStructureID,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Descending,
             bool includeAllowOutOfStockPurchase = false)
@@ -1604,6 +1638,7 @@
                 "GetProductsInStock",
                 page,
                 itemsPerPage,
+                domainRootStructureID,
                 sortBy,
                 sortDirection,
                 new Dictionary<string, string>
@@ -1621,7 +1656,7 @@
                     pagedKeys ??
                     PagedKeyCache.CachePage(
                         cacheKey,
-                        _productService.GetProductsKeysInStock(page, itemsPerPage, sortBy, sortDirection)));
+                        _productService.GetProductsKeysInStock(page, itemsPerPage, domainRootStructureID, sortBy, sortDirection)));
         }
 
         /// <summary>
@@ -1645,6 +1680,7 @@
         public QueryResultDisplay GetProductsOnSale(
             long page,
             long itemsPerPage,
+            int domainRootStructureID,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Descending)
         {
@@ -1652,6 +1688,7 @@
                 "GetProductsOnSale",
                 page,
                 itemsPerPage,
+                domainRootStructureID,
                 sortBy,
                 sortDirection);
 
@@ -1662,7 +1699,7 @@
                     pagedKeys ??
                     PagedKeyCache.CachePage(
                         cacheKey,
-                        _productService.GetProductsKeysOnSale(page, itemsPerPage, sortBy, sortDirection)));
+                        _productService.GetProductsKeysOnSale(page, itemsPerPage, domainRootStructureID, sortBy, sortDirection)));
         }
 
         /// <summary>
@@ -1703,7 +1740,8 @@
         /// </param>
         internal void ReindexEntity(IProductVariant entity)
         {
-            IndexProvider.ReIndexNode(entity.SerializeToXml().Root, IndexTypes.ProductVariant);
+            var product = _productService.GetByKey(entity.ProductKey);
+            IndexProvider.ReIndexNode(entity.SerializeToXml(product.DomainRootStructureID).Root, IndexTypes.ProductVariant);
         }        
 
         /// <summary>
@@ -1799,9 +1837,9 @@
         /// <returns>
         /// The <see cref="IProductContent"/>.
         /// </returns>
-        private IProductContent GetProductContentBySku(string sku)
+        private IProductContent GetProductContentBySku(string sku, int domainRootStructureID)
         {
-            var display = GetBySku(sku);
+            var display = GetBySku(sku, domainRootStructureID);
             return display == null ? null :
                 display.AsProductContent(_productContentFactory.Value);
         }
@@ -1815,9 +1853,9 @@
         /// <returns>
         /// The <see cref="IProductContent"/>.
         /// </returns>
-        private IProductContent GetProductContentBySlug(string slug)
+        private IProductContent GetProductContentBySlug(string slug, int domainRootStructureID)
         {
-            var display = GetBySlug(slug);
+            var display = GetBySlug(slug, domainRootStructureID);
             return display == null ? null :
                 display.AsProductContent(_productContentFactory.Value);
         }

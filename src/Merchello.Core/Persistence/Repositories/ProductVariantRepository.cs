@@ -485,18 +485,19 @@
                         });
                     }
                 }
-                
+
                 //split into batches of 100
-                if (++variantIndex >= 100) {
+                if (++variantIndex >= 100)
+                {
                     if (!string.IsNullOrEmpty(sqlStatement))
                     {
-                    		Database.Execute(sqlStatement, parms.ToArray());
+                        Database.Execute(sqlStatement, parms.ToArray());
                     }
-                		variantIndex = 0;
+                    variantIndex = 0;
                     sqlStatement = string.Empty;
                 }
             }
-            
+
             if (!string.IsNullOrEmpty(sqlStatement))
             {
                 Database.Execute(sqlStatement, parms.ToArray());
@@ -522,14 +523,14 @@
                 new Sql(
                     "UPDATE merchCatalogInventory SET Count = @ct, LowCount = @lct, Location = @loc, UpdateDate = @ud WHERE catalogKey = @ck AND productVariantKey = @pvk",
                     new
-                        {
-                            @ct = inv.Count,
-                            @lct = inv.LowCount,
-                            @loc = inv.Location,
-                            @ud = DateTime.Now,
-                            @ck = inv.CatalogKey,
-                            @pvk = inv.ProductVariantKey
-                        });
+                    {
+                        @ct = inv.Count,
+                        @lct = inv.LowCount,
+                        @loc = inv.Location,
+                        @ud = DateTime.Now,
+                        @ck = inv.CatalogKey,
+                        @pvk = inv.ProductVariantKey
+                    });
 
             Database.Execute(sql);
         }
@@ -655,14 +656,15 @@
                         }
                     }
                 }
-                
+
                 //split into batches of 100
-                if (++variantIndex >= 100) {
+                if (++variantIndex >= 100)
+                {
                     if (!string.IsNullOrEmpty(sqlStatement))
                     {
-                    		Database.Execute(sqlStatement, parms.ToArray());
+                        Database.Execute(sqlStatement, parms.ToArray());
                     }
-                		variantIndex = 0;
+                    variantIndex = 0;
                     sqlStatement = string.Empty;
                 }
             }
@@ -726,16 +728,16 @@
                 Database.Execute(
                     Update,
                     new
-                        {
-                            @Dctk = dto.DetachedContentTypeKey,
-                            @Tid = dto.TemplateId,
-                            @Slug = dto.Slug,
-                            @Vals = dto.Values,
-                            @Cbr = dto.CanBeRendered,
-                            @Ud = dto.UpdateDate,
-                            @Cn = dto.CultureName,
-                            @Pvk = dto.ProductVariantKey
-                        });
+                    {
+                        @Dctk = dto.DetachedContentTypeKey,
+                        @Tid = dto.TemplateId,
+                        @Slug = dto.Slug,
+                        @Vals = dto.Values,
+                        @Cbr = dto.CanBeRendered,
+                        @Ud = dto.UpdateDate,
+                        @Cn = dto.CultureName,
+                        @Pvk = dto.ProductVariantKey
+                    });
             }
         }
 
@@ -1386,7 +1388,7 @@
             Mandate.ParameterCondition(entity.ProductKey != Guid.Empty, "productKey must be set");
 
             if (!((ProductVariant)entity).Master)
-                Mandate.ParameterCondition(entity.Attributes.Any(), "Product variant must have attributes");            
+                Mandate.ParameterCondition(entity.Attributes.Any(), "Product variant must have attributes");
 
             return true;
         }
@@ -1441,7 +1443,7 @@
                     invLocation = inv.Location,
                     invUpdateDate = inv.UpdateDate,
                     catalogKey = inv.CatalogKey,
-                    productVariantKey = inv.ProductVariantKey                    
+                    productVariantKey = inv.ProductVariantKey
                 });
         }
 
@@ -1471,12 +1473,10 @@
         /// <returns>A value indicating whether or not a SKU exists on a record other than the record with the id passed</returns>
         private bool SkuExists(string sku, Guid productVariantKey)
         {
-            var sql = new Sql();
-            sql.Select("*")
-                .From<ProductVariantDto>(SqlSyntax)
-                .Where<ProductVariantDto>(x => x.Sku == sku && x.Key != productVariantKey, SqlSyntax);
+            var sql = GetBaseQuery(false);
+            sql.Where<ProductVariantDto>(x => x.Sku == sku && x.Key != productVariantKey, SqlSyntax);
 
-            return Database.Fetch<ProductAttributeDto>(sql).Any();
+            return Database.Fetch<ProductDto, ProductVariantDto, ProductVariantIndexDto>(sql).Any();
         }
 
 
@@ -1487,15 +1487,13 @@
         /// <returns>A value indicating whether or not a SKU exists on a record other than the record with the id passed</returns>
         private bool SkuExists(IEnumerable<IProductVariant> entities)
         {
-            var sql = new Sql();
-            sql.Select("*")
-                .From<ProductVariantDto>(SqlSyntax);
+            var sql = GetBaseQuery(false);
 
             var whereClauses = entities.Select(entity => string.Format("(Sku = '{0}' and pk != '{1}')", entity.Sku, entity.Key)).ToList();
 
             sql = sql.Where(string.Join(" or ", whereClauses), null);
 
-            return Database.Fetch<ProductAttributeDto>(sql).Any();
+            return Database.Fetch<ProductDto, ProductVariantDto, ProductVariantIndexDto>(sql).Any();
         }
 
         /// <summary>
@@ -1513,7 +1511,15 @@
         private string EnsureSlug(IProductVariantDetachedContent detachedContent, string slug, int interval = 0)
         {
             var modSlug = interval > 0 ? string.Format("{0}-{1}", slug, interval) : slug;
-            var count = Database.ExecuteScalar<int>("SELECT COUNT(slug) FROM [merchProductVariantDetachedContent] WHERE [merchProductVariantDetachedContent].[slug] = @Slug AND [merchProductVariantDetachedContent].[productVariantKey] != @Pvk", new { @Slug = modSlug, @Pvk = detachedContent.ProductVariantKey });
+            var count = Database.ExecuteScalar<int>(@"
+                SELECT COUNT(slug)
+                FROM [merchProduct]
+                INNER JOIN [merchProductVariant] ON [merchProduct].[pk] = [merchProductVariant].[productKey]
+                INNER JOIN [merchProductVariantDetachedContent] ON [merchProductVariant].[pk] = [merchProductVariantDetachedContent].[productVariantKey]
+                WHERE [merchProductVariantDetachedContent].[slug] = @Slug
+                AND [merchProductVariantDetachedContent].[productVariantKey] != @Pvk
+                AND [merchProduct].[domainRootStructureID] = @DomainRootStructureID",
+                new { @Slug = modSlug, @Pvk = detachedContent.ProductVariantKey, @DomainRootStructureID = _domainRootStructureID });
             if (count > 0) modSlug = EnsureSlug(detachedContent, slug, interval + 1);
             return modSlug;
         }

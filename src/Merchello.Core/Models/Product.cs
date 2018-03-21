@@ -50,7 +50,12 @@
         /// </param>
         public Product(IProductVariant variant)
             : this(variant, new ProductOptionCollection(), new ProductVariantCollection())
-        {            
+        {
+        }
+        public Product(IProductVariant variant, int domainRootStructureID)
+            : this(variant)
+        {
+            DomainRootStructureID = domainRootStructureID;
         }
 
         /// <summary>
@@ -566,7 +571,7 @@
             /// <summary>
             /// The domain root structure ID selector.
             /// </summary>
-            public readonly PropertyInfo DomainRootStructureIDSelector = ExpressionHelper.GetPropertyInfo<StoreSetting, int>(x => x.DomainRootStructureID);
+            public readonly PropertyInfo DomainRootStructureIDSelector = ExpressionHelper.GetPropertyInfo<Product, int>(x => x.DomainRootStructureID);
         }
     }
 }

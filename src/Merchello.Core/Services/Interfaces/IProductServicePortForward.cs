@@ -19,7 +19,7 @@
         /// <returns>
         /// The <see cref="IEnumerable{String}"/> (manufacturer names).
         /// </returns>
-        IEnumerable<string> GetAllManufacturers();
+        IEnumerable<string> GetAllManufacturers(int domainRootStructureID);
 
         /// <summary>
         /// Gets recently updated products.
@@ -37,7 +37,7 @@
         /// Return value breaks the pattern in this repository for easier port forward to Merchello Version 3.0
         /// where all repositories return <see cref="PagedCollection"/> rather than the ORM <see cref="Page{T}"/>.
         /// </remarks>
-        PagedCollection<IProduct> GetRecentlyUpdatedProducts(long page, long itemsPerPage = 10);
+        PagedCollection<IProduct> GetRecentlyUpdatedProducts(int domainRootStructureID, long page, long itemsPerPage = 10);
 
         ///// <summary>
         ///// Special case advanced search.

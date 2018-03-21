@@ -32,11 +32,6 @@
     internal class ProductOptionRepository : MerchelloPetaPocoRepositoryBase<IProductOption>, IProductOptionRepository
     {
         /// <summary>
-        /// The domain root structure ID.
-        /// </summary>
-        private readonly int _domainRootStructureID;
-
-        /// <summary>
         /// Valid sort fields.
         /// </summary>
         private static readonly string[] _validSortFields = { "name" };
@@ -58,11 +53,10 @@
         /// <param name="sqlSyntax">
         /// The SQL syntax.
         /// </param>
-        public ProductOptionRepository(IDatabaseUnitOfWork work, ILogger logger, ISqlSyntaxProvider sqlSyntax, int domainRootStructureID)
+        public ProductOptionRepository(IDatabaseUnitOfWork work, ILogger logger, ISqlSyntaxProvider sqlSyntax)
             : base(work, logger, sqlSyntax)
         {
             _detachedContentTypeRepository = new DetachedContentTypeRepository(work, logger, sqlSyntax);
-            _domainRootStructureID = domainRootStructureID;
         }
 
         /// <summary>

@@ -78,13 +78,13 @@
         /// <returns>
         /// The <see cref="IProductContent"/>.
         /// </returns>
-        public IProductContent GetBySlug(string slug, Func<string, IProductContent> get)
+        public IProductContent GetBySlug(string slug, int domainRootStructureID, Func<string, int, IProductContent> get)
         {
-            var cacheKey = GetSlugCacheKey(slug, ModifiedVersion);
+            var cacheKey = GetSlugCacheKey(slug, domainRootStructureID, ModifiedVersion);
             var content = (IProductContent)Cache.RuntimeCache.GetCacheItem(cacheKey);
             if (content != null) return content;
 
-            return CacheContent(cacheKey, get.Invoke(slug));
+            return CacheContent(cacheKey, get.Invoke(slug, domainRootStructureID));
         }
 
         /// <summary>
@@ -99,13 +99,13 @@
         /// <returns>
         /// The <see cref="IProductContent"/>.
         /// </returns>
-        public IProductContent GetBySku(string sku, Func<string, IProductContent> get)
+        public IProductContent GetBySku(string sku, int domainRootStructureID, Func<string, int, IProductContent> get)
         {
-            var cacheKey = GetSkuCacheKey(sku, ModifiedVersion);
+            var cacheKey = GetSkuCacheKey(sku, domainRootStructureID, ModifiedVersion);
             var content = (IProductContent)Cache.RuntimeCache.GetCacheItem(cacheKey);
             if (content != null) return content;
 
-            return CacheContent(cacheKey, get.Invoke(sku));
+            return CacheContent(cacheKey, get.Invoke(sku, domainRootStructureID));
         }
 
         /// <summary>
@@ -159,9 +159,9 @@
         /// <returns>
         /// The <see cref="string"/>.
         /// </returns>
-        private static string GetSlugCacheKey(string slug, bool modified)
+        private static string GetSlugCacheKey(string slug, int domainRootStructureID, bool modified)
         {
-            return string.Format("merch.productcontent.slug.{0}.{1}", slug, modified);
+            return string.Format("merch.productcontent.slug.{0}.{1}.{2}", slug, domainRootStructureID, modified);
         }
 
         /// <summary>
@@ -176,9 +176,9 @@
         /// <returns>
         /// The <see cref="string"/>.
         /// </returns>
-        private static string GetSkuCacheKey(string sku, bool modified)
+        private static string GetSkuCacheKey(string sku, int domainRootStructureID, bool modified)
         {
-            return string.Format("merch.productcontent.sku.{0}.{1}", sku, modified);
+            return string.Format("merch.productcontent.sku.{0}.{1}.{2}", sku, domainRootStructureID, modified);
         }
 
         /// <summary>
@@ -207,13 +207,13 @@
             {
                 foreach (var dc in product.DetachedContents.Where(x => !x.Slug.IsNullOrWhiteSpace()))
                 {
-                    Cache.RuntimeCache.ClearCacheItem(GetSlugCacheKey(dc.Slug, true));
-                    Cache.RuntimeCache.ClearCacheItem(GetSlugCacheKey(dc.Slug, false));
+                    Cache.RuntimeCache.ClearCacheItem(GetSlugCacheKey(dc.Slug, product.DomainRootStructureID, true));
+                    Cache.RuntimeCache.ClearCacheItem(GetSlugCacheKey(dc.Slug, product.DomainRootStructureID, false));
                 }
             }
 
-            Cache.RuntimeCache.ClearCacheItem(GetSkuCacheKey(product.Sku, true));
-            Cache.RuntimeCache.ClearCacheItem(GetSkuCacheKey(product.Sku, false));
+            Cache.RuntimeCache.ClearCacheItem(GetSkuCacheKey(product.Sku, product.DomainRootStructureID, true));
+            Cache.RuntimeCache.ClearCacheItem(GetSkuCacheKey(product.Sku, product.DomainRootStructureID, false));
         }
     }
 }

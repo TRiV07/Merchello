@@ -1,6 +1,6 @@
 angular.module('merchello.directives').directive('invoiceItemizationTable',
-    ['$q', '$timeout', 'localizationService', 'invoiceResource', 'invoiceHelper', 'dialogService', 'productResource', 'notificationsService',
-        function ($q, $timeout, localizationService, invoiceResource, invoiceHelper, dialogService, productResource, notificationsService) {
+    ['$q', '$routeParams', '$timeout', 'localizationService', 'invoiceResource', 'invoiceHelper', 'dialogService', 'productResource', 'notificationsService',
+        function ($q, $routeParams, $timeout, localizationService, invoiceResource, invoiceHelper, dialogService, productResource, notificationsService) {
             return {
                 restrict: 'E',
                 replace: true,
@@ -51,7 +51,7 @@ angular.module('merchello.directives').directive('invoiceItemizationTable',
 
                         // Get the product if it exists! We call the vairant service as this seems
                         // to return the base product too
-                        productResource.getVariantBySku(sku).then(function(result) {
+                        productResource.getVariantBySku(sku, $routeParams.storeId).then(function (result) {
                             // If we get something back then add it to the diaglogData
                             if (result) {
                                 dialogData.product = result;

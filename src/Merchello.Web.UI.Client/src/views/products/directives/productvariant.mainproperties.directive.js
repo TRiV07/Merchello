@@ -19,7 +19,7 @@
                     settings: '='
                 },
                 templateUrl: '/App_Plugins/Merchello/Backoffice/Merchello/Directives/productvariant.mainproperties.tpl.html',
-                controller: function ($scope, productResource, warehouseResource, warehouseDisplayBuilder, catalogInventoryDisplayBuilder) {
+                controller: function ($scope, $routeParams, productResource, warehouseResource, warehouseDisplayBuilder, catalogInventoryDisplayBuilder) {
 
                     // Get the default warehouse for the ensureCatalogInventory() function below
                     $scope.defaultWarehouse = {};
@@ -39,7 +39,7 @@
                     function init() {
 
                         // get the list of existing manufacturers to make it easier to enter
-                        productResource.getManufacturers().then(function(data) {
+                        productResource.getManufacturers($routeParams.storeId).then(function(data) {
                             $scope.manufacturers = data;
                         });
 

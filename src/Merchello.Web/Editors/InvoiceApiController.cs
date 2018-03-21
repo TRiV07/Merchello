@@ -535,8 +535,9 @@
                             }
                             else
                             {
-                                invoiceAddItem.ProductVariant = productService.GetProductVariantBySku(invoiceAddItem.Sku);
-                                invoiceAddItem.Product = productService.GetBySku(invoiceAddItem.Sku);
+                                //TODOMS
+                                invoiceAddItem.ProductVariant = productService.GetProductVariantBySku(invoiceAddItem.Sku, -1);
+                                invoiceAddItem.Product = productService.GetBySku(invoiceAddItem.Sku, -1);
                                 invoiceAddItem.IsProductVariant = invoiceAddItem.Product == null;
                             }
                         }

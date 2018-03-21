@@ -80,9 +80,9 @@
         /// <returns>
         /// The <see cref="IProductContent"/>.
         /// </returns>
-        public static IProductContent TypedProductContentBySlug(this MerchelloHelper merchello, string slug)
+        public static IProductContent TypedProductContentBySlug(this MerchelloHelper merchello, string slug, int domainRootStructureID)
         {
-            return merchello.Query.Product.TypedProductContentBySlug(slug);
+            return merchello.Query.Product.TypedProductContentBySlug(slug, domainRootStructureID);
         }
 
         /// <summary>
@@ -97,9 +97,9 @@
         /// <returns>
         /// The <see cref="IProductContent"/>.
         /// </returns>
-        public static IProductContent TypeProductContentBySku(this MerchelloHelper merchello, string sku)
+        public static IProductContent TypeProductContentBySku(this MerchelloHelper merchello, string sku, int domainRootStructureID)
         {
-            return merchello.Query.Product.TypedProductContentBySku(sku);
+            return merchello.Query.Product.TypedProductContentBySku(sku, domainRootStructureID);
         }
 
         /// <summary>

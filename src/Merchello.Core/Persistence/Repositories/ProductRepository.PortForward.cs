@@ -10,6 +10,8 @@
 
     using Umbraco.Core.Persistence;
 
+    using UConstants = Umbraco.Core.Constants;
+
     /// <inheritdoc/>
     internal partial class ProductRepository : IPortForwardProductRepository
     {
@@ -232,8 +234,13 @@
         public IEnumerable<string> GetAllManufacturers()
         {
             var sql = new Sql("SELECT DISTINCT(manufacturer)")
-                .From<ProductVariantDto>(SqlSyntax)
+                .From<ProductDto>(SqlSyntax)
+                .InnerJoin<ProductVariantDto>(SqlSyntax)
+                .On<ProductDto, ProductVariantDto>(SqlSyntax, left => left.Key, right => right.ProductKey)
+                .InnerJoin<ProductVariantIndexDto>(SqlSyntax)
+                .On<ProductVariantDto, ProductVariantIndexDto>(SqlSyntax, left => left.Key, right => right.ProductVariantKey)
                 .Where<ProductVariantDto>(x => x.Manufacturer != string.Empty, SqlSyntax)
+                .Where<ProductDto>(x => x.DomainRootStructureID == _domainRootStructureID, SqlSyntax)
                 .OrderBy<ProductVariantDto>(x => x.Manufacturer, SqlSyntax);
 
             var results = Database.Fetch<string>(sql);
@@ -278,7 +285,7 @@
             }
 
             var results = Database.Page<ProductVariantDto>(page, itemsPerPage, sql);
-            
+
             // We have to check if any results are returned before passing to get all or
             // we WILL actually query every product.
             var products = results.Items.Any()
@@ -307,7 +314,17 @@
             var validFields = ValidSearchFields.Where(includeFields.Contains).ToArray();
 
             var sql = new Sql();
-            sql.Select("*").From<ProductVariantDto>(SqlSyntax);
+            sql.Select("*")
+                .From<ProductDto>(SqlSyntax)
+                .InnerJoin<ProductVariantDto>(SqlSyntax)
+                .On<ProductDto, ProductVariantDto>(SqlSyntax, left => left.Key, right => right.ProductKey)
+                .InnerJoin<ProductVariantIndexDto>(SqlSyntax)
+                .On<ProductVariantDto, ProductVariantIndexDto>(SqlSyntax, left => left.Key, right => right.ProductVariantKey);
+
+            if (_domainRootStructureID != UConstants.System.Root)
+            {
+                sql.Where<ProductDto>(x => x.DomainRootStructureID == _domainRootStructureID, SqlSyntax);
+            }
 
             if (terms.Any())
             {

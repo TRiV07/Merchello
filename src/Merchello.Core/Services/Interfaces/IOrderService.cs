@@ -8,7 +8,7 @@
     /// <summary>
     /// Defines the OrderService.
     /// </summary>
-    public interface IOrderService : IPageCachedService<IOrder>
+    public interface IOrderService : IPageCachedMSService<IOrder>
     {
         /// <summary>
         /// Creates a <see cref="IOrder"/> without saving it to the database

@@ -270,7 +270,7 @@
             /// <summary>
             /// The domain root structure ID selector.
             /// </summary>
-            public readonly PropertyInfo DomainRootStructureIDSelector = ExpressionHelper.GetPropertyInfo<StoreSetting, int>(x => x.DomainRootStructureID);
+            public readonly PropertyInfo DomainRootStructureIDSelector = ExpressionHelper.GetPropertyInfo<EntityCollection, int>(x => x.DomainRootStructureID);
         }
     }
 }

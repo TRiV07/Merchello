@@ -164,6 +164,13 @@
             return builder;
         }
 
+        public static IProductContentQueryBuilder DomainRootStructureID(this IProductContentQueryBuilder builder, int domainRootStructureID)
+        {
+            if (domainRootStructureID < 1) domainRootStructureID = -1;
+            builder.DomainRootStructureID = domainRootStructureID;
+            return builder;
+        }
+
         /// <summary>
         /// Sets the ordering of the query result.
         /// </summary>

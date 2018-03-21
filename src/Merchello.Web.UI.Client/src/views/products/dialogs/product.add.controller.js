@@ -9,7 +9,7 @@
 angular.module('merchello').controller('Merchello.Product.Dialogs.ProductAddController',
     ['$scope', '$q', '$location', 'notificationsService', 'navigationService', 'contentResource', 'productResource','warehouseResource', 'settingsResource',
         'detachedContentResource', 'productDisplayBuilder', 'productVariantDetachedContentDisplayBuilder', 'warehouseDisplayBuilder',
-        function($scope, $q, $location, notificationsService, navigationService, contentResource, productResource, warehouseResource, settingsResource,
+        function ($scope, $q, $location, notificationsService, navigationService, contentResource, productResource, warehouseResource, settingsResource,
                  detachedContentResource, productDisplayBuilder, productVariantDetachedContentDisplayBuilder, warehouseDisplayBuilder) {
             $scope.loaded = false;
             $scope.wasFormSubmitted = false;
@@ -25,6 +25,7 @@ angular.module('merchello').controller('Merchello.Product.Dialogs.ProductAddCont
             $scope.settings = {};
             $scope.currencySymbol = '';
             $scope.defaultWarehouseCatalog = {};
+            $scope.dialogData = {};
             
             // grab the sku text box to test if sku is unique
             var input = angular.element( document.querySelector( '#sku' ) );
@@ -57,19 +58,21 @@ angular.module('merchello').controller('Merchello.Product.Dialogs.ProductAddCont
                 }
 
                 // make the API call to create the product
-                productResource.create($scope.product).then(function(np) {
+                productResource.create($scope.product, $scope.dialogData.storeId).then(function(np) {
                     navigationService.hideNavigation();
-                    $location.url('/merchello/merchello/productedit/' + np.key, true);
+                    $location.url('/merchello/merchello/productedit/' + np.key + '/store/' + $scope.dialogData.storeId, true);
                 });
             }
 
             function init() {
+                $scope.dialogData = $scope.$parent.currentAction.metaData.dialogData;
+
                 // we need to get all the languages configured in Umbraco so that we can
                 // create detached content for each one. We also need the currency symbol so we 
                 // can append it to the price textbox
                 $q.all([
                     detachedContentResource.getAllLanguages(),
-                    settingsResource.getAllCombined(),
+                    settingsResource.getAllCombined($scope.dialogData.storeId),
                     warehouseResource.getDefaultWarehouse()
                 ]).then(function(data) {
                     var langArray = [];
@@ -152,7 +155,7 @@ angular.module('merchello').controller('Merchello.Product.Dialogs.ProductAddCont
                         $scope.checking = false;
                         return true;
                     }
-                    var checkPromise = productResource.getSkuExists(sku).then(function(exists) {
+                    var checkPromise = productResource.getSkuExists(sku, $scope.dialogData.storeId).then(function(exists) {
                             $scope.checking = false;
                             currentSku = sku;
                             $scope.isUnique = exists === 'false';
