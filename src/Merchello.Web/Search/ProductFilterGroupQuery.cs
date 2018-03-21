@@ -101,14 +101,14 @@
         /// <returns>
         /// The <see cref="IEnumerable{IProductFilterGroup}"/>.
         /// </returns>
-        public IEnumerable<IProductFilterGroup> GetAll(params Guid[] keys)
+        public IEnumerable<IProductFilterGroup> GetAll(int domainRootStructureID, params Guid[] keys)
         {
             var cacheKey = this.GetCacheKey("GetAll", keys);
 
             var filterGroups = (IEnumerable<IProductFilterGroup>)this.Cache.GetCacheItem(cacheKey);
             if (filterGroups != null) return filterGroups;
 
-            var collections = ((EntityCollectionService)this.Service).GetEntityFilterGroupsByProviderKeys(this._filterProviderKeys);
+            var collections = ((EntityCollectionService)this.Service).GetEntityFilterGroupsByProviderKeys(this._filterProviderKeys, domainRootStructureID);
 
             return Map(keys.Any() ? 
                             collections.Where(x => keys.Any(y => y == x.Key)) : 
@@ -220,9 +220,9 @@
         /// <returns>
         /// The <see cref="IEnumerable{IProductFilterGroup}"/>.
         /// </returns>
-        private IEnumerable<IProductFilterGroup> All()
+        private IEnumerable<IProductFilterGroup> All(int domainRootStructureID)
         {
-            return GetAll();
+            return GetAll(domainRootStructureID);
         }
 
         /// <summary>

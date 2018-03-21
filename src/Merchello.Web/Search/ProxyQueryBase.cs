@@ -44,5 +44,11 @@
         {
             return string.Format("{0}.{1}.{2}", methodName, this.GetType(), string.Join(string.Empty, keys));
         }
+
+
+        protected string GetCacheKey(string methodName, int domainRootStructureID, params Guid[] keys)
+        {
+            return string.Format("{0}.{1}.{2}.{3}", methodName, this.GetType(), domainRootStructureID, string.Join(string.Empty, keys));
+        }
     }
 }

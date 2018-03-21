@@ -540,7 +540,17 @@ namespace Merchello.Web.Models.ContentEditing
 
 		internal static WarehouseDisplay ToWarehouseDisplay(this IWarehouse warehouse)
 		{
-			return AutoMapper.Mapper.Map<WarehouseDisplay>(warehouse);
+			var warehouseDisplay = AutoMapper.Mapper.Map<WarehouseDisplay>(warehouse);
+            foreach(var catalog in warehouseDisplay.WarehouseCatalogs)
+            {
+                catalog.IsDefault = false;
+            }
+            var firstCatalog = warehouseDisplay.WarehouseCatalogs.FirstOrDefault();
+            if (firstCatalog != null)
+            {
+                firstCatalog.IsDefault = true;
+            }
+            return warehouseDisplay;
 		}
 
 		#endregion

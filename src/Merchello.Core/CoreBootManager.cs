@@ -231,6 +231,8 @@
         // ReSharper disable once StyleCop.SA1204
         public static void FinalizeBoot()
         {
+            EntityCollectionProviderResolver.Current.EnsureInitialized();
+
             // Once the application is booted, initialize the value converters
             InitializeValueConverters();
 
@@ -390,7 +392,8 @@
                    PluginManager.Current.ResolveEnityCollectionProviders(),
                    merchelloContext);
                 // REFACTOR HACK FIX - this resolver
-                EntityCollectionProviderResolver.Current.EnsureInitialized();
+                //DomainService not initialized here... Moving init to Core.CoreBootManager.FinalizeBoot()
+                //EntityCollectionProviderResolver.Current.EnsureInitialized();
             }
         }
 

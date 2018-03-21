@@ -304,8 +304,8 @@
         /// </returns>
         private IEnumerable<TreeNode> GetTreeNodesForCollections(string collectionId, string parentRouteId, FormDataCollection queryStrings, bool collectionRoots = true)
         {
-            var info = this.GetCollectionProviderInfo(collectionId);
             var splitId = new SplitRoutePath(parentRouteId);
+            var info = this.GetCollectionProviderInfo(collectionId, splitId);
 
             // add any configured dynamic collections
             var currentTree = _rootTrees.FirstOrDefault(x => x.Id == splitId.CollectionId && x.Visible);
@@ -481,7 +481,7 @@
                 var providerDisplay =
                     this._entityCollectionProviderResolver.GetProviderAttributes()
                         .First(x => x.Key == elementKey)
-                        .ToEntityCollectionProviderDisplay();
+                        .ToEntityCollectionProviderDisplay(splitId.StoreIdInt);
                 if (providerDisplay != null)
                 {
                     grouping.Add(new Tuple<EntityCollectionProviderElement, EntityCollectionProviderDisplay>(element, providerDisplay));
@@ -535,7 +535,7 @@
             var hasSubs = tree.SubTree != null && tree.SubTree.GetTrees().Any();
 
             if (_collectiontrees.Contains(tree.Id))
-                hasSubs = this.GetCollectionProviderInfo(tree.Id).ManagedCollections.Any()
+                hasSubs = this.GetCollectionProviderInfo(tree.Id, splitId).ManagedCollections.Any()
                           || tree.SelfManagedEntityCollectionProviderCollections.EntityCollectionProviders().Any();
 
             if (_attributetrees.Contains(tree.Id))
@@ -610,7 +610,7 @@
         /// <returns>
         /// The <see cref="CollectionProviderInfo"/>.
         /// </returns>
-        private CollectionProviderInfo GetCollectionProviderInfo(string collectionId)
+        private CollectionProviderInfo GetCollectionProviderInfo(string collectionId, SplitRoutePath splitId)
         {
             collectionId = collectionId.ToLowerInvariant();
             var info = new CollectionProviderInfo();
@@ -620,19 +620,19 @@
                 case "sales":
                     info.ManagedCollections =
                         this._entityCollectionProviderResolver.GetProviderAttribute<StaticInvoiceCollectionProvider>()
-                            .ToEntityCollectionProviderDisplay().ManagedCollections;
+                            .ToEntityCollectionProviderDisplay(splitId.StoreIdInt).ManagedCollections;
                     info.ViewName = "saleslist";
                     break;
                 case "customers":
                     info.ManagedCollections =
                         this._entityCollectionProviderResolver.GetProviderAttribute<StaticCustomerCollectionProvider>()
-                            .ToEntityCollectionProviderDisplay().ManagedCollections;
+                            .ToEntityCollectionProviderDisplay(splitId.StoreIdInt).ManagedCollections;
                     info.ViewName = "customerlist";
                     break;
                 default:
                     info.ManagedCollections =
                         this._entityCollectionProviderResolver.GetProviderAttribute<StaticProductCollectionProvider>()
-                            .ToEntityCollectionProviderDisplay().ManagedCollections;
+                            .ToEntityCollectionProviderDisplay(splitId.StoreIdInt).ManagedCollections;
                     info.ViewName = "productlist";
                     break;
             }
@@ -748,6 +748,11 @@
             /// Gets the store id.
             /// </summary>
             public string StoreId { get; private set; }
+
+            /// <summary>
+            /// Gets the store id as int.
+            /// </summary>
+            public int StoreIdInt { get { if (int.TryParse(StoreId, out int result)) return result; else return -1; } }
 
             /// <summary>
             /// Gets the collection key.

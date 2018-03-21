@@ -36,6 +36,7 @@
             EntityType entityType,
             Guid providerKey,
             string name,
+            int domainRootStructureID,
             bool raiseEvents = true);
 
         /// <summary>
@@ -60,6 +61,7 @@
             EntityType entityType,
             Guid providerKey,
             string name,
+            int domainRootStructureID,
             bool raiseEvents = true);
 
 
@@ -170,7 +172,7 @@
         /// <returns>
         /// The <see cref="IEnumerable{IEntityCollection}"/>.
         /// </returns>
-        IEnumerable<IEntityCollection> GetByEntityTfKey(Guid entityTfKey);
+        IEnumerable<IEntityCollection> GetByEntityTfKey(Guid entityTfKey, int domainRootStructureID);
 
         /// <summary>
         /// The get by provider key.
@@ -181,7 +183,7 @@
         /// <returns>
         /// The <see cref="IEnumerable{IEntityCollection}"/>.
         /// </returns>
-        IEnumerable<IEntityCollection> GetByProviderKey(Guid providerKey);
+        IEnumerable<IEntityCollection> GetByProviderKey(Guid providerKey, int domainRootStructureID);
 
         /// <summary>
         /// Gets an entity filter group by key.
@@ -203,7 +205,7 @@
         /// <returns>
         /// The <see cref="IEnumerable{IEntityCollection}"/>.
         /// </returns>
-        IEnumerable<IEntityCollection> GetAll(params Guid[] keys);
+        IEnumerable<IEntityCollection> GetAll(int domainRootStructureID, params Guid[] keys);
 
         /// <summary>
         /// The get children.
@@ -236,7 +238,7 @@
         /// <returns>
         /// The <see cref="IEnumerable{IEntityCollection}"/>.
         /// </returns>
-        IEnumerable<IEntityCollection> GetRootLevelEntityCollections();
+        IEnumerable<IEntityCollection> GetRootLevelEntityCollections(int domainRootStructureID);
 
         /// <summary>
         /// The get root level entity collections.
@@ -247,7 +249,7 @@
         /// <returns>
         /// The <see cref="IEnumerable{IEntityCollection}"/>.
         /// </returns>
-        IEnumerable<IEntityCollection> GetRootLevelEntityCollections(EntityType entityType);
+        IEnumerable<IEntityCollection> GetRootLevelEntityCollections(EntityType entityType, int domainRootStructureID);
 
         /// <summary>
         /// The get root level entity collections.
@@ -261,7 +263,7 @@
         /// <returns>
         /// The <see cref="IEnumerable{IEntityCollection}"/>.
         /// </returns>
-        IEnumerable<IEntityCollection> GetRootLevelEntityCollections(EntityType entityType, Guid providerKey);
+        IEnumerable<IEntityCollection> GetRootLevelEntityCollections(EntityType entityType, Guid providerKey, int domainRootStructureID);
 
         /// <summary>
         /// The get root level entity collections.
@@ -272,7 +274,7 @@
         /// <returns>
         /// The <see cref="IEnumerable{IEntityCollection}"/>.
         /// </returns>
-        IEnumerable<IEntityCollection> GetRootLevelEntityCollections(Guid entityTfKey);
+        IEnumerable<IEntityCollection> GetRootLevelEntityCollections(Guid entityTfKey, int domainRootStructureID);
 
         /// <summary>
         /// The get root level entity collections.
@@ -286,7 +288,7 @@
         /// <returns>
         /// The <see cref="IEnumerable{IEntityCollection}"/>.
         /// </returns>
-        IEnumerable<IEntityCollection> GetRootLevelEntityCollections(Guid entityTfKey, Guid providerKey);
+        IEnumerable<IEntityCollection> GetRootLevelEntityCollections(Guid entityTfKey, Guid providerKey, int domainRootStructureID);
 
         /// <summary>
         /// Gets a Page of collections from collection.
@@ -345,6 +347,6 @@
         /// <returns>
         /// The count of collections managed by a provider
         /// </returns>
-        int CollectionCountManagedByProvider(Guid providerKey);
+        int CollectionCountManagedByProvider(Guid providerKey, int domainRootStructureID);
     }
 }

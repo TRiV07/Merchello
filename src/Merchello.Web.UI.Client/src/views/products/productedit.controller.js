@@ -73,7 +73,7 @@ angular.module('merchello').controller('Merchello.Backoffice.ProductEditControll
              * Loads in default warehouse and all other warehouses from server into the scope.  Called in init().
              */
             function loadAllWarehouses(key, productVariantKey) {
-                var promiseWarehouse = warehouseResource.getDefaultWarehouse();
+                var promiseWarehouse = warehouseResource.getDefaultWarehouse($routeParams.storeId);
                 promiseWarehouse.then(function (warehouse) {
                     $scope.defaultWarehouse = warehouseDisplayBuilder.transform(warehouse);
                     $scope.warehouses.push($scope.defaultWarehouse);

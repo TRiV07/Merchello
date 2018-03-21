@@ -147,5 +147,7 @@
         /// Gets the relative path to the editor view html
         /// </summary>
         public string EditorView { get; private set; }
+
+        public int DomainRootStructureID { get; set; }
     }
 }

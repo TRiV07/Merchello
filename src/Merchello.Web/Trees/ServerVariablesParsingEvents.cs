@@ -88,7 +88,7 @@
             merchelloUrls.Add(
                 "merchelloEntityCollectionApiBaseUrl",
                 url.GetUmbracoApiServiceBaseUrl<EntityCollectionApiController>(
-                controller => controller.GetEntityCollectionProviders()));
+                controller => controller.GetEntityCollectionProviders(-1)));
 
             merchelloUrls.Add(
                 "merchelloFixedRateShippingApiBaseUrl",
@@ -188,7 +188,7 @@
             merchelloUrls.Add(
                 "merchelloWarehouseApiBaseUrl",
                 url.GetUmbracoApiServiceBaseUrl<WarehouseApiController>(
-                controller => controller.GetDefaultWarehouse()));      
+                controller => controller.GetDefaultWarehouse(Constants.System.Root)));      
 
             if (!ReportApiControllerResolver.HasCurrent) return;
 

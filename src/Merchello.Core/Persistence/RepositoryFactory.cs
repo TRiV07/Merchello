@@ -264,9 +264,9 @@
         /// <returns>
         /// The <see cref="IEntityCollectionRepository"/>.
         /// </returns>
-        internal virtual IEntityCollectionRepository CreateEntityCollectionRepository(IDatabaseUnitOfWork uow)
+        internal virtual IEntityCollectionRepository CreateEntityCollectionRepository(IDatabaseUnitOfWork uow, int domainRootStructureID)
         {
-            return new EntityCollectionRepository(uow, _logger, _sqlSyntax);
+            return new EntityCollectionRepository(uow, _logger, _sqlSyntax, domainRootStructureID);
         }
 
         /// <summary>
@@ -642,9 +642,9 @@
         /// <returns>
         /// The <see cref="IWarehouseRepository"/>.
         /// </returns>
-        internal virtual IWarehouseRepository CreateWarehouseRepository(IDatabaseUnitOfWork uow)
+        internal virtual IWarehouseRepository CreateWarehouseRepository(IDatabaseUnitOfWork uow, int domainRootStructureID)
         {
-            return new WarehouseRepository(uow, this.CreateWarehouseCatalogRepository(uow), _logger, _sqlSyntax);
+            return new WarehouseRepository(uow, this.CreateWarehouseCatalogRepository(uow), _logger, _sqlSyntax, domainRootStructureID);
         }
 
         /// <summary>

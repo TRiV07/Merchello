@@ -25,6 +25,7 @@
             if (!PropertyInfoCache.IsEmpty) return;
 
             CacheMap<Warehouse, WarehouseDto>(src => src.Key, dto => dto.Key);
+            CacheMap<Warehouse, WarehouseDto>(src => src.DomainRootStructureID, dto => dto.DomainRootStructureID);
             CacheMap<Warehouse, WarehouseDto>(src => src.Name, dto => dto.Name);
             CacheMap<Warehouse, WarehouseDto>(src => src.Address1, dto => dto.Address1);
             CacheMap<Warehouse, WarehouseDto>(src => src.Address2, dto => dto.Address2);

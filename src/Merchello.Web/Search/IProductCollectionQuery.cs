@@ -16,7 +16,7 @@
         /// <returns>
         /// The <see cref="IEnumerable{IProductCollection}"/>.
         /// </returns>
-        IEnumerable<IProductCollection> GetRootLevelCollections();
+        IEnumerable<IProductCollection> GetRootLevelCollections(int domainRootStructureID);
 
         /// <summary>
         /// Get collections containing product.

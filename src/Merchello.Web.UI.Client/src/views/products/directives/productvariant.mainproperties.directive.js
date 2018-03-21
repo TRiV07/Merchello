@@ -43,7 +43,7 @@
                             $scope.manufacturers = data;
                         });
 
-                        var promiseWarehouse = warehouseResource.getDefaultWarehouse();
+                        var promiseWarehouse = warehouseResource.getDefaultWarehouse($routeParams.storeId);
                         promiseWarehouse.then(function (warehouse) {
                             $scope.defaultWarehouse = warehouseDisplayBuilder.transform(warehouse);
                             $scope.defaultWarehouseCatalog = _.find($scope.defaultWarehouse.warehouseCatalogs, function (dwc) { return dwc.isDefault; });

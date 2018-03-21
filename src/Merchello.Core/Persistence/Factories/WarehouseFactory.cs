@@ -41,6 +41,7 @@
             var warehouse = new Warehouse(warehouseCatalogs)
             {
                 Key = dto.Key,
+                DomainRootStructureID = dto.DomainRootStructureID,
                 Name = dto.Name,
                 Address1 = dto.Address1,
                 Address2 = dto.Address2,
@@ -73,6 +74,7 @@
             var dto = new WarehouseDto()
             {
                 Key = entity.Key,
+                DomainRootStructureID = entity.DomainRootStructureID,
                 Name = entity.Name,
                 Address1 = entity.Address1,
                 Address2 = entity.Address2,

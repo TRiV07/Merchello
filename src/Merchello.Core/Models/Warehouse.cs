@@ -31,6 +31,11 @@
         private string _name;
 
         /// <summary>
+        /// The domain root structure ID.
+        /// </summary>
+        private int _domainRootStructureID;
+
+        /// <summary>
         /// The address 1.
         /// </summary>
         private string _address1;
@@ -110,6 +115,21 @@
             set 
             { 
                 SetPropertyValueAndDetectChanges(value, ref _name, _ps.Value.NameSelector); 
+            }
+        }
+
+        /// <inheritdoc/>
+        [DataMember]
+        public int DomainRootStructureID
+        {
+            get
+            {
+                return _domainRootStructureID;
+            }
+
+            set
+            {
+                SetPropertyValueAndDetectChanges(value, ref _domainRootStructureID, _ps.Value.DomainRootStructureIDSelector);
             }
         }
 
@@ -313,6 +333,11 @@
             /// The primary selector.
             /// </summary>
             public readonly PropertyInfo IsDefaultSelector = ExpressionHelper.GetPropertyInfo<Warehouse, bool>(x => x.IsDefault);
+
+            /// <summary>
+            /// The domain root structure ID selector.
+            /// </summary>
+            public readonly PropertyInfo DomainRootStructureIDSelector = ExpressionHelper.GetPropertyInfo<Warehouse, int>(x => x.DomainRootStructureID);
         }
     }
 }

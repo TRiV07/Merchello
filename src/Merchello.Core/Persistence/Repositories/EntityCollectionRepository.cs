@@ -24,6 +24,11 @@
     internal class EntityCollectionRepository : MerchelloPetaPocoRepositoryBase<IEntityCollection>, IEntityCollectionRepository
     {
         /// <summary>
+        /// The domain root structure ID.
+        /// </summary>
+        private readonly int _domainRootStructureID;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="EntityCollectionRepository"/> class.
         /// </summary>
         /// <param name="work">
@@ -35,9 +40,10 @@
         /// <param name="sqlSyntax">
         /// The SQL Syntax.
         /// </param>
-        public EntityCollectionRepository(IDatabaseUnitOfWork work, ILogger logger, ISqlSyntaxProvider sqlSyntax)
+        public EntityCollectionRepository(IDatabaseUnitOfWork work, ILogger logger, ISqlSyntaxProvider sqlSyntax, int domainRootStructureID)
             : base(work, logger, sqlSyntax)
         {
+            _domainRootStructureID = domainRootStructureID;
         }
 
         /// <summary>
@@ -185,8 +191,13 @@
         public IEnumerable<IEntityFilterGroup> GetEntityFilterGroupsByProviderKeys(Guid[] keys)
         {
             var sql = new Sql("SELECT pk").From<EntityCollectionDto>(SqlSyntax)
-                .Where<EntityCollectionDto>(x => x.ParentKey == null)
+                .Where<EntityCollectionDto>(x => x.ParentKey == null, SqlSyntax)
                 .Where("providerKey IN (@keys)", new { @keys = keys });
+
+            if (_domainRootStructureID != Constants.System.Root)
+            {
+                sql.Where<EntityCollectionDto>(x => x.DomainRootStructureID == _domainRootStructureID, SqlSyntax);
+            }
 
             var matches = Database.Fetch<KeyDto>(sql);
 
@@ -384,7 +395,7 @@
 
             var dtos = Database.Fetch<EntityCollectionDto>(sql);
 
-            return dtos.DistinctBy(x => x.Key).Select(dto => Get(dto.Key));
+            return dtos.DistinctBy(x => x.Key).Select(dto => Get(dto.Key)).ToArray();
         }
 
         /// <summary>
@@ -401,6 +412,11 @@
             var sql = new Sql();
             sql.Select(isCount ? "COUNT(*)" : "*")
                .From<EntityCollectionDto>(SqlSyntax);
+
+            if (_domainRootStructureID != Constants.System.Root)
+            {
+                sql.Where<EntityCollectionDto>(x => x.DomainRootStructureID == _domainRootStructureID, SqlSyntax);
+            }
 
             return sql;
         }

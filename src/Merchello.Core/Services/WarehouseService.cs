@@ -162,7 +162,7 @@
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreateWarehouseRepository(uow))
+                using (var repository = RepositoryFactory.CreateWarehouseRepository(uow, warehouse.DomainRootStructureID))
                 {
                     repository.AddOrUpdate(warehouse);
                     uow.Commit();
@@ -186,7 +186,7 @@
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreateWarehouseRepository(uow))
+                using (var repository = RepositoryFactory.CreateWarehouseRepository(uow, Constants.System.Root))
                 {
                     foreach (var warehouse in warehouseArray)
                     {
@@ -204,9 +204,9 @@
         /// Gets the default <see cref="IWarehouse"/>
         /// </summary>
         /// <returns>The default <see cref="IWarehouse"/></returns>
-        public IWarehouse GetDefaultWarehouse()
+        public IWarehouse GetDefaultWarehouse(int domainRootStructureID)
         {
-            using (var repository = RepositoryFactory.CreateWarehouseRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateWarehouseRepository(UowProvider.GetUnitOfWork(), domainRootStructureID))
             {
                 var query = Query<IWarehouse>.Builder.Where(x => x.IsDefault);
                 return repository.GetByQuery(query).FirstOrDefault();
@@ -220,7 +220,7 @@
         /// <returns>The <see cref="IWarehouse"/></returns>
         public IWarehouse GetByKey(Guid key)
         {
-            using (var repository = RepositoryFactory.CreateWarehouseRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateWarehouseRepository(UowProvider.GetUnitOfWork(), Constants.System.Root))
             {
                 return repository.Get(key);
             }
@@ -233,7 +233,7 @@
         /// <returns>A collection of <see cref="IWarehouse"/></returns>
         public IEnumerable<IWarehouse> GetByKeys(IEnumerable<Guid> keys)
         {
-            using (var repository = RepositoryFactory.CreateWarehouseRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateWarehouseRepository(UowProvider.GetUnitOfWork(), Constants.System.Root))
             {
                 return repository.GetAll(keys.ToArray());
             }
@@ -388,7 +388,7 @@
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreateWarehouseRepository(uow))
+                using (var repository = RepositoryFactory.CreateWarehouseRepository(uow, Constants.System.Root))
                 {
                     repository.Delete(warehouse);
                     uow.Commit();
@@ -411,7 +411,7 @@
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreateWarehouseRepository(uow))
+                using (var repository = RepositoryFactory.CreateWarehouseRepository(uow, Constants.System.Root))
                 {
                     foreach (var warehouse in warehouseArray)
                     {

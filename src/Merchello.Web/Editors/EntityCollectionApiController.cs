@@ -27,6 +27,8 @@
     using Umbraco.Web;
     using Umbraco.Web.Mvc;
 
+    using UConstants = Umbraco.Core.Constants;
+
     /// <summary>
     /// The entity collection api controller.
     /// </summary>
@@ -141,9 +143,9 @@
         /// The <see cref="IEnumerable"/>.
         /// </returns>
         [HttpGet]
-        public IEnumerable<EntityCollectionProviderDisplay> GetDefaultEntityCollectionProviders()
+        public IEnumerable<EntityCollectionProviderDisplay> GetDefaultEntityCollectionProviders(int domainRootStructureID)
         {
-            var providers = _staticProviderAtts.Select(x => x.ToEntityCollectionProviderDisplay());
+            var providers = _staticProviderAtts.Select(x => x.ToEntityCollectionProviderDisplay(domainRootStructureID));
             return providers;
         }
 
@@ -157,13 +159,13 @@
         /// The <see cref="IEnumerable"/>.
         /// </returns>
         [HttpGet]
-        public IEnumerable<EntityCollectionProviderDisplay> GetEntityFilterGroupProviders(EntityType entityType)
+        public IEnumerable<EntityCollectionProviderDisplay> GetEntityFilterGroupProviders(EntityType entityType, int domainRootStructureID)
         {
             if (entityType != EntityType.Product) throw new NotImplementedException("Only Product types have been implemented");
 
             return
                 _resolver.GetProviderAttributes<IProductEntityFilterGroupProvider>()
-                    .Select(x => x.ToEntityCollectionProviderDisplay());
+                    .Select(x => x.ToEntityCollectionProviderDisplay(domainRootStructureID));
         }
 
         /// <summary>
@@ -176,14 +178,14 @@
         /// The <see cref="EntityCollectionProviderDisplay"/>.
         /// </returns>
         [HttpGet]
-        public EntityCollectionProviderDisplay GetEntityFilterGroupFilterProvider(Guid key)
+        public EntityCollectionProviderDisplay GetEntityFilterGroupFilterProvider(Guid key, int domainRootStructureID)
         {
             var att = 
                 _resolver.GetProviderAttributeForFilter(key);
 
             if (att == null) throw new NullReferenceException("Could not find Attribute Provider");
 
-            return att.ToEntityCollectionProviderDisplay();
+            return att.ToEntityCollectionProviderDisplay(domainRootStructureID);
         }
 
         /// <summary>
@@ -193,9 +195,9 @@
         /// The <see cref="IEnumerable"/>.
         /// </returns>
         [HttpGet]
-        public IEnumerable<EntityCollectionProviderDisplay> GetEntityCollectionProviders()
+        public IEnumerable<EntityCollectionProviderDisplay> GetEntityCollectionProviders(int domainRootStructureID)
         {
-            return _resolver.GetProviderAttributes().Select(x => x.ToEntityCollectionProviderDisplay());
+            return _resolver.GetProviderAttributes().Select(x => x.ToEntityCollectionProviderDisplay(domainRootStructureID));
         }
 
         /// <summary>
@@ -208,9 +210,9 @@
         /// The <see cref="IEnumerable{EntityCollectionDisplay}"/>.
         /// </returns>
         [HttpGet]
-        public IEnumerable<EntityCollectionDisplay> GetRootEntityCollections(EntityType entityType)
+        public IEnumerable<EntityCollectionDisplay> GetRootEntityCollections(EntityType entityType, int domainRootStructureID)
         {
-            var collections = _entityCollectionService.GetRootLevelEntityCollections(entityType);
+            var collections = _entityCollectionService.GetRootLevelEntityCollections(entityType, domainRootStructureID);
             return collections.Select(x => x.ToEntityCollectionDisplay()).OrderBy(x => x.SortOrder);
         }
 
@@ -240,9 +242,9 @@
         /// The <see cref="IEnumerable"/>.
         /// </returns>
         [HttpGet]
-        public IEnumerable<EntityCollectionDisplay> GetEntityCollections(Guid entityTfKey)
+        public IEnumerable<EntityCollectionDisplay> GetEntityCollections(Guid entityTfKey, int domainRootStructureID)
         {
-            var collections = _entityCollectionService.GetByEntityTfKey(entityTfKey);
+            var collections = _entityCollectionService.GetByEntityTfKey(entityTfKey, domainRootStructureID);
             return collections.Select(x => x.ToEntityCollectionDisplay()).OrderBy(x => x.SortOrder);
         }
 
@@ -256,14 +258,14 @@
         /// The <see cref="IEnumerable"/>.
         /// </returns>
         [HttpGet]
-        public IEnumerable<EntityFilterGroupDisplay> GetEntityFilterGroups(EntityType entityType)
+        public IEnumerable<EntityFilterGroupDisplay> GetEntityFilterGroups(EntityType entityType, int domainRootStructureID)
         {
             if (entityType != EntityType.Product) throw new NotImplementedException();
 
             var keys = EntityCollectionProviderResolver.Current.GetProviderKeys<IEntityFilterGroupProvider>();
 
             // TODO service call will need to be updated to respect entity type if ever opened up to other entity types
-            var collections = ((EntityCollectionService)_entityCollectionService).GetEntityFilterGroupsByProviderKeys(keys);
+            var collections = ((EntityCollectionService)_entityCollectionService).GetEntityFilterGroupsByProviderKeys(keys, domainRootStructureID);
             
             return collections.Select(c => c.ToEntitySpecificationCollectionDisplay()).OrderBy(x => x.SortOrder);
         }
@@ -531,7 +533,7 @@
         [HttpPost]
         public HttpResponseMessage PostAssociateEntityWithFilters(Entity2FilterCollectionsModel model)
         {
-            var collections = _entityCollectionService.GetAll(model.CollectionKeys).ToArray();
+            var collections = _entityCollectionService.GetAll(UConstants.System.Root, model.CollectionKeys).ToArray();
 
             foreach (var collection in collections)
             {
@@ -635,12 +637,13 @@
         /// The <see cref="EntityCollectionDisplay"/>.
         /// </returns>
         [HttpPost]
-        public EntityCollectionDisplay PostAddEntityCollection(EntityCollectionDisplay collection)
+        public EntityCollectionDisplay PostAddEntityCollection(int domainRootStructureID, EntityCollectionDisplay collection)
         {
             var ec = _entityCollectionService.CreateEntityCollection(
                 collection.EntityType,
                 collection.ProviderKey,
-                collection.Name);
+                collection.Name,
+                domainRootStructureID);
             if (collection.ParentKey != null)
             {
                 ec.ParentKey = collection.ParentKey;
@@ -693,7 +696,7 @@
             {
                 if (op.Key.Equals(Guid.Empty))
                 {
-                    var ec = _entityCollectionService.CreateEntityCollection(op.EntityType, op.ProviderKey, op.Name);
+                    var ec = _entityCollectionService.CreateEntityCollection(op.EntityType, op.ProviderKey, op.Name, filter.DomainRootStructureID);
 
                     ec.ParentKey = op.ParentKey ?? collection.Key;
                     ec.IsFilter = collection.IsFilter;
@@ -760,7 +763,7 @@
             var collectionsArray = collections.ToArray();
             if (!collectionsArray.Any()) return Enumerable.Empty<EntityCollectionDisplay>();
 
-            var existing = _entityCollectionService.GetAll(collectionsArray.Select(x => x.Key).ToArray()).ToArray();
+            var existing = _entityCollectionService.GetAll(UConstants.System.Root, collectionsArray.Select(x => x.Key).ToArray()).ToArray();
 
             var updates = new List<IEntityCollection>();
 

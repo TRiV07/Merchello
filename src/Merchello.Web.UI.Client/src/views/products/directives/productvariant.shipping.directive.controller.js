@@ -1,7 +1,7 @@
 
 angular.module('merchello').controller('Merchello.Directives.ProductVariantShippingDirectiveController',
-    ['$scope', 'notificationsService', 'dialogService', 'warehouseResource', 'warehouseDisplayBuilder', 'catalogInventoryDisplayBuilder',
-        function($scope, notificationsService, dialogService, warehouseResource, warehouseDisplayBuilder, catalogInventoryDisplayBuilder) {
+    ['$scope', '$routeParams', 'notificationsService', 'dialogService', 'warehouseResource', 'warehouseDisplayBuilder', 'catalogInventoryDisplayBuilder',
+        function ($scope, $routeParams, notificationsService, dialogService, warehouseResource, warehouseDisplayBuilder, catalogInventoryDisplayBuilder) {
 
             $scope.warehouses = [];
             $scope.defaultWarehouse = {};
@@ -25,7 +25,7 @@ angular.module('merchello').controller('Merchello.Directives.ProductVariantShipp
              * Loads in default warehouse and all other warehouses from server into the scope.  Called in init().
              */
             function loadAllWarehouses() {
-                var promiseWarehouse = warehouseResource.getDefaultWarehouse();
+                var promiseWarehouse = warehouseResource.getDefaultWarehouse($routeParams.storeId);
                 promiseWarehouse.then(function (warehouse) {
                     $scope.defaultWarehouse = warehouseDisplayBuilder.transform(warehouse);
                     $scope.warehouses.push($scope.defaultWarehouse);
@@ -44,8 +44,8 @@ angular.module('merchello').controller('Merchello.Directives.ProductVariantShipp
              * Maps a catalog to a product variant catalog inventory
              */
             function mapToCatalog(catalog) {
-                var mapped = _.find($scope.productVariant.catalogInventories, function(ci) { return ci.catalogKey === catalog.key;});
-                if(mapped === undefined) {
+                var mapped = _.find($scope.productVariant.catalogInventories, function (ci) { return ci.catalogKey === catalog.key; });
+                if (mapped === undefined) {
                     var catalogInventory = catalogInventoryDisplayBuilder.createDefault();
                     catalogInventory.productVariantKey = $scope.productVariant.key;
                     catalogInventory.catalogKey = catalog.key;
@@ -61,7 +61,7 @@ angular.module('merchello').controller('Merchello.Directives.ProductVariantShipp
             }
 
             function getUnits(settings, type) {
-                if(settings.unitSystem === 'Imperial') {
+                if (settings.unitSystem === 'Imperial') {
                     return type === 'weight' ? '(pounds)' : '(inches)';
                 } else {
                     return type === 'weight' ? '(kg)' : '(cm)';
@@ -70,4 +70,4 @@ angular.module('merchello').controller('Merchello.Directives.ProductVariantShipp
 
             // Initializes the controller
             init();
-}]);
+        }]);

@@ -32,7 +32,7 @@
         /// <returns>
         /// The <see cref="IWarehouse"/>.
         /// </returns>
-        IWarehouse GetDefaultWarehouse();
+        IWarehouse GetDefaultWarehouse(int domainRootStructureID);
 
         /// <summary>
         /// Gets an <see cref="IWarehouse"/> object by its 'UniqueId'

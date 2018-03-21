@@ -30,6 +30,11 @@
         private readonly IWarehouseCatalogRepository _warehouseCatalogRepository;
 
         /// <summary>
+        /// The domain root structure ID.
+        /// </summary>
+        private readonly int _domainRootStructureID;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="WarehouseRepository"/> class.
         /// </summary>
         /// <param name="work">
@@ -44,12 +49,13 @@
         /// <param name="sqlSyntax">
         /// The SQL Syntax.
         /// </param>
-        public WarehouseRepository(IDatabaseUnitOfWork work, IWarehouseCatalogRepository warehouseCatalogRepository, ILogger logger, ISqlSyntaxProvider sqlSyntax)
+        public WarehouseRepository(IDatabaseUnitOfWork work, IWarehouseCatalogRepository warehouseCatalogRepository, ILogger logger, ISqlSyntaxProvider sqlSyntax, int domainRootStructureID)
             : base(work, logger, sqlSyntax)
         {
             Mandate.ParameterNotNull(warehouseCatalogRepository, "warehouseCatalogRepository");
 
             _warehouseCatalogRepository = warehouseCatalogRepository;
+            _domainRootStructureID = domainRootStructureID;
         }
 
         /// <summary>
@@ -131,7 +137,12 @@
             var sql = new Sql();
             sql.Select(isCount ? "COUNT(*)" : "*")
                 .From<WarehouseDto>(SqlSyntax);
-            
+
+            if (_domainRootStructureID != Constants.System.Root)
+            {
+                sql.Where<WarehouseDto>(x => x.DomainRootStructureID == _domainRootStructureID, SqlSyntax);
+            }
+
             return sql;
         }
 
@@ -234,7 +245,7 @@
 
             var dtos = Database.Fetch<WarehouseDto>(sql);
 
-            return dtos.DistinctBy(x => x.Key).Select(dto => Get(dto.Key));
+            return dtos.DistinctBy(x => x.Key).Select(dto => Get(dto.Key)).ToArray();
         }
     }
 }

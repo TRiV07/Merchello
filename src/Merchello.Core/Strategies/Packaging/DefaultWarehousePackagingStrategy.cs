@@ -85,17 +85,6 @@
             LineItemCollection.Accept(shippableVisitor);            
 
             if (!shippableVisitor.ShippableItems.Any()) return new List<IShipment>();
-   
-            // the origin address will be the default warehouse
-            // For the initial version we are only exposing a single warehouse
-            var warehouse = MerchelloContext.Services.WarehouseService.GetDefaultWarehouse();
-            var origin = warehouse.AsAddress();
-            
-            ////For the initial version we are only exposing a single shipment
-            var shipment = new Shipment(quoted, origin, Destination)
-                {
-                    VersionKey = VersionKey // this is used in cache keys
-                };
 
             // get the variants for each of the shippable line items
             var variants =
@@ -103,6 +92,20 @@
                        shippableVisitor.ShippableItems
                        .Select(x => x.ExtendedData.GetProductVariantKey())
                        .Where(x => !Guid.Empty.Equals(x))).ToArray();
+
+            //TODOMS Change way to get DomainRootStructureId
+            var domainRootStructureId = MerchelloContext.Services.ProductVariantService.GetDomainRootStructureId(variants.FirstOrDefault());
+
+            // the origin address will be the default warehouse
+            // For the initial version we are only exposing a single warehouse
+            var warehouse = MerchelloContext.Services.WarehouseService.GetDefaultWarehouse(domainRootStructureId);
+            var origin = warehouse.AsAddress();
+
+            ////For the initial version we are only exposing a single shipment
+            var shipment = new Shipment(quoted, origin, Destination)
+            {
+                VersionKey = VersionKey // this is used in cache keys
+            };
 
             foreach (var lineItem in shippableVisitor.ShippableItems)
             {

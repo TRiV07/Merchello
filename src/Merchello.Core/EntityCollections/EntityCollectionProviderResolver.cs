@@ -8,6 +8,7 @@
     using Merchello.Core.Logging;
     using Merchello.Core.Models.Interfaces;
     using Merchello.Core.Models.TypeFields;
+    using Merchello.Core.MultiStore;
     using Merchello.Core.Services;
 
     using Umbraco.Core;
@@ -391,11 +392,11 @@
         /// <returns>
         /// The <see cref="bool"/>.
         /// </returns>
-        private bool EnusureUniqueProvider(Guid providerKey)
+        private bool EnusureUniqueProvider(Guid providerKey, int domainRootStructureID)
         {
             //if (_entityCollectionProviderCache.Any(x => x.Value.GetCustomAttribute<EntityCollectionProviderAttribute>(false).Key == providerKey)) return false;
            
-            return _merchelloContext.Services.EntityCollectionService.CollectionCountManagedByProvider(providerKey) <= 1;
+            return _merchelloContext.Services.EntityCollectionService.CollectionCountManagedByProvider(providerKey, domainRootStructureID) <= 1;
         }
 
         /// <summary>
@@ -403,45 +404,55 @@
         /// </summary>
         private void Initialize()
         {
-            var collections = _merchelloContext.Services.EntityCollectionService.GetAll().ToArray();
+            var domains = ApplicationContext.Current.Services.DomainService
+                .GetAllFromCache()
+                .Where(x => x.RootContentId.HasValue)
+                .Select(x => x.RootContentId.Value)
+                .Distinct();
 
-            foreach (var collection in collections)
+            foreach(var domain in domains)
             {
-                var type = this.GetTypeByProviderKey(collection.ProviderKey);
-                if (type != null)
+                var collections = _merchelloContext.Services.EntityCollectionService.GetAll(domain).ToArray();
+
+                foreach (var collection in collections)
                 {
-                    var att = type.GetCustomAttribute<EntityCollectionProviderAttribute>(false);
-                    this.AddOrUpdateCache(collection.Key, type);
+                    var type = this.GetTypeByProviderKey(collection.ProviderKey);
+                    if (type != null)
+                    {
+                        var att = type.GetCustomAttribute<EntityCollectionProviderAttribute>(false);
+                        this.AddOrUpdateCache(collection.Key, type);
+                    }
+                    else
+                    {
+                        // remove this collection
+                        _merchelloContext.Services.EntityCollectionService.Delete(collection);
+                    }
                 }
-                else
+
+                // Find any providers that should need to register themselves
+                var unregistered =
+                    _instanceTypes.Where(
+                        x =>
+                        x.GetCustomAttribute<EntityCollectionProviderAttribute>(false).ManagesUniqueCollection
+                        && collections.All(
+                            y => y.ProviderKey != x.GetCustomAttribute<EntityCollectionProviderAttribute>(false).Key));
+
+                foreach (var reg in unregistered)
                 {
-                    // remove this collection
-                    _merchelloContext.Services.EntityCollectionService.Delete(collection);
-                }
-            }
+                    var att = reg.GetCustomAttribute<EntityCollectionProviderAttribute>(false);
 
-            // Find any providers that should need to register themselves
-            var unregistered =
-                _instanceTypes.Where(
-                    x =>
-                    x.GetCustomAttribute<EntityCollectionProviderAttribute>(false).ManagesUniqueCollection
-                    && collections.All(
-                        y => y.ProviderKey != x.GetCustomAttribute<EntityCollectionProviderAttribute>(false).Key));
+                    if (EnusureUniqueProvider(att.Key, domain))
+                    {
+                        var collection = ((EntityCollectionService)_merchelloContext.Services.EntityCollectionService).CreateEntityCollection(
+                            att.EntityTfKey,
+                            att.Key,
+                            att.Name,
+                            domain);
 
-            foreach (var reg in unregistered)
-            {
-                var att = reg.GetCustomAttribute<EntityCollectionProviderAttribute>(false);
-
-                if (EnusureUniqueProvider(att.Key))
-                {
-                    var collection = ((EntityCollectionService)_merchelloContext.Services.EntityCollectionService).CreateEntityCollection(
-                        att.EntityTfKey,
-                        att.Key,
-                        att.Name);
-
-                    if (typeof(IEntityFilterGroupProvider).IsAssignableFrom(reg)) collection.IsFilter = true;
-                    _merchelloContext.Services.EntityCollectionService.Save(collection);
-                    this.AddOrUpdateCache(collection.Key, reg);
+                        if (typeof(IEntityFilterGroupProvider).IsAssignableFrom(reg)) collection.IsFilter = true;
+                        _merchelloContext.Services.EntityCollectionService.Save(collection);
+                        this.AddOrUpdateCache(collection.Key, reg);
+                    }
                 }
             }
 

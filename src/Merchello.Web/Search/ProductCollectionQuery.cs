@@ -56,9 +56,9 @@
         /// <returns>
         /// The <see cref="IEnumerable{IProductCollection}"/>.
         /// </returns>
-        public IEnumerable<IProductCollection> GetRootLevelCollections()
+        public IEnumerable<IProductCollection> GetRootLevelCollections(int domainRootStructureID)
         {
-            var cacheKey = this.GetCacheKey("GetRootLevelCollections");
+            var cacheKey = this.GetCacheKey("GetRootLevelCollections", domainRootStructureID);
             var pc = this.Cache.GetCacheItem(cacheKey);
             if (pc != null) return (IEnumerable<IProductCollection>)pc;
 
@@ -68,7 +68,7 @@
             return (IEnumerable<IProductCollection>)
                     this.Cache.GetCacheItem(
                         cacheKey, 
-                        () => Map(this.Service.GetRootLevelEntityCollections()));
+                        () => Map(this.Service.GetRootLevelEntityCollections(domainRootStructureID)));
         }
 
 
@@ -113,9 +113,9 @@
         /// <returns>
         /// The <see cref="IEnumerable{IProductCollection}"/>.
         /// </returns>
-        public IEnumerable<IProductCollection> GetAll(params Guid[] keys)
+        public IEnumerable<IProductCollection> GetAll(int domainRootStructureID, params Guid[] keys)
         {
-            var cacheKey = this.GetCacheKey("GetAll", keys);
+            var cacheKey = this.GetCacheKey("GetAll", domainRootStructureID, keys);
             var pc = this.Cache.GetCacheItem(cacheKey);
             if (pc != null) return (IEnumerable<IProductCollection>)pc;
 
@@ -123,7 +123,7 @@
                  (IEnumerable<IProductCollection>)
                     this.Cache.GetCacheItem(
                         cacheKey,
-                        () => Map(this.Service.GetAll(keys)));
+                        () => Map(this.Service.GetAll(domainRootStructureID, keys)));
         }
 
         /// <summary>

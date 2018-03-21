@@ -533,6 +533,8 @@
     <Compile Include="Models\Rdbms\DigitalMediaDto.cs" />
     <Compile Include="Models\Rdbms\UserGroup2AppDto.cs" />
     <Compile Include="PagedCollection.cs" />
+    <Compile Include="Persistence\Migrations\UpgradesMS\TargetVersionOneZeroTwo\UpdateWarehouseTable.cs" />
+    <Compile Include="Persistence\Migrations\UpgradesMS\TargetVersionOneZeroTwo\UpdateEntityCollectionTable.cs" />
     <Compile Include="Persistence\Migrations\UpgradesMS\TargetVersionOneZeroOne\UpdateProductVariantTable.cs" />
     <Compile Include="Persistence\Migrations\UpgradesMS\TargetVersionOneZeroOne\UpdateProductTable.cs" />
     <Compile Include="Persistence\Migrations\UpgradesMS\TargetVersionOneZeroZero\UpdateStoreSetting.cs" />

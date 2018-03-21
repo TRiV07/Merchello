@@ -6,11 +6,11 @@
  * The controller for the shipment provider view
  */
 angular.module('merchello').controller('Merchello.Backoffice.ShippingProvidersController',
-    ['$scope', 'notificationsService', 'dialogService', 'merchelloTabsFactory',
+    ['$scope', '$routeParams', 'notificationsService', 'dialogService', 'merchelloTabsFactory',
     'settingsResource', 'warehouseResource', 'shippingGatewayProviderResource', 'dialogDataFactory',
     'settingDisplayBuilder', 'warehouseDisplayBuilder', 'warehouseCatalogDisplayBuilder', 'countryDisplayBuilder',
         'shippingGatewayProviderDisplayBuilder', 'shipCountryDisplayBuilder',
-    function($scope, notificationsService, dialogService, merchelloTabsFactory,
+        function ($scope, $routeParams, notificationsService, dialogService, merchelloTabsFactory,
              settingsResource, warehouseResource, shippingGatewayProviderResource, dialogDataFactory,
              settingDisplayBuilder, warehouseDisplayBuilder, warehouseCatalogDisplayBuilder, countryDisplayBuilder,
              shippingGatewayProviderDisplayBuilder, shipCountryDisplayBuilder) {
@@ -68,7 +68,7 @@ angular.module('merchello').controller('Merchello.Backoffice.ShippingProvidersCo
          * Once loaded, it calls the loadCountries method.
          */
         function loadWarehouses() {
-            var promiseWarehouses = warehouseResource.getDefaultWarehouse(); // Only a default warehouse in v1
+            var promiseWarehouses = warehouseResource.getDefaultWarehouse($routeParams.storeId); // Only a default warehouse in v1
             promiseWarehouses.then(function (warehouses) {
                 $scope.warehouses.push(warehouseDisplayBuilder.transform(warehouses));
                 changePrimaryWarehouse();

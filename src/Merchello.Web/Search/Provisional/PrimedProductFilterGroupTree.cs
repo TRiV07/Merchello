@@ -34,7 +34,7 @@ namespace Merchello.Web.Search.Provisional
         /// <summary>
         /// A function to get all of the product filter groups.
         /// </summary>
-        private readonly Func<IEnumerable<IProductFilterGroup>> _getter;
+        private readonly Func<int, IEnumerable<IProductFilterGroup>> _getter;
 
         /// <summary>
         /// The <see cref="IRuntimeCacheProvider"/>.
@@ -52,7 +52,7 @@ namespace Merchello.Web.Search.Provisional
         /// <param name="getAll">
         /// A function to get all of the product filter groups.
         /// </param>
-        internal PrimedProductFilterGroupTree(IMerchelloContext merchelloContext, Func<IEnumerable<IProductFilterGroup>> getAll)
+        internal PrimedProductFilterGroupTree(IMerchelloContext merchelloContext, Func<int, IEnumerable<IProductFilterGroup>> getAll)
         {
             Ensure.ParameterNotNull(merchelloContext, "merchelloContext");
             Ensure.ParameterNotNull(getAll, "getAll");
@@ -80,7 +80,8 @@ namespace Merchello.Web.Search.Provisional
 
 
             // get all of the filter groups
-            var filterGroups = _getter.Invoke().ToArray();
+            //TODOMS
+            var filterGroups = _getter.Invoke(-1).ToArray();
 
             // create a specific context for each filter group and filter (within the group)
             var contextKeys = GetContextKeys(filterGroups, collectionKeys);

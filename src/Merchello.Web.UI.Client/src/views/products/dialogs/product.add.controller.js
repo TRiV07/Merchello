@@ -73,7 +73,7 @@ angular.module('merchello').controller('Merchello.Product.Dialogs.ProductAddCont
                 $q.all([
                     detachedContentResource.getAllLanguages(),
                     settingsResource.getAllCombined($scope.dialogData.storeId),
-                    warehouseResource.getDefaultWarehouse()
+                    warehouseResource.getDefaultWarehouse($scope.dialogData.storeId)
                 ]).then(function(data) {
                     var langArray = [];
                     if (!angular.isArray(data[0])) {

@@ -448,7 +448,7 @@
         /// <returns>
         /// The <see cref="IWarehouse"/>.
         /// </returns>
-        IWarehouse GetDefaultWarehouse();
+        IWarehouse GetDefaultWarehouse(int domainRootStructureID);
 
 
         #endregion

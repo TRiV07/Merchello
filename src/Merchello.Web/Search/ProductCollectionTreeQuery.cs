@@ -59,7 +59,8 @@
         /// <inheritdoc />
         public TreeNode<IProductCollection> GetTreeWithRoot(IProductCollection collection)
         {
-            return new TreeNode<IProductCollection>(collection).Populate(GetAll());
+            //TODOMS
+            return new TreeNode<IProductCollection>(collection).Populate(GetAll(-1));
         }
 
         /// <inheritdoc />
@@ -70,10 +71,10 @@
 
             if (trees != null) return trees;
 
-
+            //TODOMS
             var factory = new TreeNodeFactory<IProductCollection>();
             return (IEnumerable<TreeNode<IProductCollection>>)
-                        Cache.GetCacheItem(cacheKey, () => factory.BuildTrees(GetAll()));
+                        Cache.GetCacheItem(cacheKey, () => factory.BuildTrees(GetAll(-1)));
         }
     }
 }

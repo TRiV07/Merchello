@@ -7,7 +7,7 @@
     /// <summary>
     /// Represents a warehouse or shipping origin.
     /// </summary>
-    public interface IWarehouse : IEntity
+    public interface IWarehouse : IHasDomainRoot, IEntity
     {            
         /// <summary>
         /// Gets or sets the name for the Warehouse

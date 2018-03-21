@@ -168,11 +168,11 @@
         /// <returns>
         /// The <see cref="IEntityCollection"/>.
         /// </returns>
-        public IEntityCollection CreateEntityCollection(EntityType entityType, Guid providerKey, string name, bool raiseEvents = true)
+        public IEntityCollection CreateEntityCollection(EntityType entityType, Guid providerKey, string name, int domainRootStructureID, bool raiseEvents = true)
         {
             var entityTfKey = EnumTypeFieldConverter.EntityType.GetTypeField(entityType).TypeKey;
 
-            return CreateEntityCollection(entityTfKey, providerKey, name, raiseEvents);
+            return CreateEntityCollection(entityTfKey, providerKey, name, domainRootStructureID, raiseEvents);
         }
 
         /// <summary>
@@ -197,11 +197,12 @@
             EntityType entityType,
             Guid providerKey,
             string name,
+            int domainRootStructureID,
             bool raiseEvents = true)
         {
             var entityTfKey = EnumTypeFieldConverter.EntityType.GetTypeField(entityType).TypeKey;
 
-            return CreateEntityCollectionWithKey(entityTfKey, providerKey, name, raiseEvents);
+            return CreateEntityCollectionWithKey(entityTfKey, providerKey, name, domainRootStructureID, raiseEvents);
         }
 
         /// <summary>
@@ -216,16 +217,16 @@
         public void Save(IEntityCollection entityCollection, bool raiseEvents = true)
         {
             if (raiseEvents)
-            if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IEntityCollection>(entityCollection), this))
-            {
-                ((EntityCollection)entityCollection).WasCancelled = true;
-                return;
-            }
+                if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IEntityCollection>(entityCollection), this))
+                {
+                    ((EntityCollection)entityCollection).WasCancelled = true;
+                    return;
+                }
 
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreateEntityCollectionRepository(uow))
+                using (var repository = RepositoryFactory.CreateEntityCollectionRepository(uow, entityCollection.DomainRootStructureID))
                 {
                     repository.AddOrUpdate(entityCollection);
                     uow.Commit();
@@ -233,7 +234,7 @@
             }
 
             if (raiseEvents)
-            Saved.RaiseEvent(new SaveEventArgs<IEntityCollection>(entityCollection), this);
+                Saved.RaiseEvent(new SaveEventArgs<IEntityCollection>(entityCollection), this);
         }
 
         /// <summary>
@@ -253,7 +254,7 @@
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreateEntityCollectionRepository(uow))
+                using (var repository = RepositoryFactory.CreateEntityCollectionRepository(uow, Constants.System.Root))
                 {
                     foreach (var collection in collectionsArray)
                     {
@@ -279,11 +280,11 @@
         public void Delete(IEntityCollection entityCollection, bool raiseEvents = true)
         {
             if (raiseEvents)
-            if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IEntityCollection>(entityCollection), this))
-            {
-                ((EntityCollection)entityCollection).WasCancelled = true;
-                return;
-            }
+                if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IEntityCollection>(entityCollection), this))
+                {
+                    ((EntityCollection)entityCollection).WasCancelled = true;
+                    return;
+                }
 
             DeleteAllChildCollections(entityCollection);
 
@@ -292,7 +293,7 @@
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreateEntityCollectionRepository(uow))
+                using (var repository = RepositoryFactory.CreateEntityCollectionRepository(uow, entityCollection.DomainRootStructureID))
                 {
                     repository.Delete(entityCollection);
                     uow.Commit();
@@ -300,7 +301,7 @@
             }
 
             if (raiseEvents) Deleted.RaiseEvent(new DeleteEventArgs<IEntityCollection>(entityCollection), this);
-        }        
+        }
 
         /// <summary>
         /// The get by key.
@@ -313,7 +314,7 @@
         /// </returns>
         public IEntityCollection GetByKey(Guid key)
         {
-            using (var repository = RepositoryFactory.CreateEntityCollectionRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateEntityCollectionRepository(UowProvider.GetUnitOfWork(), Constants.System.Root))
             {
                 return repository.Get(key);
             }
@@ -328,9 +329,9 @@
         /// <returns>
         /// The <see cref="IEnumerable{IEntityCollection}"/>.
         /// </returns>
-        public IEnumerable<IEntityCollection> GetByEntityTfKey(Guid entityTfKey)
+        public IEnumerable<IEntityCollection> GetByEntityTfKey(Guid entityTfKey, int domainRootStructureID)
         {
-            using (var repository = RepositoryFactory.CreateEntityCollectionRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateEntityCollectionRepository(UowProvider.GetUnitOfWork(), domainRootStructureID))
             {
                 var query = Query<IEntityCollection>.Builder.Where(x => x.EntityTfKey == entityTfKey);
                 return repository.GetByQuery(query);
@@ -346,9 +347,9 @@
         /// <returns>
         /// The <see cref="IEnumerable{IEntityCollection}"/>.
         /// </returns>
-        public IEnumerable<IEntityCollection> GetByProviderKey(Guid providerKey)
+        public IEnumerable<IEntityCollection> GetByProviderKey(Guid providerKey, int domainRootStructureID)
         {
-            using (var repository = RepositoryFactory.CreateEntityCollectionRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateEntityCollectionRepository(UowProvider.GetUnitOfWork(), domainRootStructureID))
             {
                 var query = Query<IEntityCollection>.Builder.Where(x => x.ProviderKey == providerKey);
                 return repository.GetByQuery(query);
@@ -367,7 +368,7 @@
         /// </returns>
         public IEntityFilterGroup GetEntityFilterGroupByKey(Guid key)
         {
-            using (var repository = RepositoryFactory.CreateEntityCollectionRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateEntityCollectionRepository(UowProvider.GetUnitOfWork(), Constants.System.Root))
             {
                 return repository.GetEntityFilterGroup(key);
             }
@@ -382,9 +383,9 @@
         /// <returns>
         /// The <see cref="IEnumerable{IEntityCollection}"/>.
         /// </returns>
-        public IEnumerable<IEntityCollection> GetAll(params Guid[] keys)
+        public IEnumerable<IEntityCollection> GetAll(int domainRootStructureID, params Guid[] keys)
         {
-            using (var repository = RepositoryFactory.CreateEntityCollectionRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateEntityCollectionRepository(UowProvider.GetUnitOfWork(), domainRootStructureID))
             {
                 return repository.GetAll(keys);
             }
@@ -401,7 +402,7 @@
         /// </returns>
         public IEnumerable<IEntityCollection> GetChildren(Guid collectionKey)
         {
-            using (var repository = RepositoryFactory.CreateEntityCollectionRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateEntityCollectionRepository(UowProvider.GetUnitOfWork(), Constants.System.Root))
             {
                 var query = Query<IEntityCollection>.Builder.Where(x => x.ParentKey == collectionKey);
                 return repository.GetByQuery(query);
@@ -422,7 +423,7 @@
         /// </returns>
         public bool ExistsInCollection(Guid? parentKey, Guid collectionKey)
         {
-            using (var repository = RepositoryFactory.CreateEntityCollectionRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateEntityCollectionRepository(UowProvider.GetUnitOfWork(), Constants.System.Root))
             {
                 var query = Query<IEntityCollection>.Builder.Where(x => x.ParentKey == parentKey && x.Key == collectionKey);
                 return repository.Count(query) > 0;
@@ -435,9 +436,9 @@
         /// <returns>
         /// The <see cref="IEnumerable{IEntityCollection}"/>.
         /// </returns>
-        public IEnumerable<IEntityCollection> GetRootLevelEntityCollections()
+        public IEnumerable<IEntityCollection> GetRootLevelEntityCollections(int domainRootStructureID)
         {
-            using (var repository = RepositoryFactory.CreateEntityCollectionRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateEntityCollectionRepository(UowProvider.GetUnitOfWork(), domainRootStructureID))
             {
                 var query = Query<IEntityCollection>.Builder.Where(x => x.ParentKey == null);
                 return repository.GetByQuery(query);
@@ -453,10 +454,10 @@
         /// <returns>
         /// The <see cref="IEnumerable{IEntityCollection}"/>.
         /// </returns>
-        public IEnumerable<IEntityCollection> GetRootLevelEntityCollections(EntityType entityType)
+        public IEnumerable<IEntityCollection> GetRootLevelEntityCollections(EntityType entityType, int domainRootStructureID)
         {
             return this.GetRootLevelEntityCollections(
-                EnumTypeFieldConverter.EntityType.GetTypeField(entityType).TypeKey);
+                EnumTypeFieldConverter.EntityType.GetTypeField(entityType).TypeKey, domainRootStructureID);
         }
 
         /// <summary>
@@ -471,10 +472,10 @@
         /// <returns>
         /// The <see cref="IEnumerable"/>.
         /// </returns>
-        public IEnumerable<IEntityCollection> GetRootLevelEntityCollections(EntityType entityType, Guid providerKey)
+        public IEnumerable<IEntityCollection> GetRootLevelEntityCollections(EntityType entityType, Guid providerKey, int domainRootStructureID)
         {
             return this.GetRootLevelEntityCollections(
-                EnumTypeFieldConverter.EntityType.GetTypeField(entityType).TypeKey, providerKey);
+                EnumTypeFieldConverter.EntityType.GetTypeField(entityType).TypeKey, providerKey, domainRootStructureID);
         }
 
         /// <summary>
@@ -486,9 +487,9 @@
         /// <returns>
         /// The <see cref="IEnumerable{IEntityCollection}"/>.
         /// </returns>
-        public IEnumerable<IEntityCollection> GetRootLevelEntityCollections(Guid entityTfKey)
+        public IEnumerable<IEntityCollection> GetRootLevelEntityCollections(Guid entityTfKey, int domainRootStructureID)
         {
-            using (var repository = RepositoryFactory.CreateEntityCollectionRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateEntityCollectionRepository(UowProvider.GetUnitOfWork(), domainRootStructureID))
             {
                 var query = Query<IEntityCollection>.Builder.Where(x => x.ParentKey == null && x.EntityTfKey == entityTfKey);
                 return repository.GetByQuery(query);
@@ -507,9 +508,9 @@
         /// <returns>
         /// The <see cref="IEnumerable{IEntityCollection}"/>.
         /// </returns>
-        public IEnumerable<IEntityCollection> GetRootLevelEntityCollections(Guid entityTfKey, Guid providerKey)
+        public IEnumerable<IEntityCollection> GetRootLevelEntityCollections(Guid entityTfKey, Guid providerKey, int domainRootStructureID)
         {
-            using (var repository = RepositoryFactory.CreateEntityCollectionRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateEntityCollectionRepository(UowProvider.GetUnitOfWork(), domainRootStructureID))
             {
                 var query = Query<IEntityCollection>.Builder.Where(x => x.ParentKey == null && x.EntityTfKey == entityTfKey && x.ProviderKey == providerKey);
                 return repository.GetByQuery(query);
@@ -544,7 +545,7 @@
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Descending)
         {
-            using (var repository = RepositoryFactory.CreateEntityCollectionRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateEntityCollectionRepository(UowProvider.GetUnitOfWork(), Constants.System.Root))
             {
                 var query = Query<IEntityCollection>.Builder.Where(x => x.ParentKey == collectionKey);
                 return repository.GetPage(page, itemsPerPage, query, ValidateSortByField(sortBy), sortDirection);
@@ -562,7 +563,7 @@
         /// </returns>
         public int ChildEntityCollectionCount(Guid collectionKey)
         {
-            using (var repository = RepositoryFactory.CreateEntityCollectionRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateEntityCollectionRepository(UowProvider.GetUnitOfWork(), Constants.System.Root))
             {
                 var query = Query<IEntityCollection>.Builder.Where(x => x.ParentKey == collectionKey);
                 return repository.Count(query);
@@ -590,9 +591,9 @@
         /// <returns>
         /// The count of collections managed by a provider
         /// </returns>
-        public int CollectionCountManagedByProvider(Guid providerKey)
+        public int CollectionCountManagedByProvider(Guid providerKey, int domainRootStructureID)
         {
-            using (var repostitory = RepositoryFactory.CreateEntityCollectionRepository(UowProvider.GetUnitOfWork()))
+            using (var repostitory = RepositoryFactory.CreateEntityCollectionRepository(UowProvider.GetUnitOfWork(), domainRootStructureID))
             {
                 var query = Query<IEntityCollection>.Builder.Where(x => x.ProviderKey == providerKey);
                 return repostitory.Count(query);
@@ -610,7 +611,7 @@
         /// </returns>
         public bool Exists(Guid key)
         {
-            using (var repository = RepositoryFactory.CreateEntityCollectionRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateEntityCollectionRepository(UowProvider.GetUnitOfWork(), Constants.System.Root))
             {
                 return repository.Exists(key);
             }
@@ -640,7 +641,7 @@
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreateEntityCollectionRepository(uow))
+                using (var repository = RepositoryFactory.CreateEntityCollectionRepository(uow, Constants.System.Root))
                 {
                     foreach (var collection in collectionsArray)
                     {
@@ -673,15 +674,16 @@
         /// <returns>
         /// The <see cref="IEntityCollection"/>.
         /// </returns>
-        internal IEntityCollection CreateEntityCollection(Guid entityTfKey, Guid providerKey, string name, bool raiseEvents = true)
+        internal IEntityCollection CreateEntityCollection(Guid entityTfKey, Guid providerKey, string name, int domainRootStructureID, bool raiseEvents = true)
         {
             Mandate.ParameterCondition(!Guid.Empty.Equals(entityTfKey), "entityTfKey");
             Mandate.ParameterCondition(!Guid.Empty.Equals(providerKey), "providerKey");
             var collection = new EntityCollection(entityTfKey, providerKey)
-                                 {
-                                     Name = name,
-                                     ExtendedData = new ExtendedDataCollection()
-                                 };
+            {
+                DomainRootStructureID = domainRootStructureID,
+                Name = name,
+                ExtendedData = new ExtendedDataCollection()
+            };
 
             if (Creating.IsRaisedEventCancelled(new Events.NewEventArgs<IEntityCollection>(collection), this))
             {
@@ -710,16 +712,16 @@
         /// <returns>
         /// The <see cref="IEntityCollection"/>.
         /// </returns>
-        internal IEntityCollection CreateEntityCollectionWithKey(Guid entityTfKey, Guid providerKey, string name, bool raiseEvents = true)
+        internal IEntityCollection CreateEntityCollectionWithKey(Guid entityTfKey, Guid providerKey, string name, int domainRootStructureID, bool raiseEvents = true)
         {
-            var collection = this.CreateEntityCollection(entityTfKey, providerKey, name, raiseEvents);
+            var collection = this.CreateEntityCollection(entityTfKey, providerKey, name, domainRootStructureID, raiseEvents);
 
             if (((EntityCollection)collection).WasCancelled) return collection;
 
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreateEntityCollectionRepository(uow))
+                using (var repository = RepositoryFactory.CreateEntityCollectionRepository(uow, domainRootStructureID))
                 {
                     repository.AddOrUpdate(collection);
                     uow.Commit();
@@ -747,9 +749,9 @@
         /// </returns>
         internal IEnumerable<IEntityCollection> GetEntityCollectionsByProductKey(Guid productKey, bool isFilter = false)
         {
-            using (var repository = RepositoryFactory.CreateEntityCollectionRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateEntityCollectionRepository(UowProvider.GetUnitOfWork(), Constants.System.Root))
             {
-                return repository.GetEntityCollectionsByProductKey(productKey, isFilter);                
+                return repository.GetEntityCollectionsByProductKey(productKey, isFilter);
             }
         }
 
@@ -765,7 +767,7 @@
         /// </returns>
         internal IEnumerable<IEntityCollection> GetEntityCollectionsByInvoiceKey(Guid invoiceKey)
         {
-            using (var repository = RepositoryFactory.CreateEntityCollectionRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateEntityCollectionRepository(UowProvider.GetUnitOfWork(), Constants.System.Root))
             {
                 return repository.GetEntityCollectionsByInvoiceKey(invoiceKey);
             }
@@ -782,7 +784,7 @@
         /// </returns>
         internal IEnumerable<IEntityCollection> GetEntityCollectionsByCustomerKey(Guid customerKey)
         {
-            using (var repository = RepositoryFactory.CreateEntityCollectionRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateEntityCollectionRepository(UowProvider.GetUnitOfWork(), Constants.System.Root))
             {
                 return repository.GetEntityCollectionsByCustomerKey(customerKey);
             }
@@ -797,9 +799,9 @@
         /// <returns>
         /// The <see cref="IEnumerable{IEntityFilterGroup}"/>.
         /// </returns>
-        internal IEnumerable<IEntityFilterGroup> GetEntityFilterGroupsByProviderKeys(IEnumerable<Guid> keys)
+        internal IEnumerable<IEntityFilterGroup> GetEntityFilterGroupsByProviderKeys(IEnumerable<Guid> keys, int domainRootStructureID)
         {
-            using (var repository = RepositoryFactory.CreateEntityCollectionRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateEntityCollectionRepository(UowProvider.GetUnitOfWork(), domainRootStructureID))
             {
                 return repository.GetEntityFilterGroupsByProviderKeys(keys.ToArray());
             }
@@ -820,7 +822,7 @@
         /// </returns>
         internal IEnumerable<IEntityFilterGroup> GetEntityFilterGroupsContainingProduct(IEnumerable<Guid> keys, Guid productKey)
         {
-            using (var repository = RepositoryFactory.CreateEntityCollectionRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateEntityCollectionRepository(UowProvider.GetUnitOfWork(), Constants.System.Root))
             {
                 return repository.GetEntityFilterGroupsContainingProduct(keys.ToArray(), productKey);
             }
@@ -841,7 +843,7 @@
         /// </returns>
         internal IEnumerable<IEntityFilterGroup> GetEntityFilterGroupsNotContainingProduct(IEnumerable<Guid> keys, Guid productKey)
         {
-            using (var repository = RepositoryFactory.CreateEntityCollectionRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateEntityCollectionRepository(UowProvider.GetUnitOfWork(), Constants.System.Root))
             {
                 return repository.GetEntityFilterGroupsNotContainingProduct(keys.ToArray(), productKey);
             }
@@ -884,11 +886,11 @@
         private void UpdateSiblingSortOrders(IEntityCollection collection)
         {
             var siblings = collection.ParentKey == null
-                               ? this.GetRootLevelEntityCollections(collection.EntityType)
+                               ? this.GetRootLevelEntityCollections(collection.EntityType, collection.DomainRootStructureID)
                                : this.GetChildren(collection.ParentKey.Value);
 
             var updates = siblings.Where(x => x.SortOrder > collection.SortOrder).ToArray();
-            
+
             foreach (var update in updates)
             {
                 ((EntityCollection)update).SortOrder -= 1;

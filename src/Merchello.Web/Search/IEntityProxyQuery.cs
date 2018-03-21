@@ -42,7 +42,7 @@ namespace Merchello.Web.Search
         /// <returns>
         /// The collection of proxies.
         /// </returns>
-        IEnumerable<TProxy> GetAll(params Guid[] keys);
+        IEnumerable<TProxy> GetAll(int domainRootStructureID, params Guid[] keys);
     }
 
     /// <summary>

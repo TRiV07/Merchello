@@ -42,7 +42,7 @@
 
             if (!MerchelloContext.HasCurrent || att == null) return Enumerable.Empty<IEntityCollection>();
 
-            return MerchelloContext.Current.Services.EntityCollectionService.GetByProviderKey(att.Key);
+            return MerchelloContext.Current.Services.EntityCollectionService.GetByProviderKey(att.Key, Constants.System.Root);
         }
     }
 }
