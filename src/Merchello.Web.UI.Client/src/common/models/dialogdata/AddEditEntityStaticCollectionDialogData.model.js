@@ -9,6 +9,7 @@
 var AddEditEntityStaticCollectionDialog = function () {
     var self = this;
     self.entityType = '';
+    self.storeId = 0;
     self.collectionKeys = [];
 };
 

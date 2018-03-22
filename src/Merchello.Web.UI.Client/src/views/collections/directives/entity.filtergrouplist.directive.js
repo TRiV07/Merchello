@@ -1,8 +1,8 @@
 angular.module('merchello.directives').directive('entityFilterGroupList', [
-    '$q', 'localizationService', 'eventsService', 'dialogService', 'entityCollectionResource', 'entityCollectionDisplayBuilder',
+    '$q', '$routeParams', 'localizationService', 'eventsService', 'dialogService', 'entityCollectionResource', 'entityCollectionDisplayBuilder',
     'entityCollectionProviderDisplayBuilder',
-    function($q, localizationService, eventsService, dialogService, entityCollectionResource, entityCollectionDisplayBuilder,
-             entityCollectionProviderDisplayBuilder) {
+    function ($q, $routeParams, localizationService, eventsService, dialogService, entityCollectionResource, entityCollectionDisplayBuilder,
+        entityCollectionProviderDisplayBuilder) {
         return {
             restrict: 'E',
             replace: true,
@@ -14,7 +14,7 @@ angular.module('merchello.directives').directive('entityFilterGroupList', [
                 preValuesLoaded: '='
             },
             templateUrl: '/App_Plugins/Merchello/Backoffice/Merchello/directives/entity.filtergrouplist.tpl.html',
-            link: function(scope, elm, attr) {
+            link: function (scope, elm, attr) {
 
                 scope.loaded = false;
                 scope.noResults = '';
@@ -29,7 +29,7 @@ angular.module('merchello.directives').directive('entityFilterGroupList', [
                 var filterLabel = '';
 
 
-                scope.getColumnValue = function(col, spec) {
+                scope.getColumnValue = function (col, spec) {
                     switch (col) {
                         case 'name':
                             return spec.name;
@@ -38,11 +38,11 @@ angular.module('merchello.directives').directive('entityFilterGroupList', [
                     };
                 }
 
-                scope.showDelete = function(spec) {
-                    return !_.find(scope.hideDeletes, function(k) { return k === spec.providerKey; });
+                scope.showDelete = function (spec) {
+                    return !_.find(scope.hideDeletes, function (k) { return k === spec.providerKey; });
                 }
 
-                scope.delete = function(collection) {
+                scope.delete = function (collection) {
                     var dialogData = {
                         name: collection.name,
                         collection: collection
@@ -56,7 +56,7 @@ angular.module('merchello.directives').directive('entityFilterGroupList', [
                     });
                 }
 
-                scope.add = function() {
+                scope.add = function () {
                     var dialogData = {
                         providers: getValidProviders(),
                         entityType: scope.entityType,
@@ -71,10 +71,10 @@ angular.module('merchello.directives').directive('entityFilterGroupList', [
                     });
                 }
 
-                scope.edit = function(collection) {
+                scope.edit = function (collection) {
                     // first we need to get the provider assigned to the filter attribute collections (child collections)
-                    entityCollectionResource.getEntityFilterGroupFilterProvider(collection.key)
-                        .then(function(result) {
+                    entityCollectionResource.getEntityFilterGroupFilterProvider(collection.key, $routeParams.storeId)
+                        .then(function (result) {
 
                             var provider = entityCollectionProviderDisplayBuilder.transform(result);
                             var filterTemplate = entityCollectionDisplayBuilder.createDefault();
@@ -103,13 +103,13 @@ angular.module('merchello.directives').directive('entityFilterGroupList', [
                                 callback: processEditCollection,
                                 dialogData: dialogData
                             });
-                    });
+                        });
 
                 }
 
-                scope.openSort = function() {
+                scope.openSort = function () {
                     var clones = [];
-                    angular.forEach(scope.collections, function(c) {
+                    angular.forEach(scope.collections, function (c) {
                         clones.push(c.clone());
                     });
 
@@ -126,8 +126,8 @@ angular.module('merchello.directives').directive('entityFilterGroupList', [
                 }
 
                 function processSortCollections(collections) {
-                    entityCollectionResource.updateSortOrders(collections).then(function() {
-                       load();
+                    entityCollectionResource.updateSortOrders(collections).then(function () {
+                        load();
                     });
                 }
 
@@ -152,10 +152,10 @@ angular.module('merchello.directives').directive('entityFilterGroupList', [
                 function processDeleteCollection(dialogData) {
                     var remover = dialogData.collection;
                     var updateSorts = _.filter(scope.collections, function (c) {
-                       if (c.sortOrder > remover.sortOrder) {
-                           c.sortOrder = c.sortOrder - 1;
-                           return c;
-                       }
+                        if (c.sortOrder > remover.sortOrder) {
+                            c.sortOrder = c.sortOrder - 1;
+                            return c;
+                        }
                     });
                     scope.collections = _.reject(scope.collections, function (rem) { return rem.key === remover.key });
 
@@ -165,8 +165,8 @@ angular.module('merchello.directives').directive('entityFilterGroupList', [
                         promises.push(entityCollectionResource.updateSortOrders(updateSorts));
                     }
 
-                    $q.all(promises).then(function() {
-                       load();
+                    $q.all(promises).then(function () {
+                        load();
                     });
                 }
 
@@ -187,8 +187,8 @@ angular.module('merchello.directives').directive('entityFilterGroupList', [
                         localizationService.localize('general_no'),
                         localizationService.localize('merchelloTableCaptions_filters'),
                         localizationService.localize('merchelloSpecFilters_noSpecFilters'),
-                        entityCollectionResource.getEntityFilterGroupProviders(scope.entityType)
-                    ]).then(function(data) {
+                        entityCollectionResource.getEntityFilterGroupProviders(scope.entityType, $routeParams.storeId)
+                    ]).then(function (data) {
                         yes = data[0];
                         no = data[1];
                         filterLabel = data[2];
@@ -196,13 +196,13 @@ angular.module('merchello.directives').directive('entityFilterGroupList', [
                         scope.providers = entityCollectionProviderDisplayBuilder.transform(data[4]);
                         scope.hideDeletes =
                             _.pluck(
-                                _.filter(scope.providers, function(p) {
+                                _.filter(scope.providers, function (p) {
                                     if (p.managesUniqueCollection) return p;
                                 }),
-                            'key');
+                                'key');
                     });
 
-                    scope.$watch('preValuesLoaded', function(nv, ov) {
+                    scope.$watch('preValuesLoaded', function (nv, ov) {
                         if (nv === true) {
                             scope.isReady = true;
                         } else {
@@ -218,10 +218,10 @@ angular.module('merchello.directives').directive('entityFilterGroupList', [
                 function getValidProviders() {
                     // providers that manage a unique collection may only ever be added once and should
                     // be automatically added by the bootstrapping
-                    return _.filter(scope.providers, function(p) {
+                    return _.filter(scope.providers, function (p) {
 
                         var usedByCollection = _.find(scope.collections, function (c) {
-                           return c.providerKey === p.key;
+                            return c.providerKey === p.key;
                         });
 
                         // this is valid
@@ -232,7 +232,7 @@ angular.module('merchello.directives').directive('entityFilterGroupList', [
                 }
 
                 function load() {
-                    entityCollectionResource.getEntityFilterGroups(scope.entityType).then(function(results) {
+                    entityCollectionResource.getEntityFilterGroups(scope.entityType, $routeParams.storeId).then(function (results) {
                         scope.collections = entityCollectionDisplayBuilder.transform(results);
                         scope.loaded = true;
                     });

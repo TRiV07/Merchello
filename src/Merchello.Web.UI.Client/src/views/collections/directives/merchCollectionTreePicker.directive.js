@@ -1,17 +1,18 @@
-angular.module('merchello.directives').directive('merchCollectionTreePicker', function($q, $timeout, treeService, userService) {
+angular.module('merchello.directives').directive('merchCollectionTreePicker', function ($q, $timeout, treeService, userService) {
     return {
         restrict: 'E',
         replace: true,
         terminal: false,
 
         scope: {
-            subTreeId : '=',
+            subTreeId: '=',
+            getRootNode: '=?',
             entityType: '=',
             mode: '@?',
             hasSelection: '&?'
         },
 
-        compile: function(element, attrs) {
+        compile: function (element, attrs) {
 
             // makes multiple selection default
             if (!attrs.mode) { attrs.mode = 'multiple'; }
@@ -24,18 +25,35 @@ angular.module('merchello.directives').directive('merchCollectionTreePicker', fu
                 '<span class="root-link">{{tree.root.name}}</span></h5>' +
                 '</div>';
             template += '<ul>' +
-               '<merch-collection-tree-item ng-repeat="child in tree.root.children" eventhandler="eventhandler" node="child" current-node="currentNode" tree="this" mode="{{mode}}" has-selection="hasSelection()" section="{{section}}" ng-animate="animation()"></merch-collection-tree-item>' +
+                '<merch-collection-tree-item ng-repeat="child in tree.root.children" eventhandler="eventhandler" node="child" current-node="currentNode" tree="this" mode="{{mode}}" has-selection="hasSelection()" section="{{section}}" ng-animate="animation()"></merch-collection-tree-item>' +
                 '</ul>' +
                 '</li>' +
                 '</ul>';
 
             element.replaceWith(template);
 
-            return function(scope, elem, attr, controller) {
+            return function (scope, elem, attr, controller) {
 
                 var lastSection = "";
 
                 /** Method to load in the tree data */
+
+                function loadChildrensForRoot(rootNode) {
+                    scope.loadChildren(rootNode, true).then(function (data) {
+                        scope.activeTree = rootNode;
+                        // todo - this is really hacky but we need to remove the dynamic collections since
+                        // they are not valid in this context
+                        var invalidNodes = _.filter(scope.activeTree.children, function (c) {
+                            var found = _.find(c.cssClasses, function (css) {
+                                return css === 'static-collection';
+                            });
+                            return found === undefined;
+                        });
+                        angular.forEach(invalidNodes, function (n) {
+                            treeService.removeNode(n);
+                        });
+                    });
+                }
 
                 function loadTree() {
                     scope.section = 'merchello';
@@ -43,38 +61,30 @@ angular.module('merchello.directives').directive('merchCollectionTreePicker', fu
                         scope.loading = true;
 
                         //default args
-                        var args = { section: scope.section, tree: scope.treealias, cacheKey: scope.cachekey, isDialog:  true };
+                        var args = { section: scope.section, tree: scope.treealias, cacheKey: scope.cachekey, isDialog: true };
                         treeService.getTree(args)
-                            .then(function(data) {
+                            .then(function (data) {
                                 //set the data once we have it
+                                var tempRoot = data.root;
+                                data.root = [];
                                 scope.tree = data;
 
-                                scope.loading = false;
-
                                 //set the root as the current active tree
-
-                                scope.tree.root = _.find(scope.tree.root.children, function(c) {
-                                    return c.id === scope.subTreeId;
-                                });
-                                scope.loadChildren(scope.tree.root, true).then(function(data) {
-                                    scope.activeTree = scope.tree.root;
-                                    // todo - this is really hacky but we need to remove the dynamic collections since
-                                    // they are not valid in this context
-                                    var invalidNodes = _.filter(scope.activeTree.children, function(c) {
-                                        var found = _.find(c.cssClasses, function(css) {
-                                            return css === 'static-collection';
-                                        });
-                                        return found === undefined;
+                                if (scope.getRootNode) {
+                                    scope.getRootNode().then(function (rootNode) {
+                                        scope.loading = false;
+                                        scope.tree.root = rootNode;
+                                        loadChildrensForRoot(scope.tree.root);
                                     });
-                                    angular.forEach(invalidNodes, function(n) {
-                                        treeService.removeNode(n);
+                                } else {
+                                    scope.loading = false;
+                                    scope.tree.root = _.find(tempRoot.children, function (c) {
+                                        return c.id === scope.subTreeId;
                                     });
-                                });
+                                    loadChildrensForRoot(scope.tree.root);
+                                }
 
-                               // emitEvent("treeLoaded", { tree: scope.tree });
-                                //emitEvent("treeNodeExpanded", { tree: scope.tree, node: scope.tree.root, children: scope.tree.root.children });
-
-                            }, function(reason) {
+                            }, function (reason) {
                                 scope.loading = false;
                                 notificationsService.error("Tree Error", reason);
                             });
@@ -102,7 +112,7 @@ angular.module('merchello.directives').directive('merchCollectionTreePicker', fu
                 }
 
                 /* helper to force reloading children of a tree node */
-                scope.loadChildren = function(node, forceReload) {
+                scope.loadChildren = function (node, forceReload) {
                     var deferred = $q.defer();
 
                     //standardising
@@ -113,7 +123,7 @@ angular.module('merchello.directives').directive('merchCollectionTreePicker', fu
                     if (forceReload || (node.hasChildren && node.children.length === 0)) {
                         //get the children from the tree service
                         treeService.loadNodeChildren({ node: node, section: scope.section })
-                            .then(function(data) {
+                            .then(function (data) {
                                 deferred.resolve(data);
                             });
                     }
@@ -143,7 +153,7 @@ angular.module('merchello.directives').directive('merchCollectionTreePicker', fu
 
 
                 //watch for section changes
-                scope.$watch("section", function(newVal, oldVal) {
+                scope.$watch("section", function (newVal, oldVal) {
 
                     if (!scope.tree) {
                         loadTree();

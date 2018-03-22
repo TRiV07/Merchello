@@ -1,4 +1,4 @@
-angular.module('merchello.directives').directive('merchCollectionTreeItem', function($compile, treeService, eventsService) {
+angular.module('merchello.directives').directive('merchCollectionTreeItem', function ($compile, treeService, eventsService) {
     return {
         restrict: 'E',
         replace: true,
@@ -13,14 +13,14 @@ angular.module('merchello.directives').directive('merchCollectionTreeItem', func
         },
 
         template: '<li ng-class="{\'current\': (node == currentNode)}">' +
-        '<div ng-class="getNodeCssClass(node)" id="{{node.id}}">' +
-        '<ins style="width:18px;"></ins>' +
-        '<ins ng-class="{\'icon-navigation-right\': !node.expanded, \'icon-navigation-down\': node.expanded}" ng-click="load(node)"></ins>' +
-        '<i class="icon umb-tree-icon sprTree"></i>' +
-        '<a ng-click="select(node, $event)"></a>' +
-        '<div ng-show="node.loading" class="l"><div></div></div>' +
-        '</div>' +
-        '</li>',
+            '<div ng-class="getNodeCssClass(node)" id="{{node.id}}">' +
+            '<ins style="width:18px;"></ins>' +
+            '<ins ng-class="{\'icon-navigation-right\': !node.expanded, \'icon-navigation-down\': node.expanded}" ng-click="load(node)"></ins>' +
+            '<i class="icon umb-tree-icon sprTree"></i>' +
+            '<a ng-click="select(node, $event)"></a>' +
+            '<div ng-show="node.loading" class="l"><div></div></div>' +
+            '</div>' +
+            '</li>',
 
         link: function (scope, element, attrs) {
 
@@ -32,7 +32,7 @@ angular.module('merchello.directives').directive('merchCollectionTreeItem', func
                 //get the first div element
                 element.children(":first")
                     //set the padding
-                    .css("padding-left", (node.level * 20) + "px");
+                    .css("padding-left", (node.level * 10) + "px");
 
                 //remove first 'ins' if there is no children
                 //show/hide last 'ins' depending on children
@@ -65,8 +65,8 @@ angular.module('merchello.directives').directive('merchCollectionTreeItem', func
              and emits it as a treeNodeSelect element if there is a callback object
              defined on the tree
              */
-            scope.select = function(n, ev) {
-               var args = buildArgs(n);
+            scope.select = function (n, ev) {
+                var args = buildArgs(n);
                 var el = $('#' + n.id + ' i.icon');
                 if ($(el).hasClass('icon-list')) {
                     // single mode
@@ -88,7 +88,11 @@ angular.module('merchello.directives').directive('merchCollectionTreeItem', func
                 var args = { key: '', value: '' };
                 var id = n.id + '';
                 var ids = id.split('_');
-                args.value = ids[1];
+                if (ids.length > 2) {
+                    args.value = ids[2];
+                } else {
+                    args.value = ids[1];
+                }
                 return args;
             }
 
@@ -122,7 +126,7 @@ angular.module('merchello.directives').directive('merchCollectionTreeItem', func
             /* helper to force reloading children of a tree node */
             scope.loadChildren = function (node, forceReload) {
                 //emit treeNodeExpanding event, if a callback object is set on the tree
-               // emitEvent("treeNodeExpanding", { tree: scope.tree, node: node });
+                // emitEvent("treeNodeExpanding", { tree: scope.tree, node: node });
 
                 if (node.hasChildren && (forceReload || !node.children || (angular.isArray(node.children) && node.children.length === 0))) {
                     //get the children from the tree service

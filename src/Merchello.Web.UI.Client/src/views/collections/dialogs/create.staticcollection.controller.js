@@ -30,7 +30,7 @@ angular.module('merchello')
             }
 
             function loadProviders() {
-                var promise = entityCollectionResource.getDefaultEntityCollectionProviders();
+                var promise = entityCollectionResource.getDefaultEntityCollectionProviders($scope.dialogData.storeId);
                 promise.then(function(results) {
                     $scope.entityCollectionProviders = entityCollectionProviderDisplayBuilder.transform(results);
                     $scope.provider = _.find($scope.entityCollectionProviders, function(p) { return p.entityType == $scope.entityType; });
@@ -55,7 +55,7 @@ angular.module('merchello')
                     collection.entityType = $scope.provider.entityType;
                     collection.parentKey = $scope.dialogData.parentKey;
                     collection.name = $scope.name;
-                    var promise = entityCollectionResource.addEntityCollection(collection);
+                    var promise = entityCollectionResource.addEntityCollection(collection, $scope.dialogData.storeId);
                     promise.then(function() {
                         navigationService.hideNavigation();
 

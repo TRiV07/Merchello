@@ -45,7 +45,7 @@ angular.module('merchello')
 
             function loadRootLevelCollections() {
                 $scope.isRootNode = true;
-                var parentPromise = entityCollectionResource.getRootCollectionsByEntityType($scope.entityType);
+                var parentPromise = entityCollectionResource.getRootCollectionsByEntityType($scope.entityType, $scope.dialogData.storeId);
                 parentPromise.then(function(collections) {
                     var transformed = [];
                     if (!angular.isArray(collections)) {

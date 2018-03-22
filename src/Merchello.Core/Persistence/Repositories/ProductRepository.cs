@@ -3,7 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-
+    using System.Text;
     using Merchello.Core.Models;
     using Merchello.Core.Models.Rdbms;
     using Merchello.Core.Persistence.Factories;
@@ -1652,19 +1652,30 @@
         /// </returns>
         protected override IEnumerable<IProduct> PerformGetAll(params Guid[] keys)
         {
-
+            //TODOMS this implementation have nove items order... Sorted items will be unsorted
             var dtos = new List<ProductDto>();
 
             if (keys.Any())
             {
                 // This is to get around the WhereIn max limit of 2100 parameters and to help with performance of each WhereIn query
-                var keyLists = keys.Split(400).ToList();
+                var keyLists = keys.Split(400).Select(x => x.ToArray()).ToList();
 
                 // Loop the split keys and get them
-                foreach (var keyList in keyLists)
+                foreach (Guid[] keyList in keyLists)
                 {
-                    dtos.AddRange(Database.Fetch<ProductDto, ProductVariantDto, ProductVariantIndexDto>(GetBaseQuery(false).WhereIn<ProductDto>(x => x.Key, keyList, SqlSyntax)));
+                    var sql = GetBaseQuery(false).WhereIn<ProductDto>(x => x.Key, keyList, SqlSyntax);
+                    //sql.Append("ORDER BY case");
+
+                    //for (int i = 0; i < keyList.Length; i++)
+                    //{
+                    //    sql.Append($"when merchProduct.pk = '{keyList[i]}' then {i}");
+                    //}
+                    //sql.Append("end");
+
+                    dtos.AddRange(Database.Fetch<ProductDto, ProductVariantDto, ProductVariantIndexDto>(sql));
                 }
+
+                dtos = keys.Select(k => dtos.FirstOrDefault(x => x.Key == k)).ToList();
             }
             else
             {

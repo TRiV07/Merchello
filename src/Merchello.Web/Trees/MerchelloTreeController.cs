@@ -221,7 +221,7 @@
                     _collectiontrees.Contains(splitId.CollectionId),
                     new Dictionary<string, object>()
                         {
-                            { "dialogData", new { entityType = splitId.CollectionId, parentKey = splitId.CollectionKey } }
+                            { "dialogData", new { entityType = splitId.CollectionId, parentKey = splitId.CollectionKey, storeId = splitId.StoreId } }
                         }).LaunchDialogView(DialogsPath + "create.staticcollection.html", _textService.Localize(string.Format("merchelloCollections/{0}", NewCollectionAction.Instance.Alias), _culture));
 
                 if (!_collectiontrees.Contains(splitId.CollectionId)) // don't show this on root nodes
@@ -230,7 +230,7 @@
                         false,
                         new Dictionary<string, object>()
                             {
-                            { "dialogData", new { entityType = splitId.CollectionId, collectionKey = splitId.CollectionKey } }
+                            { "dialogData", new { entityType = splitId.CollectionId, collectionKey = splitId.CollectionKey, storeId = splitId.StoreId } }
                             }).LaunchDialogView(DialogsPath + "manage.staticcollection.html", _textService.Localize(string.Format("merchelloCollections/{0}", ManageEntitiesAction.Instance.Alias), _culture));
 
                 menu.Items.Add<SortCollectionAction>(
@@ -238,7 +238,7 @@
                     false,
                     new Dictionary<string, object>()
                         {
-                             { "dialogData", new { entityType = splitId.CollectionId, parentKey = splitId.CollectionKey } }
+                             { "dialogData", new { entityType = splitId.CollectionId, parentKey = splitId.CollectionKey, storeId = splitId.StoreId } }
                         }).LaunchDialogView(DialogsPath + "sort.staticcollection.html", _textService.Localize(string.Format("merchelloCollections/{0}", SortCollectionAction.Instance.Alias), _culture));
 
                 if (splitId.IsChildCollection)
