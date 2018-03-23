@@ -52,29 +52,28 @@
         /// <inheritdoc />
         public TreeNode<IProductCollection> GetTreeContaining(IProductCollection collection)
         {
-            var trees = GetRootTrees();
+            var col = Service.GetByKey(collection.Key);
+            var trees = GetRootTrees(col.DomainRootStructureID);
             return trees.FirstOrDefault(tree => tree.Flatten().Any(node => node.Key == collection.Key));
         }
 
         /// <inheritdoc />
-        public TreeNode<IProductCollection> GetTreeWithRoot(IProductCollection collection)
+        public TreeNode<IProductCollection> GetTreeWithRoot(IProductCollection collection, int domainRootStructureID)
         {
-            //TODOMS
-            return new TreeNode<IProductCollection>(collection).Populate(GetAll(-1));
+            return new TreeNode<IProductCollection>(collection).Populate(GetAll(domainRootStructureID));
         }
 
         /// <inheritdoc />
-        public IEnumerable<TreeNode<IProductCollection>> GetRootTrees()
+        public IEnumerable<TreeNode<IProductCollection>> GetRootTrees(int domainRootStructureID)
         {
-            var cacheKey = GetCacheKey("GetRootTrees");
+            var cacheKey = GetCacheKey("GetRootTrees", domainRootStructureID);
             var trees = (IEnumerable<TreeNode<IProductCollection>>)Cache.GetCacheItem(cacheKey);
 
             if (trees != null) return trees;
 
-            //TODOMS
             var factory = new TreeNodeFactory<IProductCollection>();
             return (IEnumerable<TreeNode<IProductCollection>>)
-                        Cache.GetCacheItem(cacheKey, () => factory.BuildTrees(GetAll(-1)));
+                        Cache.GetCacheItem(cacheKey, () => factory.BuildTrees(GetAll(domainRootStructureID)));
         }
     }
 }

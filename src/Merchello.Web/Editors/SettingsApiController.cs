@@ -271,6 +271,20 @@
 			return response;
 		}
 
+        [HttpGet]
+        public HttpResponseMessage GetDomainRootIdByContentId(int id)
+        {
+            var domainService = ApplicationContext.Services.DomainService;
+            var domains = domainService.GetAllFromCache();
+
+            var content = UmbracoContext.Current.ContentCache.GetById(id);
+            if (content == null) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+
+            var rootContent = content.AncestorOrSelf(1);
+            return Request.CreateResponse(HttpStatusCode.OK, domains
+                .FirstOrDefault(x => x.RootContentId.HasValue && x.RootContentId.Value == rootContent.Id)?.RootContentId);
+        }
+
         /// <summary>
         /// Records the domain used by Merchello.
         /// </summary>

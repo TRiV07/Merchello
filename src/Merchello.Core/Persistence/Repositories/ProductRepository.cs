@@ -1652,7 +1652,6 @@
         /// </returns>
         protected override IEnumerable<IProduct> PerformGetAll(params Guid[] keys)
         {
-            //TODOMS this implementation have nove items order... Sorted items will be unsorted
             var dtos = new List<ProductDto>();
 
             if (keys.Any())
@@ -1664,14 +1663,6 @@
                 foreach (Guid[] keyList in keyLists)
                 {
                     var sql = GetBaseQuery(false).WhereIn<ProductDto>(x => x.Key, keyList, SqlSyntax);
-                    //sql.Append("ORDER BY case");
-
-                    //for (int i = 0; i < keyList.Length; i++)
-                    //{
-                    //    sql.Append($"when merchProduct.pk = '{keyList[i]}' then {i}");
-                    //}
-                    //sql.Append("end");
-
                     dtos.AddRange(Database.Fetch<ProductDto, ProductVariantDto, ProductVariantIndexDto>(sql));
                 }
 

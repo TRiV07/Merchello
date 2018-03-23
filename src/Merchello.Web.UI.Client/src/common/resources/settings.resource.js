@@ -223,6 +223,10 @@
 
             getReportBackofficeTrees: function() {
                 return getCachedOrApi("pluginReports", "GetReportBackofficeTrees", "BackofficeTree");
+            },
+
+            getDomainRootIdByContentId: function (contentId) {
+                return getCachedOrApi("DomainRootIdByContentId_" + contentId, "GetDomainRootIdByContentId/" + contentId, "DomainRootId")
             }
 
         };

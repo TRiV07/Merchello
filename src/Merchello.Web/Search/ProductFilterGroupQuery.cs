@@ -103,7 +103,7 @@
         /// </returns>
         public IEnumerable<IProductFilterGroup> GetAll(int domainRootStructureID, params Guid[] keys)
         {
-            var cacheKey = this.GetCacheKey("GetAll", keys);
+            var cacheKey = this.GetCacheKey("GetAll", domainRootStructureID, keys);
 
             var filterGroups = (IEnumerable<IProductFilterGroup>)this.Cache.GetCacheItem(cacheKey);
             if (filterGroups != null) return filterGroups;
@@ -168,9 +168,9 @@
         }
 
         /// <inheritdoc/>
-        public IEnumerable<IPrimedProductFilterGroup> GetFilterGroupsForCollectionContext(params Guid[] collectionKeys)
+        public IEnumerable<IPrimedProductFilterGroup> GetFilterGroupsForCollectionContext(int domainRootStructureID, params Guid[] collectionKeys)
         {
-            var tree = _primedTree.GetTree(collectionKeys);
+            var tree = _primedTree.GetTree(domainRootStructureID);
 
             return tree.Children.Select(x => x.Value.Item);
         }

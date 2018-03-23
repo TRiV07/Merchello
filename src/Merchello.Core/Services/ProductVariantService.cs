@@ -405,7 +405,6 @@
             }
         }
 
-        //TODOMS
         /// <summary>
         /// Gets a collection of <see cref="IProductVariant"/> objects associated with a given warehouse 
         /// </summary>

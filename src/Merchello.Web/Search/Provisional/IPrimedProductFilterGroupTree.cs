@@ -36,7 +36,7 @@
         /// <remarks>
         /// With no key parameters, the context is assumed to be with no constraining collections.
         /// </remarks>
-        TreeNode<ProductFilterGroupNode> GetTree(params Guid[] collectionKeys);
+        TreeNode<ProductFilterGroupNode> GetTree(int domainRootStructureID, params Guid[] collectionKeys);
 
         /// <summary>
         /// Clears the cache.
