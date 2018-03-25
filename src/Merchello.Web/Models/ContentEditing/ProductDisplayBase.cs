@@ -14,6 +14,11 @@
     public abstract class ProductDisplayBase : ProductVariantDataModifierData
     {
         /// <summary>
+        /// DomainRootStructureID
+        /// </summary>
+        public int DomainRootStructureID { get; set; }
+
+        /// <summary>
         /// Gets or sets the version key.
         /// </summary>
         public Guid VersionKey { get; set; }

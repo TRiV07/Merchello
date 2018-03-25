@@ -1,5 +1,6 @@
 ﻿namespace Merchello.Web.Models.VirtualContent
 {
+    using Merchello.Web.Models.ContentEditing;
     using System;
 
     using Umbraco.Core.Models;
@@ -24,5 +25,10 @@
         /// Gets or sets the parent.
         /// </summary>
         public IPublishedContent Parent { get; set; }
+
+        /// <summary>
+        /// Gets or sets function to get parrent by content
+        /// </summary>
+        public Func<ProductDisplay, IPublishedContent> ParentGetter { get; set; }
     }
 }

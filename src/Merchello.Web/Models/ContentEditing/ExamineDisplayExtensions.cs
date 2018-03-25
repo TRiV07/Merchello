@@ -64,6 +64,7 @@
             {
                 Key = FieldAsGuid(result, "productVariantKey"),
                 ProductKey = FieldAsGuid(result, "productKey"),
+                DomainRootStructureID = FieldAsInteger(result, "domainRootStructureID"),
                 Name = FieldAsString(result, "name"),
                 Sku = FieldAsString(result, "sku"),
                 Price = FieldAsDecimal(result, "price"),
@@ -354,8 +355,7 @@
             if (!result.Fields.ContainsKey(alias)) return 0;
             var value = result.Fields[alias];
 
-            int converted;
-            return int.TryParse(value, out converted) ? converted : 0;
+            return int.TryParse(value, out int converted) ? converted : 0;
         }
 
         /// <summary>

@@ -39,6 +39,11 @@
         private IPublishedContent _parent;
 
         /// <summary>
+        /// Function to get parrent by content
+        /// </summary>
+        private Func<ProductDisplay, IPublishedContent> _parentGetter;
+
+        /// <summary>
         /// The parent culture.
         /// </summary>
         private string _parentCulture;
@@ -143,7 +148,13 @@
 
             var clone = CloneHelper.JsonClone<ProductDisplay>(display);
 
-            return new ProductContent(publishedContentType, optionContentTypes, clone, _parent, _defaultStoreLanguage);
+            var parent = _parent;
+            if (_parentGetter != null)
+            {
+                parent = _parentGetter(display);
+            }
+
+            return new ProductContent(publishedContentType, optionContentTypes, clone, parent, _defaultStoreLanguage);
         }
 
         /// <summary>
@@ -190,6 +201,7 @@
             var args = new VirtualContentEventArgs(_parent);
             Initializing.RaiseEvent(args, this);
             _parent = args.Parent;
+            _parentGetter = args.ParentGetter;
 
             //// http://issues.merchello.com/youtrack/issue/M-878
             _allLanguages = ApplicationContext.Current.Services.LocalizationService.GetAllLanguages().ToArray();
