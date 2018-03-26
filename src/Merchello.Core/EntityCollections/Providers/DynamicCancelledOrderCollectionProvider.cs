@@ -169,6 +169,7 @@
         protected override Page<Guid> PerformGetPagedEntityKeysNotInCollection(
             long page,
             long itemsPerPage,
+            int domainRootStructureID,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Ascending)
         {
@@ -205,6 +206,7 @@
             Dictionary<string, object> args,
             long page,
             long itemsPerPage,
+            int domainRootStructureID,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Ascending)
         {

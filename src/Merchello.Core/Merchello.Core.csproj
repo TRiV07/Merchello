@@ -533,6 +533,8 @@
     <Compile Include="Models\Rdbms\DigitalMediaDto.cs" />
     <Compile Include="Models\Rdbms\UserGroup2AppDto.cs" />
     <Compile Include="PagedCollection.cs" />
+    <Compile Include="Persistence\Migrations\UpgradesMS\TargetVersionOneZeroThree\UpdateAnonymousCustomerTable.cs" />
+    <Compile Include="Persistence\Migrations\UpgradesMS\TargetVersionOneZeroThree\UpdateCustomerTable.cs" />
     <Compile Include="Persistence\Migrations\UpgradesMS\TargetVersionOneZeroTwo\UpdateWarehouseTable.cs" />
     <Compile Include="Persistence\Migrations\UpgradesMS\TargetVersionOneZeroTwo\UpdateEntityCollectionTable.cs" />
     <Compile Include="Persistence\Migrations\UpgradesMS\TargetVersionOneZeroOne\UpdateProductVariantTable.cs" />
@@ -547,6 +549,7 @@
     <Compile Include="Persistence\Repositories\Interfaces\IProductBackOfficeRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IPortForwardProductRepository.cs" />
     <Compile Include="Persistence\Repositories\MerchelloMSPetaPocoRepositoryBase.cs" />
+    <Compile Include="Persistence\Repositories\PagedMSRepositoryBase.cs" />
     <Compile Include="Persistence\Repositories\ProductRepository.BackOffice.cs">
       <DependentUpon>ProductRepository.cs</DependentUpon>
     </Compile>

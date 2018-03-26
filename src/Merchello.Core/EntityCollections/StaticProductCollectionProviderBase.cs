@@ -158,6 +158,7 @@
         protected override Page<Guid> PerformGetPagedEntityKeysNotInCollection(
             long page,
             long itemsPerPage,
+            int domainRootStructureID,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Ascending)
         {
@@ -165,6 +166,7 @@
                 this.CollectionKey,
                 page,
                 itemsPerPage,
+                domainRootStructureID,
                 sortBy,
                 sortDirection);
         }
@@ -194,16 +196,18 @@
             Dictionary<string, object> args,
             long page,
             long itemsPerPage,
+            int domainRootStructureID,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Ascending)
         {
-            if (!args.ContainsKey("searchTerm")) return PerformGetPagedEntityKeysNotInCollection(page, itemsPerPage, sortBy, sortDirection);
+            if (!args.ContainsKey("searchTerm")) return PerformGetPagedEntityKeysNotInCollection(page, itemsPerPage, domainRootStructureID, sortBy, sortDirection);
 
             return ((ProductService)this.MerchelloContext.Services.ProductService).GetKeysNotInCollection(
                 this.CollectionKey,
                 args["searchTerm"].ToString(),
                 page,
                 itemsPerPage,
+                domainRootStructureID,
                 sortBy,
                 sortDirection);
         }

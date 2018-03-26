@@ -120,10 +120,7 @@
 
             var dtos = Database.Fetch<ShipMethodDto>(sql);
 
-            return dtos
-                .DistinctBy(x => x.Key)
-                .Select(dto => Get(dto.Key))
-                .ToArray();
+            return dtos.DistinctBy(x => x.Key).Select(dto => Get(dto.Key)).ToArray();
         }
 
         /// <summary>

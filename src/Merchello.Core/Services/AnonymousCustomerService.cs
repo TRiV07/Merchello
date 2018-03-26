@@ -21,7 +21,7 @@
     /// </summary>
     internal class AnonymousCustomerService : MerchelloRepositoryService, IAnonymousCustomerService
     {
-         #region fields
+        #region fields
 
         /// <summary>
         /// The locker.
@@ -48,7 +48,7 @@
         /// </param>
         public AnonymousCustomerService(ILogger logger)
             : this(logger, ApplicationContext.Current.DatabaseContext.SqlSyntax)
-        {            
+        {
         }
 
         /// <summary>
@@ -162,9 +162,9 @@
         /// <returns>
         /// The <see cref="IAnonymousCustomer"/>.
         /// </returns>
-        public IAnonymousCustomer CreateAnonymousCustomerWithKey()
+        public IAnonymousCustomer CreateAnonymousCustomerWithKey(int domainRootStructureID)
         {
-            var anonymous = new AnonymousCustomer();
+            var anonymous = new AnonymousCustomer(domainRootStructureID);
 
             if (Creating.IsRaisedEventCancelled(new Events.NewEventArgs<IAnonymousCustomer>(anonymous), this))
             {
@@ -175,7 +175,7 @@
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreateAnonymousCustomerRepository(uow))
+                using (var repository = RepositoryFactory.CreateAnonymousCustomerRepository(uow, domainRootStructureID))
                 {
                     repository.AddOrUpdate(anonymous);
                     uow.Commit();
@@ -199,15 +199,15 @@
         public void Save(IAnonymousCustomer anonymous, bool raiseEvents = true)
         {
             if (raiseEvents)
-            if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IAnonymousCustomer>(anonymous), this))
-            {
-                return;
-            }
+                if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IAnonymousCustomer>(anonymous), this))
+                {
+                    return;
+                }
 
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreateAnonymousCustomerRepository(uow))
+                using (var repository = RepositoryFactory.CreateAnonymousCustomerRepository(uow, Constants.System.Root))
                 {
                     repository.AddOrUpdate(anonymous);
                     uow.Commit();
@@ -215,7 +215,7 @@
             }
 
             if (raiseEvents)
-            Saved.RaiseEvent(new SaveEventArgs<IAnonymousCustomer>(anonymous), this);
+                Saved.RaiseEvent(new SaveEventArgs<IAnonymousCustomer>(anonymous), this);
         }
 
         /// <summary>
@@ -231,7 +231,7 @@
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreateAnonymousCustomerRepository(uow))
+                using (var repository = RepositoryFactory.CreateAnonymousCustomerRepository(uow, Constants.System.Root))
                 {
                     repository.Delete(anonymous);
                     uow.Commit();
@@ -257,7 +257,7 @@
             {
                 var uow = UowProvider.GetUnitOfWork();
 
-                using (var repository = RepositoryFactory.CreateAnonymousCustomerRepository(uow))
+                using (var repository = RepositoryFactory.CreateAnonymousCustomerRepository(uow, Constants.System.Root))
                 {
                     foreach (var anonymous in anonymousArray)
                     {
@@ -283,9 +283,9 @@
         /// <remarks>
         /// For maintenance routines
         /// </remarks>
-        public IEnumerable<IAnonymousCustomer> GetAnonymousCustomersCreatedBefore(DateTime createdDate)
+        public IEnumerable<IAnonymousCustomer> GetAnonymousCustomersCreatedBefore(DateTime createdDate, int domainRootStructureID)
         {
-            using (var repository = RepositoryFactory.CreateAnonymousCustomerRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateAnonymousCustomerRepository(UowProvider.GetUnitOfWork(), domainRootStructureID))
             {
                 var query = Query<IAnonymousCustomer>.Builder.Where(x => x.CreateDate <= createdDate);
 

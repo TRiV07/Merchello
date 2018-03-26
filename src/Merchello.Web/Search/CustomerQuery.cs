@@ -69,11 +69,11 @@
         /// The collection of all customers.
         /// </returns>
         [Obsolete("User MerchelloHelper.Query.Customer.Search")]
-        public static IEnumerable<CustomerDisplay> GetAllCustomers()
+        public static IEnumerable<CustomerDisplay> GetAllCustomers(int domainRootStructureID)
         {
             var query = new CachedCustomerQuery(MerchelloContext.Current.Services.CustomerService, false);
 
-            return query.Search(1, long.MaxValue).Items.Select(x => (CustomerDisplay)x);
+            return query.Search(1, long.MaxValue, domainRootStructureID).Items.Select(x => (CustomerDisplay)x);
         }
 
         ///// <summary>

@@ -158,9 +158,9 @@
         /// <returns>
         /// The <see cref="QueryResultDisplay"/>.
         /// </returns>
-        public QueryResultDisplay Search(long page, long itemsPerPage, string sortBy = "loginName", SortDirection sortDirection = SortDirection.Ascending)
+        public QueryResultDisplay Search(long page, long itemsPerPage, int domainRootStructureID, string sortBy = "loginName", SortDirection sortDirection = SortDirection.Ascending)
         {
-            return GetQueryResultDisplay(_customerService.GetPagedKeys(page, itemsPerPage, sortBy, sortDirection));
+            return GetQueryResultDisplay(_customerService.GetPagedKeys(page, itemsPerPage, domainRootStructureID, sortBy, sortDirection));
         }
 
         /// <summary>
@@ -184,9 +184,9 @@
         /// <returns>
         /// The <see cref="QueryResultDisplay"/>.
         /// </returns>
-        public QueryResultDisplay Search(string term, long page, long itemsPerPage, string sortBy = "loginName", SortDirection sortDirection = SortDirection.Ascending)
+        public QueryResultDisplay Search(string term, long page, long itemsPerPage, int domainRootStructureID, string sortBy = "loginName", SortDirection sortDirection = SortDirection.Ascending)
         {
-            return GetQueryResultDisplay(_customerService.GetPagedKeys(term, page, itemsPerPage, sortBy, sortDirection));
+            return GetQueryResultDisplay(_customerService.GetPagedKeys(term, page, itemsPerPage, domainRootStructureID, sortBy, sortDirection));
         }
 
         /// <summary>
@@ -213,11 +213,11 @@
         /// <returns>
         /// The <see cref="QueryResultDisplay"/>.
         /// </returns>
-        public QueryResultDisplay Search(DateTime lastActivityDateStart, DateTime lastActivityDateEnd, long page, long itemsPerPage, string sortBy = "loginName", SortDirection sortDirection = SortDirection.Ascending)
+        public QueryResultDisplay Search(DateTime lastActivityDateStart, DateTime lastActivityDateEnd, long page, long itemsPerPage, int domainRootStructureID, string sortBy = "loginName", SortDirection sortDirection = SortDirection.Ascending)
         {
             var query = Query<ICustomer>.Builder.Where(x => x.LastActivityDate >= lastActivityDateStart && x.LastActivityDate <= lastActivityDateEnd);
 
-            return GetQueryResultDisplay(_customerService.GetPagedKeys(query, page, itemsPerPage, sortBy, sortDirection));
+            return GetQueryResultDisplay(_customerService.GetPagedKeys(query, page, itemsPerPage, domainRootStructureID, sortBy, sortDirection));
         }
 
         ///// <summary>

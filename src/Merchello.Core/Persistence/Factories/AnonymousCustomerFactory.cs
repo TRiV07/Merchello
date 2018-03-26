@@ -19,7 +19,7 @@
         /// </returns>
         public IAnonymousCustomer BuildEntity(AnonymousCustomerDto dto)
         {
-            return new AnonymousCustomer()
+            return new AnonymousCustomer(dto.DomainRootStructureID)
             {
                 Key = dto.Key,
                 LastActivityDate = dto.LastActivityDate,
@@ -43,6 +43,7 @@
             return new AnonymousCustomerDto()
             {
                 Key = entity.Key,
+                DomainRootStructureID = entity.DomainRootStructureID,
                 LastActivityDate = entity.LastActivityDate,
                 ExtendedData = entity.ExtendedData.SerializeToXml(),
                 UpdateDate = entity.UpdateDate,

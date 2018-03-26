@@ -99,7 +99,7 @@
             var keys = GetAttributeCollectionKeys();
 
             return keys != null ?
-                MerchelloContext.Services.ProductService.GetProductsThatExistInAllCollections(keys, page, itemsPerPage, sortBy, sortDirection) :
+                MerchelloContext.Services.ProductService.GetEntitiesThatExistInAllCollections(keys, page, itemsPerPage, sortBy, sortDirection) :
                 null;
         }
 
@@ -199,6 +199,7 @@
         protected override Page<Guid> PerformGetPagedEntityKeysNotInCollection(
             long page,
             long itemsPerPage,
+            int domainRootStructureID,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Ascending)
         {
@@ -209,6 +210,7 @@
                            keys,
                            page,
                            itemsPerPage,
+                           domainRootStructureID,
                            sortBy,
                            sortDirection) :
                            null;
@@ -239,10 +241,11 @@
             Dictionary<string, object> args,
             long page,
             long itemsPerPage,
+            int domainRootStructureID,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Ascending)
         {
-            if (!args.ContainsKey("searchTerm")) return PerformGetPagedEntityKeysNotInCollection(page, itemsPerPage, sortBy, sortDirection);
+            if (!args.ContainsKey("searchTerm")) return PerformGetPagedEntityKeysNotInCollection(page, itemsPerPage, domainRootStructureID, sortBy, sortDirection);
             var keys = GetAttributeCollectionKeys();
 
             return keys != null
@@ -251,6 +254,7 @@
                            args["searchTerm"].ToString(),
                            page,
                            itemsPerPage,
+                           domainRootStructureID,
                            sortBy,
                            sortDirection) :
                            null;

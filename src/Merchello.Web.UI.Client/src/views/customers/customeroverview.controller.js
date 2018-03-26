@@ -338,7 +338,7 @@
             }
 
             function getEditUrl(invoice) {
-                return baseUrl + invoice.key;
+                return baseUrl + invoice.key + '/store/' + $routeParams.storeId;
             }
 
             /**
@@ -469,7 +469,7 @@
                 var promiseDeleteCustomer = customerResource.DeleteCustomer(dialogData.customer.key);
                 promiseDeleteCustomer.then(function() {
                     notificationsService.success("Customer deleted.", "");
-                    window.location.hash = "#/merchello/merchello/customerList/manage";
+                    window.location.hash = "#/merchello/merchello/customerList/manage" + '/store/' + $routeParams.storeId;
                 }, function(reason) {
                     notificationsService.error("Customer Deletion Failed", reason.message);
                 });

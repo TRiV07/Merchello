@@ -38,6 +38,7 @@
 
     using ServiceContext = Merchello.Core.Services.ServiceContext;
     using Task = System.Threading.Tasks.Task;
+    using Merchello.Core.MultiStore;
 
     /// <summary>
     /// Handles the Umbraco Application "Starting" and "Started" event and initiates the Merchello startup
@@ -195,6 +196,12 @@
             {
                 var customer = (ICustomer)pair.CustomerBasket.Customer;
                 customer.LastActivityDate = DateTime.Now;
+                var member = ApplicationContext.Current.Services.MemberService.GetByUsername(customer.LoginName);
+                if (member != null)
+                {
+                    customer.FirstName = member.GetValue<string>("firstName") ?? string.Empty;
+                    customer.LastName = member.GetValue<string>("lastName") ?? string.Empty;
+                }
                 MerchelloContext.Current.Services.CustomerService.Save(customer);
             }
         }
@@ -470,6 +477,8 @@
         /// </remarks>
         private void MemberServiceOnSaving(IMemberService sender, SaveEventArgs<IMember> saveEventArgs)
         {
+            var domains = ApplicationContext.Current.Services.DomainService.GetRootIds();
+
             foreach (var member in saveEventArgs.SavedEntities)
             {
                 if (MerchelloConfiguration.Current.CustomerMemberTypes.Any(x => x == member.ContentTypeAlias))
@@ -478,33 +487,36 @@
 
                     var customerService = MerchelloContext.Current.Services.CustomerService;
 
-                    ICustomer customer;
-                    if (original == null)
+                    foreach(var domain in domains)
                     {
-                        // assert there is not already a customer with the login name
-                        customer = customerService.GetByLoginName(member.Username);
-
-                        if (customer != null)
+                        ICustomer customer;
+                        if (original == null)
                         {
-                            MultiLogHelper.Info<UmbracoApplicationEventHandler>("A customer already exists with the loginName of: " + member.Username + " -- ABORTING customer creation");
-                            return;
+                            // assert there is not already a customer with the login name
+                            customer = customerService.GetByLoginName(member.Username, domain);
+
+                            if (customer != null)
+                            {
+                                MultiLogHelper.Info<UmbracoApplicationEventHandler>("A customer already exists with the loginName of: " + member.Username + " -- ABORTING customer creation");
+                                continue;
+                            }
+
+                            customerService.CreateCustomerWithKey(member.Username, domain, string.Empty, string.Empty, member.Email);
+
+                            continue;
                         }
 
-                        customerService.CreateCustomerWithKey(member.Username, string.Empty, string.Empty, member.Email);
+                        if (original.Username == member.Username && original.Email == member.Email) continue;
 
-                        return;
+                        customer = customerService.GetByLoginName(original.Username, domain);
+
+                        if (customer == null) continue;
+
+                        ((Customer)customer).LoginName = member.Username;
+                        customer.Email = member.Email;
+
+                        customerService.Save(customer);
                     }
-
-                    if (original.Username == member.Username && original.Email == member.Email) return;
-
-                    customer = customerService.GetByLoginName(original.Username);
-
-                    if (customer == null) return;
-
-                    ((Customer)customer).LoginName = member.Username;
-                    customer.Email = member.Email;
-
-                    customerService.Save(customer);
                 }
             }
         }

@@ -20,6 +20,7 @@ namespace Merchello.Core.Persistence.Mappers
             if (!PropertyInfoCache.IsEmpty) return;
 
             CacheMap<AnonymousCustomer, AnonymousCustomerDto>(src => src.Key, dto => dto.Key);
+            CacheMap<AnonymousCustomer, AnonymousCustomerDto>(src => src.DomainRootStructureID, dto => dto.DomainRootStructureID);
             CacheMap<AnonymousCustomer, AnonymousCustomerDto>(src => src.LastActivityDate, dto => dto.LastActivityDate);
             CacheMap<AnonymousCustomer, AnonymousCustomerDto>(src => src.CreateDate, dto => dto.CreateDate);
             CacheMap<AnonymousCustomer, AnonymousCustomerDto>(src => src.UpdateDate, dto => dto.UpdateDate);

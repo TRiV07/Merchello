@@ -6,7 +6,7 @@
     using Core.Cache;
     using Core.Models;
     using Core.Models.TypeFields;
-
+    using Merchello.Core.MultiStore;
     using Merchello.Web.Workflow.CustomerItemCache;
 
     using Umbraco.Core;
@@ -121,7 +121,8 @@
         {
             Mandate.ParameterNotNull(merchelloContext, "merchelloContext");
             
-            var customer = merchelloContext.Services.CustomerService.GetByLoginName(loginName);
+            var customer = merchelloContext.Services.CustomerService.GetByLoginName(loginName,
+                ApplicationContext.Current.Services.DomainService.CurrentDomain().RootContentId.Value/*TOCHECKMS*/);
             return customer == null ? null : GetWishList(merchelloContext, customer);
         }
 

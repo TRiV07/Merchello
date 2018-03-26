@@ -120,7 +120,7 @@
 
             var dtos = Database.Fetch<ShipRateTierDto>(sql);
 
-            return dtos.DistinctBy(x => x.Key).Select(dto => Get(dto.Key));
+            return dtos.DistinctBy(x => x.Key).Select(dto => Get(dto.Key)).ToArray();
         }
 
         /// <summary>

@@ -444,6 +444,7 @@
                   term.Value,
                   query.CurrentPage + 1,
                   query.ItemsPerPage,
+                  query.DomainRootStructureID,
                   query.SortBy,
                   query.SortDirection)
               :
@@ -451,6 +452,7 @@
                   key,
                   query.CurrentPage + 1,
                   query.ItemsPerPage,
+                  query.DomainRootStructureID,
                   query.SortBy,
                   query.SortDirection);
         }

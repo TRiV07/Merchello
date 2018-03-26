@@ -1,16 +1,16 @@
-    /**
-     * @ngdoc controller
-     * @name Merchello.Backoffice.CustomerListController
-     * @function
-     *
-     * @description
-     * The controller for customer list view
-     */
-    angular.module('merchello').controller('Merchello.Backoffice.CustomerListController',
-        ['$scope', '$routeParams', '$filter', 'notificationsService', 'localizationService', 'settingsResource', 'merchelloTabsFactory', 'customerResource', 'entityCollectionResource',
-            'customerDisplayBuilder',
-        function($scope, $routeParams, $filter, notificationsService, localizationService, settingsResource, merchelloTabsFactory, customerResource, entityCollectionResource,
-                 customerDisplayBuilder) {
+/**
+ * @ngdoc controller
+ * @name Merchello.Backoffice.CustomerListController
+ * @function
+ *
+ * @description
+ * The controller for customer list view
+ */
+angular.module('merchello').controller('Merchello.Backoffice.CustomerListController',
+    ['$scope', '$routeParams', '$filter', 'notificationsService', 'localizationService', 'settingsResource', 'merchelloTabsFactory', 'customerResource', 'entityCollectionResource',
+        'customerDisplayBuilder',
+        function ($scope, $routeParams, $filter, notificationsService, localizationService, settingsResource, merchelloTabsFactory, customerResource, entityCollectionResource,
+            customerDisplayBuilder) {
 
             $scope.loaded = false;
             $scope.preValuesLoaded = false;
@@ -47,11 +47,11 @@
 
             function loadSettings() {
                 // currency matching
-                settingsResource.getAllCombined().then(function(combined) {
+                settingsResource.getAllCombined().then(function (combined) {
                     allCurrencies = combined.currencies;
                     globalCurrency = combined.currencySymbol;
                     $scope.preValuesLoaded = true;
-                }, function(reason) {
+                }, function (reason) {
                     notificationsService.error('Failed to load combined settings', reason.message);
                 });
             }
@@ -65,15 +65,15 @@
             }
 
             function getColumnValue(result, col) {
-                switch(col.name) {
+                switch (col.name) {
                     case 'loginName':
                         return '<a href="' + getEditUrl(result) + '">' + result.loginName + '</a>';
                     case 'firstName':
-                        return  '<a href="' + getEditUrl(result) + '">' + result.firstName + ' ' + result.lastName + '</a>';
+                        return '<a href="' + getEditUrl(result) + '">' + result.firstName + ' ' + result.lastName + '</a>';
                     case 'location':
                         var address = result.getPrimaryLocation();
                         var ret = address.locality;
-                            ret += ' ' + address.region;
+                        ret += ' ' + address.region;
                         if (address.countryCode !== '') {
                             ret += ' ' + address.countryCode;
                         }
@@ -98,10 +98,10 @@
                     return invoice.currency.symbol;
                 }
                 var currencyCode = invoice.getCurrencyCode();
-                var currency = _.find(allCurrencies, function(currency) {
+                var currency = _.find(allCurrencies, function (currency) {
                     return currency.currencyCode === currencyCode;
                 });
-                if(currency === null || currency === undefined) {
+                if (currency === null || currency === undefined) {
                     return globalCurrency;
                 } else {
                     return currency.symbol;
@@ -109,9 +109,9 @@
             }
 
             function getEditUrl(customer) {
-                return baseUrl + customer.key;
+                return baseUrl + customer.key + '/store/' + $routeParams.storeId;
             }
 
             // Initializes the controller
             init();
-    }]);
+        }]);

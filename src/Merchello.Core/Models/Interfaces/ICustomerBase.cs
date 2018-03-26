@@ -8,7 +8,7 @@
     /// <summary>
     /// Defines the customer base class 
     /// </summary>
-    public interface ICustomerBase : IHasExtendedData, IEntity
+    public interface ICustomerBase : IHasDomainRoot, IHasExtendedData, IEntity
     {
         /// <summary>
         /// Gets or sets the date the customer was last active on the site

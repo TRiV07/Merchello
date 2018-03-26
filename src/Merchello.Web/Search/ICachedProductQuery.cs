@@ -382,7 +382,7 @@
         /// <returns>
         /// The <see cref="PagedCollection"/>.
         /// </returns>
-        PagedCollection<IProductContent> TypedProductContentPageThatNotInAnyCollections(IEnumerable<Guid> collectionKeys, long page, long itemsPerPage, string sortBy = "", SortDirection sortDirection = SortDirection.Ascending);
+        PagedCollection<IProductContent> TypedProductContentPageThatNotInAnyCollections(IEnumerable<Guid> collectionKeys, long page, long itemsPerPage, int domainRootStructureID, string sortBy = "", SortDirection sortDirection = SortDirection.Ascending);
 
         /// <summary>
         /// Gets a <see cref="PagedCollection{IProductContent}"/> that does not exists in any of the collections referenced..
@@ -408,7 +408,7 @@
         /// <returns>
         /// The <see cref="PagedCollection"/>.
         /// </returns>
-        PagedCollection<IProductContent> TypedProductContentPageThatNotInAnyCollections(IEnumerable<Guid> collectionKeys, string searchTerm, long page, long itemsPerPage, string sortBy = "", SortDirection sortDirection = SortDirection.Ascending);
+        PagedCollection<IProductContent> TypedProductContentPageThatNotInAnyCollections(IEnumerable<Guid> collectionKeys, string searchTerm, long page, long itemsPerPage, int domainRootStructureID, string sortBy = "", SortDirection sortDirection = SortDirection.Ascending);
 
 
 
@@ -439,7 +439,7 @@
         /// <returns>
         /// The <see cref="PagedCollection"/>.
         /// </returns>
-        PagedCollection<IProductContent> TypedProductContentPageThatNotInAnyCollections(IEnumerable<Guid> collectionKeys, decimal min, decimal max, long page, long itemsPerPage, string sortBy = "", SortDirection sortDirection = SortDirection.Ascending);
+        PagedCollection<IProductContent> TypedProductContentPageThatNotInAnyCollections(IEnumerable<Guid> collectionKeys, decimal min, decimal max, long page, long itemsPerPage, int domainRootStructureID, string sortBy = "", SortDirection sortDirection = SortDirection.Ascending);
 
         /// <summary>
         /// Gets a <see cref="PagedCollection{IProductContent}"/> that does not exists in any of the collections referenced..
@@ -471,7 +471,7 @@
         /// <returns>
         /// The <see cref="PagedCollection"/>.
         /// </returns>
-        PagedCollection<IProductContent> TypedProductContentPageThatNotInAnyCollections(IEnumerable<Guid> collectionKeys, string searchTerm, decimal min, decimal max, long page, long itemsPerPage, string sortBy = "", SortDirection sortDirection = SortDirection.Ascending);
+        PagedCollection<IProductContent> TypedProductContentPageThatNotInAnyCollections(IEnumerable<Guid> collectionKeys, string searchTerm, decimal min, decimal max, long page, long itemsPerPage, int domainRootStructureID, string sortBy = "", SortDirection sortDirection = SortDirection.Ascending);
 
 
         /// <summary>

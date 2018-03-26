@@ -228,12 +228,14 @@
                   term.Value,
                   query.CurrentPage + 1,
                   query.ItemsPerPage,
+                  query.DomainRootStructureID,
                   query.SortBy,
                   query.SortDirection)
               :
               _merchello.Query.Customer.Search(
                   query.CurrentPage + 1,
                   query.ItemsPerPage,
+                  query.DomainRootStructureID,
                   query.SortBy,
                   query.SortDirection);
         }       
@@ -270,6 +272,7 @@
                     endDate,
                     query.CurrentPage + 1,
                     query.ItemsPerPage,
+                    query.DomainRootStructureID,
                     query.SortBy,
                     query.SortDirection);
         }
@@ -286,10 +289,11 @@
         /// The <see cref="CustomerDisplay"/>.
         /// </returns>
         [HttpPost]
-        public CustomerDisplay AddCustomer(CustomerDisplay customer)
+        public CustomerDisplay AddCustomer(int domainRootStructureID, CustomerDisplay customer)
         {
             var newCustomer = _customerService.CreateCustomer(
                 string.IsNullOrEmpty(customer.LoginName) ? customer.Email : customer.LoginName,
+                domainRootStructureID,
                 customer.FirstName,
                 customer.LastName,
                 customer.Email);
@@ -312,9 +316,9 @@
         /// The <see cref="CustomerDisplay"/>.
         /// </returns>
         [HttpPost]
-        public IAnonymousCustomer AddAnonymousCustomer(CustomerDisplay customer)
+        public IAnonymousCustomer AddAnonymousCustomer(int domainRootStructureID, CustomerDisplay customer)
         {            
-            var newCustomer = _customerService.CreateAnonymousCustomerWithKey();
+            var newCustomer = _customerService.CreateAnonymousCustomerWithKey(domainRootStructureID);
             
             newCustomer.LastActivityDate = DateTime.Today;
             

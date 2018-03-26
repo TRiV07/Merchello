@@ -10,6 +10,10 @@ angular.module('merchello').controller('Merchello.Customer.Dialogs.CustomerNewCu
             // exposed methods
             $scope.save = save;
 
+            function init() {
+                $scope.dialogData = $scope.$parent.currentAction.metaData.dialogData;
+            }
+
             /**
              * @ngdoc method
              * @name submitIfValid
@@ -31,14 +35,16 @@ angular.module('merchello').controller('Merchello.Customer.Dialogs.CustomerNewCu
                         customer.extendedData.items = null;
                     }
 
-                    var promiseSaveCustomer = customerResource.AddCustomer(customer);
+                    var promiseSaveCustomer = customerResource.AddCustomer(customer, $scope.dialogData.storeId);
                     promiseSaveCustomer.then(function (customerResponse) {
                         notificationsService.success("Customer Saved", "");
                         navigationService.hideNavigation();
-                        $location.url("/merchello/merchello/customeroverview/" + customerResponse.key, true);
+                        $location.url("/merchello/merchello/customeroverview/" + customerResponse.key + '/store/' + $scope.dialogData.storeId, true);
                     }, function (reason) {
                         notificationsService.error("Customer Save Failed", reason.message);
                     });
                 }
             }
+
+            init();
         }]);

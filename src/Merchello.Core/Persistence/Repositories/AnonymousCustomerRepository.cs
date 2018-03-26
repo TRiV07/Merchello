@@ -24,6 +24,11 @@
     internal class AnonymousCustomerRepository : MerchelloPetaPocoRepositoryBase<IAnonymousCustomer>, IAnonymousCustomerRepository
     {
         /// <summary>
+        /// The domain root structure ID.
+        /// </summary>
+        private readonly int _domainRootStructureID;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="AnonymousCustomerRepository"/> class.
         /// </summary>
         /// <param name="work">
@@ -35,7 +40,10 @@
         /// <param name="sqlSyntax">
         /// The SQL Syntax.
         /// </param>
-        public AnonymousCustomerRepository(IDatabaseUnitOfWork work, ILogger logger, ISqlSyntaxProvider sqlSyntax)
+        /// <param name="domainRootStructureID">
+        /// The domain root structure ID.
+        /// </param>
+        public AnonymousCustomerRepository(IDatabaseUnitOfWork work, ILogger logger, ISqlSyntaxProvider sqlSyntax, int domainRootStructureID)
             : base(work, logger, sqlSyntax)
         {
         }
@@ -89,6 +97,8 @@
                 {
                     dtos.AddRange(Database.Fetch<AnonymousCustomerDto>(GetBaseQuery(false).WhereIn<AnonymousCustomerDto>(x => x.Key, keyList, SqlSyntax)));
                 }
+
+                dtos = keys.Select(k => dtos.FirstOrDefault(x => x.Key == k)).ToList();
             }
             else
             {
@@ -116,6 +126,11 @@
             var sql = new Sql();
             sql.Select(isCount ? "COUNT(*)" : "*")
                .From<AnonymousCustomerDto>(SqlSyntax);
+
+            if (_domainRootStructureID != Constants.System.Root)
+            {
+                sql.Where<AnonymousCustomerDto>(x => x.DomainRootStructureID == _domainRootStructureID, SqlSyntax);
+            }
 
             return sql;
         }
@@ -217,7 +232,7 @@
 
             var dtos = Database.Fetch<AnonymousCustomerDto>(sql);
 
-            return dtos.DistinctBy(x => x.Key).Select(dto => Get(dto.Key));
+            return dtos.DistinctBy(x => x.Key).Select(dto => Get(dto.Key)).ToArray();
         }
     }
 }

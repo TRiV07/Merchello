@@ -1,5 +1,6 @@
 ﻿namespace Merchello.Core.Models.Rdbms
 {
+    using Merchello.Core.Models.EntityBase;
     using System;
 
     using Umbraco.Core.Persistence;
@@ -11,7 +12,7 @@
     [TableName("merchCustomer")]
     [PrimaryKey("pk", autoIncrement = false)]
     [ExplicitColumns]
-    internal class CustomerDto : IPageableDto
+    internal class CustomerDto : IPageableDto, IHasDomainRoot
     {
         /// <summary>
         /// Gets or sets the key.
@@ -20,6 +21,13 @@
         [PrimaryKeyColumn(AutoIncrement = false)]
         [Constraint(Default = "newid()")]
         public Guid Key { get; set; }
+
+        /// <summary>
+        /// Gets or sets domain root structure ID
+        /// </summary>
+        [Column("domainRootStructureID")]
+        [Constraint(Default = "-1")]
+        public int DomainRootStructureID { get; set; }
 
         /// <summary>
         /// Gets or sets the login name.

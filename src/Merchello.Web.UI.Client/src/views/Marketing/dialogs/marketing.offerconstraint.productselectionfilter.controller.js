@@ -71,6 +71,7 @@ angular.module('merchello').controller('Merchello.Marketing.Dialogs.OfferConstra
                 var query = queryDisplayBuilder.createDefault();
                 query.currentPage = page;
                 query.itemsPerPage = perPage;
+                query.domainRootStructureID = $scope.dialogData.storeId;
                 query.sortBy = sortBy;
                 query.sortDirection = sortDirection;
                 query.addFilterTermParam($scope.filterText);

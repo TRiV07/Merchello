@@ -194,9 +194,9 @@
         /// <returns>
         /// The <see cref="ICustomerRepository"/>.
         /// </returns>
-        internal virtual ICustomerRepository CreateCustomerRepository(IDatabaseUnitOfWork uow)
+        internal virtual ICustomerRepository CreateCustomerRepository(IDatabaseUnitOfWork uow, int domainRootStructureID)
         {
-            return new CustomerRepository(uow, CreateCustomerAddressRepository(uow), CreateNoteRepository(uow), _logger, _sqlSyntax);
+            return new CustomerRepository(uow, CreateCustomerAddressRepository(uow), CreateNoteRepository(uow), _logger, _sqlSyntax, domainRootStructureID);
         }
 
         /// <summary>
@@ -208,9 +208,9 @@
         /// <returns>
         /// The <see cref="IAnonymousCustomerRepository"/>.
         /// </returns>
-        internal virtual IAnonymousCustomerRepository CreateAnonymousCustomerRepository(IDatabaseUnitOfWork uow)
+        internal virtual IAnonymousCustomerRepository CreateAnonymousCustomerRepository(IDatabaseUnitOfWork uow, int domainRootStructureID)
         {
-            return new AnonymousCustomerRepository(uow, _logger, _sqlSyntax);                
+            return new AnonymousCustomerRepository(uow, _logger, _sqlSyntax, domainRootStructureID);                
         }
 
         /// <summary>

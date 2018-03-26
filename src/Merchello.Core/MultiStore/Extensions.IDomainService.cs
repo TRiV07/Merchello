@@ -29,5 +29,13 @@ namespace Merchello.Core.MultiStore
             }
             return umDomainsList;
         }
+
+        public static IEnumerable<int> GetRootIds(this IDomainService domainService)
+        {
+            return domainService.GetAllFromCache()
+                .Where(x => x.RootContentId.HasValue)
+                .Select(x => x.RootContentId.Value)
+                .Distinct();
+        }
     }
 }

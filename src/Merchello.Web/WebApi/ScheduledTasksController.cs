@@ -12,6 +12,8 @@
     using Umbraco.Web.Mvc;
     using Umbraco.Web.WebApi;
 
+    using UConstants = Umbraco.Core.Constants;
+
     /// <summary>
     /// Schedule Tasks
     /// </summary>
@@ -57,7 +59,7 @@
         {
             int maxDays = MerchelloConfiguration.Current.AnonymousCustomersMaxDays;
 
-            var anonymousCustomers = _anonymousCustomerService.GetAnonymousCustomersCreatedBefore(DateTime.Today.AddDays(-maxDays)).ToArray();
+            var anonymousCustomers = _anonymousCustomerService.GetAnonymousCustomersCreatedBefore(DateTime.Today.AddDays(-maxDays),UConstants.System.Root).ToArray();
 
             _anonymousCustomerService.Delete(anonymousCustomers);
 

@@ -21,7 +21,7 @@
     /// <summary>
     /// The customer repository.
     /// </summary>
-    internal class CustomerRepository : PagedRepositoryBase<ICustomer, CustomerDto>, ICustomerRepository
+    internal class CustomerRepository : PagedMSRepositoryBase<ICustomer, CustomerDto>, ICustomerRepository
     {
         /// <summary>
         /// The _customer address repository.
@@ -51,13 +51,17 @@
         /// <param name="sqlSyntax">
         /// The SQL Syntax.
         /// </param>
+        /// <param name="domainRootStructureID">
+        /// The domain root structure ID.
+        /// </param>
         public CustomerRepository(
             IDatabaseUnitOfWork work, 
             ICustomerAddressRepository customerAddressRepository, 
             INoteRepository noteRepository,
             ILogger logger, 
-            ISqlSyntaxProvider sqlSyntax) 
-            : base(work, logger, sqlSyntax)
+            ISqlSyntaxProvider sqlSyntax,
+            int domainRootStructureID) 
+            : base(work, logger, sqlSyntax, domainRootStructureID)
         {
             Mandate.ParameterNotNull(customerAddressRepository, "customerAddressRepository");
             Mandate.ParameterNotNull(noteRepository, "noteRepository");
@@ -393,6 +397,8 @@
                .Append("WHERE [merchCustomer2EntityCollection].[entityCollectionKey] = @eckey", new { @eckey = collectionKey })
                .Append(")");
 
+            sql.Append("AND [merchCustomer].[domainRootStructureID] = @DomainRootStructureID", new { @DomainRootStructureID = _domainRootStructureID });
+
             return GetPagedKeys(page, itemsPerPage, sql, orderExpression, sortDirection);
         }
 
@@ -432,6 +438,8 @@
                .Append("FROM [merchCustomer2EntityCollection]")
                .Append("WHERE [merchCustomer2EntityCollection].[entityCollectionKey] IN (@eckeys)", new { @eckeys = collectionKeys })
                .Append(")");
+
+            sql.Append("AND [merchCustomer].[domainRootStructureID] = @DomainRootStructureID", new { @DomainRootStructureID = _domainRootStructureID });
 
             return GetPagedKeys(page, itemsPerPage, sql, orderExpression, sortDirection);
         }
@@ -773,6 +781,8 @@
                 {
                     dtos.AddRange(Database.Fetch<CustomerDto, CustomerIndexDto>(GetBaseQuery(false).WhereIn<CustomerDto>(x => x.Key, keyList, SqlSyntax)));
                 }
+
+                dtos = keys.Select(k => dtos.FirstOrDefault(x => x.Key == k)).ToList();
             }
             else
             {
@@ -821,6 +831,11 @@
                 .From<CustomerDto>(SqlSyntax)
                 .InnerJoin<CustomerIndexDto>(SqlSyntax)
                 .On<CustomerDto, CustomerIndexDto>(SqlSyntax, left => left.Key, right => right.CustomerKey);
+
+            if (_domainRootStructureID != Constants.System.Root)
+            {
+                sql.Where<CustomerDto>(x => x.DomainRootStructureID == _domainRootStructureID, SqlSyntax);
+            }
 
             return sql;
         }
@@ -934,7 +949,7 @@
 
             var dtos = Database.Fetch<CustomerDto, CustomerIndexDto>(sql);
 
-            return dtos.DistinctBy(x => x.Key).Select(dto => Get(dto.Key));
+            return dtos.DistinctBy(x => x.Key).Select(dto => Get(dto.Key)).ToArray();
         }
 
         /// <summary>
@@ -954,6 +969,10 @@
 
             var sql = new Sql();
             sql.Select("*").From<CustomerDto>(SqlSyntax);
+            if (_domainRootStructureID != Constants.System.Root)
+            {
+                sql.Where<CustomerDto>(x => x.DomainRootStructureID == _domainRootStructureID, SqlSyntax);
+            }
 
             if (terms.Any())
             {

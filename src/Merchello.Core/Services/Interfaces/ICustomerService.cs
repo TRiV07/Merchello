@@ -30,7 +30,7 @@
         /// <returns>
         /// The new <see cref="ICustomer"/>
         /// </returns>
-        ICustomer CreateCustomer(string loginName, string firstName, string lastName, string email);
+        ICustomer CreateCustomer(string loginName, int domainRootStructureID, string firstName, string lastName, string email);
 
         /// <summary>
         /// Creates a customer and saves the record to the database
@@ -50,7 +50,7 @@
         /// <returns>
         /// <see cref="ICustomer"/>
         /// </returns>
-        ICustomer CreateCustomerWithKey(string loginName, string firstName, string lastName, string email);
+        ICustomer CreateCustomerWithKey(string loginName, int domainRootStructureID, string firstName, string lastName, string email);
 
         /// <summary>
         /// Creates a customer with the Umbraco member id passed
@@ -61,7 +61,7 @@
         /// <returns>
         /// <see cref="ICustomer"/>
         /// </returns>
-        ICustomer CreateCustomerWithKey(string loginName);
+        ICustomer CreateCustomerWithKey(string loginName, int domainRootStructureID);
 
         /// <summary>
         /// Saves a single <see cref="ICustomer"/> object
@@ -108,7 +108,7 @@
         /// <returns>
         /// <see cref="ICustomer"/> object or null if not found
         /// </returns>
-        ICustomer GetByLoginName(string loginName);
+        ICustomer GetByLoginName(string loginName, int domainRootStructureID);
 
         /// <summary>
         /// Gets list of <see cref="ICustomer"/> objects given a list of Unique keys
@@ -118,12 +118,20 @@
         IEnumerable<ICustomer> GetByKeys(IEnumerable<Guid> keys);
 
         /// <summary>
+        /// Gets a collection of all <see cref="ICustomer"/>.
+        /// </summary>
+        /// <returns>
+        /// The collection of all <see cref="ICustomer"/>.
+        /// </returns>
+        IEnumerable<ICustomer> GetAll(int domainRootStructureID);
+
+        /// <summary>
         /// Gets the total customer count.
         /// </summary>
         /// <returns>
         /// The <see cref="int"/>.
         /// </returns>
-        int CustomerCount();
+        int CustomerCount(int domainRootStructureID);
 
         #region Anonymous Customer
 
@@ -131,7 +139,7 @@
         /// Creates an <see cref="IAnonymousCustomer"/> and saves it to the database
         /// </summary>
         /// <returns><see cref="IAnonymousCustomer"/></returns>
-        IAnonymousCustomer CreateAnonymousCustomerWithKey();
+        IAnonymousCustomer CreateAnonymousCustomerWithKey(int domainRootStructureID);
 
         /// <summary>
         /// Saves a single <see cref="IAnonymousCustomer"/>

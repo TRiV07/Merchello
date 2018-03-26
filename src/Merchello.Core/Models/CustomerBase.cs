@@ -20,6 +20,11 @@
         private static readonly Lazy<PropertySelectors> _ps = new Lazy<PropertySelectors>();
 
         /// <summary>
+        /// The domain root structure ID.
+        /// </summary>
+        private int _domainRootStructureID;
+
+        /// <summary>
         /// The last activity date.
         /// </summary>
         private DateTime _lastActivityDate;
@@ -35,8 +40,8 @@
         /// <param name="isAnonymous">
         /// The is anonymous.
         /// </param>
-        protected CustomerBase(bool isAnonymous)
-            : this(isAnonymous, new ExtendedDataCollection())
+        protected CustomerBase(bool isAnonymous, int domainRootStructureID)
+            : this(isAnonymous, domainRootStructureID, new ExtendedDataCollection())
         {
         }
 
@@ -49,12 +54,28 @@
         /// <param name="extendedData">
         /// The extended data.
         /// </param>
-        protected CustomerBase(bool isAnonymous, ExtendedDataCollection extendedData)
+        protected CustomerBase(bool isAnonymous, int domainRootStructureID, ExtendedDataCollection extendedData)
         {
             IsAnonymous = isAnonymous;
+            _domainRootStructureID = domainRootStructureID;
             _extendedData = extendedData;
         }
-        
+
+        /// <inheritdoc/>
+        [DataMember]
+        public int DomainRootStructureID
+        {
+            get
+            {
+                return _domainRootStructureID;
+            }
+
+            set
+            {
+                SetPropertyValueAndDetectChanges(value, ref _domainRootStructureID, _ps.Value.DomainRootStructureIDSelector);
+            }
+        }
+
         /// <summary>
         /// Gets or sets date the customer was last active on the site
         /// </summary>
@@ -143,6 +164,11 @@
             /// The extended data changed selector.
             /// </summary>
             public readonly PropertyInfo ExtendedDataChangedSelector = ExpressionHelper.GetPropertyInfo<CustomerBase, ExtendedDataCollection>(x => x.ExtendedData);
+
+            /// <summary>
+            /// The domain root structure ID selector.
+            /// </summary>
+            public readonly PropertyInfo DomainRootStructureIDSelector = ExpressionHelper.GetPropertyInfo<CustomerBase, int>(x => x.DomainRootStructureID);
         }
     }
 }

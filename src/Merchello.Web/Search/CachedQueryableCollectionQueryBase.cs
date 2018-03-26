@@ -177,6 +177,7 @@
             Guid collectionKey,
             long page,
             long itemsPerPage,
+            int domainRootStructureID,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Ascending)
         {
@@ -192,6 +193,7 @@
                 "GetNotInCollection",
                 page,
                 itemsPerPage,
+                domainRootStructureID,
                 sortBy,
                 sortDirection,
                 new Dictionary<string, string>
@@ -206,7 +208,7 @@
             return this.GetQueryResultDisplay(
                     PagedKeyCache
                     .CachePage(
-                        cacheKey, ((CachedQueryableEntityCollectionProviderBase<TEntity>)provider).GetPagedEntityKeysNotInCollection(page, itemsPerPage, sortBy, sortDirection)));
+                        cacheKey, ((CachedQueryableEntityCollectionProviderBase<TEntity>)provider).GetPagedEntityKeysNotInCollection(page, itemsPerPage, domainRootStructureID, sortBy, sortDirection)));
         }
 
         /// <summary>
@@ -238,6 +240,7 @@
             string searchTerm,
             long page,
             long itemsPerPage,
+            int domainRootStructureID,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Ascending)
         {
@@ -255,6 +258,7 @@
                 "GetNotInCollection",
                 page,
                 itemsPerPage,
+                domainRootStructureID,
                 sortBy,
                 sortDirection,
                 new Dictionary<string, string>
@@ -271,7 +275,7 @@
                     PagedKeyCache
                     .CachePage(
                         cacheKey, 
-                        ((CachedQueryableEntityCollectionProviderBase<TEntity>)provider).GetPagedEntityKeysNotInCollection(args, page, itemsPerPage, sortBy, sortDirection)));
+                        ((CachedQueryableEntityCollectionProviderBase<TEntity>)provider).GetPagedEntityKeysNotInCollection(args, page, itemsPerPage, domainRootStructureID, sortBy, sortDirection)));
         }
 
         /// <summary>

@@ -617,6 +617,7 @@
             IEnumerable<Guid> collectionKeys,
             long page,
             long itemsPerPage,
+            int domainRootStructureID,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Ascending)
         {
@@ -624,7 +625,7 @@
 
             if (!keys.Any()) return PagedCollection<IProductContent>.Empty();
 
-            var pagedKeys = ((ProductService)Service).GetKeysNotInAnyCollections(keys, page, itemsPerPage, sortBy, sortDirection);
+            var pagedKeys = ((ProductService)Service).GetKeysNotInAnyCollections(keys, page, itemsPerPage, domainRootStructureID, sortBy, sortDirection);
 
             return _cache.MapPagedCollection(pagedKeys, sortBy);
         }
@@ -658,6 +659,7 @@
             string searchTerm,
             long page,
             long itemsPerPage,
+            int domainRootStructureID,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Ascending)
         {
@@ -665,7 +667,7 @@
 
             if (!keys.Any()) return PagedCollection<IProductContent>.Empty();
 
-            var pagedKeys = ((ProductService)Service).GetKeysNotInAnyCollections(keys, searchTerm, page, itemsPerPage, sortBy, sortDirection);
+            var pagedKeys = ((ProductService)Service).GetKeysNotInAnyCollections(keys, searchTerm, page, itemsPerPage, domainRootStructureID, sortBy, sortDirection);
 
             return _cache.MapPagedCollection(pagedKeys, sortBy);
         }
@@ -677,6 +679,7 @@
             decimal max,
             long page,
             long itemsPerPage,
+            int domainRootStructureID,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Ascending)
         {
@@ -684,7 +687,7 @@
 
             if (!keys.Any()) return PagedCollection<IProductContent>.Empty();
 
-            var pagedKeys = ((ProductService)Service).GetKeysNotInAnyCollections(keys, min, max, page, itemsPerPage, sortBy, sortDirection);
+            var pagedKeys = ((ProductService)Service).GetKeysNotInAnyCollections(keys, min, max, page, itemsPerPage, domainRootStructureID, sortBy, sortDirection);
 
             return _cache.MapPagedCollection(pagedKeys, sortBy);
         }
@@ -697,6 +700,7 @@
             decimal max,
             long page,
             long itemsPerPage,
+            int domainRootStructureID,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Ascending)
         {
@@ -704,7 +708,7 @@
 
             if (!keys.Any()) return PagedCollection<IProductContent>.Empty();
 
-            var pagedKeys = ((ProductService)Service).GetKeysNotInAnyCollections(keys, searchTerm, min, max, page, itemsPerPage, sortBy, sortDirection);
+            var pagedKeys = ((ProductService)Service).GetKeysNotInAnyCollections(keys, searchTerm, min, max, page, itemsPerPage, domainRootStructureID, sortBy, sortDirection);
 
             return _cache.MapPagedCollection(pagedKeys, sortBy);
         }

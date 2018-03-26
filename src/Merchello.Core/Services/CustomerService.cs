@@ -24,7 +24,7 @@
     /// <summary>
     /// Represents the Customer Service, 
     /// </summary>
-    public class CustomerService : PageCachedServiceBase<ICustomer>, ICustomerService
+    public class CustomerService : PageCachedMSServiceBase<ICustomer>, ICustomerService
     {
         #region fields
 
@@ -265,10 +265,10 @@
         /// <param name="lastName">The last name of the customer</param>
         /// <param name="email">the email address of the customer</param>
         /// <returns>The <see cref="ICustomer"/></returns>
-        public ICustomer CreateCustomer(string loginName, string firstName, string lastName, string email)
+        public ICustomer CreateCustomer(string loginName, int domainRootStructureID, string firstName, string lastName, string email)
         {
             Mandate.ParameterNotNullOrEmpty(loginName, "loginName");
-            var customer = new Customer(loginName)
+            var customer = new Customer(loginName, domainRootStructureID)
                 {
                     FirstName = firstName,
                     LastName = lastName,
@@ -303,11 +303,11 @@
         /// <returns>
         /// <see cref="ICustomer"/>
         /// </returns>
-        public ICustomer CreateCustomerWithKey(string loginName, string firstName, string lastName, string email)
+        public ICustomer CreateCustomerWithKey(string loginName, int domainRootStructureID, string firstName, string lastName, string email)
         {
             Mandate.ParameterNotNullOrEmpty(loginName, "loginName");
 
-            var customer = new Customer(loginName)
+            var customer = new Customer(loginName, domainRootStructureID)
             {
                 FirstName = firstName,
                 LastName = lastName,
@@ -323,7 +323,7 @@
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreateCustomerRepository(uow))
+                using (var repository = RepositoryFactory.CreateCustomerRepository(uow, domainRootStructureID))
                 {
                     repository.AddOrUpdate(customer);
                     uow.Commit();
@@ -346,9 +346,9 @@
         /// <returns>
         /// The <see cref="ICustomer"/>
         /// </returns>
-        public ICustomer CreateCustomerWithKey(string loginName)
+        public ICustomer CreateCustomerWithKey(string loginName, int domainRootStructureID)
         {
-            return CreateCustomerWithKey(loginName, string.Empty, string.Empty, string.Empty);
+            return CreateCustomerWithKey(loginName, domainRootStructureID, string.Empty, string.Empty, string.Empty);
         }
 
         /// <summary>
@@ -363,7 +363,7 @@
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreateCustomerRepository(uow))
+                using (var repository = RepositoryFactory.CreateCustomerRepository(uow, customer.DomainRootStructureID))
                 {
                     repository.AddOrUpdate(customer);
                     uow.Commit();
@@ -390,7 +390,7 @@
             {
                 var uow = UowProvider.GetUnitOfWork();
                 
-                using (var repository = RepositoryFactory.CreateCustomerRepository(uow))
+                using (var repository = RepositoryFactory.CreateCustomerRepository(uow, Constants.System.Root))
                 {
                     foreach (var customer in customerArray)
                     {
@@ -423,7 +423,7 @@
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreateCustomerRepository(uow))
+                using (var repository = RepositoryFactory.CreateCustomerRepository(uow, Constants.System.Root))
                 {
                     repository.Delete(customer);
                     uow.Commit();
@@ -452,7 +452,7 @@
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreateCustomerRepository(uow))
+                using (var repository = RepositoryFactory.CreateCustomerRepository(uow, Constants.System.Root))
                 {
                     foreach (var customer in customerArray)
                     {
@@ -473,7 +473,7 @@
         /// <returns><see cref="ICustomer"/></returns>
         public override ICustomer GetByKey(Guid key)
         {
-            using (var repository = RepositoryFactory.CreateCustomerRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateCustomerRepository(UowProvider.GetUnitOfWork(), Constants.System.Root))
             {
                 return repository.Get(key);
             }
@@ -497,9 +497,9 @@
         /// <returns>
         /// The <see cref="Page{Icustomer}"/>.
         /// </returns>
-        public override Page<ICustomer> GetPage(long page, long itemsPerPage, string sortBy = "", SortDirection sortDirection = SortDirection.Descending)
+        public override Page<ICustomer> GetPage(long page, long itemsPerPage, int domainRootStructureID, string sortBy = "", SortDirection sortDirection = SortDirection.Descending)
         {
-            using (var repository = RepositoryFactory.CreateCustomerRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateCustomerRepository(UowProvider.GetUnitOfWork(), domainRootStructureID))
             {
                 var query = Persistence.Querying.Query<ICustomer>.Builder.Where(x => x.Key != Guid.Empty);
 
@@ -517,7 +517,7 @@
             ICustomerBase customer;
 
             // try retrieving an anonymous customer first as in most situations this will be what is being queried
-            using (var repository = RepositoryFactory.CreateAnonymousCustomerRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateAnonymousCustomerRepository(UowProvider.GetUnitOfWork(), Constants.System.Root))
             {
                 customer = repository.Get(entityKey);
             }
@@ -525,7 +525,7 @@
             if (customer != null) return customer;
 
             // try retrieving an existing customer
-            using (var repository = RepositoryFactory.CreateCustomerRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateCustomerRepository(UowProvider.GetUnitOfWork(), Constants.System.Root))
             {
                 return repository.Get(entityKey);
             }
@@ -540,9 +540,9 @@
         /// <returns>
         /// The <see cref="ICustomer"/>.
         /// </returns>
-        public ICustomer GetByLoginName(string loginName)
+        public ICustomer GetByLoginName(string loginName, int domainRootStructureID)
         {
-            using (var repository = RepositoryFactory.CreateCustomerRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateCustomerRepository(UowProvider.GetUnitOfWork(), domainRootStructureID))
             {
                 var query = Persistence.Querying.Query<ICustomer>.Builder.Where(x => x.LoginName == loginName);
 
@@ -556,9 +556,9 @@
         /// <returns>
         /// The <see cref="int"/>.
         /// </returns>
-        public int CustomerCount()
+        public int CustomerCount(int domainRootStructureID)
         {
-            using (var repository = RepositoryFactory.CreateCustomerRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateCustomerRepository(UowProvider.GetUnitOfWork(), domainRootStructureID))
             {
                 var query = Persistence.Querying.Query<ICustomer>.Builder.Where(x => x.Key != Guid.Empty);
 
@@ -570,9 +570,9 @@
         /// Creates an <see cref="IAnonymousCustomer"/> and saves it to the database
         /// </summary>
         /// <returns><see cref="IAnonymousCustomer"/></returns>
-        public IAnonymousCustomer CreateAnonymousCustomerWithKey()
+        public IAnonymousCustomer CreateAnonymousCustomerWithKey(int domainRootStructureID)
         {
-            return _anonymousCustomerService.CreateAnonymousCustomerWithKey();
+            return _anonymousCustomerService.CreateAnonymousCustomerWithKey(domainRootStructureID);
         }
 
         /// <summary>
@@ -715,7 +715,7 @@
         /// <returns>A collection of <see cref="ICustomer"/></returns>
         public IEnumerable<ICustomer> GetByKeys(IEnumerable<Guid> keys)
         {
-            using (var repository = RepositoryFactory.CreateCustomerRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateCustomerRepository(UowProvider.GetUnitOfWork(), Constants.System.Root))
             {
                 return repository.GetAll(keys.ToArray());
             }
@@ -761,7 +761,7 @@
         /// </param>
         public void AddToCollection(Guid entityKey, Guid collectionKey)
         {
-            using (var repository = RepositoryFactory.CreateCustomerRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateCustomerRepository(UowProvider.GetUnitOfWork(), Constants.System.Root))
             {
                 repository.AddToCollection(entityKey, collectionKey);
             }
@@ -806,7 +806,7 @@
         /// </param>
         public void RemoveFromCollection(Guid entityKey, Guid collectionKey)
         {
-            using (var repository = RepositoryFactory.CreateCustomerRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateCustomerRepository(UowProvider.GetUnitOfWork(), Constants.System.Root))
             {
                 repository.RemoveFromCollection(entityKey, collectionKey);
             }
@@ -826,7 +826,7 @@
         /// </returns>
         public bool ExistsInCollection(Guid entityKey, Guid collectionKey)
         {
-            using (var repository = RepositoryFactory.CreateCustomerRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateCustomerRepository(UowProvider.GetUnitOfWork(), Constants.System.Root))
             {
                 return repository.ExistsInCollection(entityKey, collectionKey);
             }
@@ -846,7 +846,7 @@
         /// </returns>
         public bool ExistsInCollection(Guid entityKey, IEnumerable<Guid> collectionKeys)
         {
-            using (var repository = RepositoryFactory.CreateCustomerRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateCustomerRepository(UowProvider.GetUnitOfWork(), Constants.System.Root))
             {
                 return repository.ExistsInCollection(entityKey, collectionKeys.ToArray());
             }
@@ -880,7 +880,7 @@
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Descending)
         {
-            using (var repository = RepositoryFactory.CreateCustomerRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateCustomerRepository(UowProvider.GetUnitOfWork(), Constants.System.Root))
             {
                 return repository.GetFromCollection(
                     collectionKey,
@@ -912,14 +912,14 @@
         /// <returns>
         /// The <see cref="Page{IInvoice}"/>.
         /// </returns>
-        public Page<ICustomer> GetProductsThatExistInAllCollections(
+        public Page<ICustomer> GetEntitiesThatExistInAllCollections(
             IEnumerable<Guid> collectionKeys,
             long page,
             long itemsPerPage,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Descending)
         {
-            using (var repository = RepositoryFactory.CreateCustomerRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateCustomerRepository(UowProvider.GetUnitOfWork(), Constants.System.Root))
             {
                 return repository.GetEntitiesThatExistInAllCollections(
                     collectionKeys.ToArray(),
@@ -962,7 +962,7 @@
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Descending)
         {
-            using (var repository = RepositoryFactory.CreateCustomerRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateCustomerRepository(UowProvider.GetUnitOfWork(), Constants.System.Root))
             {
                 return repository.GetFromCollection(
                     collectionKey,
@@ -998,7 +998,7 @@
         /// <returns>
         /// The <see cref="Page"/>.
         /// </returns>
-        public Page<ICustomer> GetProductsThatExistInAllCollections(
+        public Page<ICustomer> GetEntitiesThatExistInAllCollections(
             IEnumerable<Guid> collectionKeys,
             string searchTerm,
             long page,
@@ -1006,7 +1006,7 @@
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Descending)
         {
-            using (var repository = RepositoryFactory.CreateCustomerRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateCustomerRepository(UowProvider.GetUnitOfWork(), Constants.System.Root))
             {
                 return repository.GetEntitiesThatExistInAllCollections(
                     collectionKeys.ToArray(),
@@ -1046,7 +1046,7 @@
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Descending)
         {
-            using (var repository = RepositoryFactory.CreateCustomerRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateCustomerRepository(UowProvider.GetUnitOfWork(), Constants.System.Root))
             {
                 return repository.GetKeysFromCollection(
                     collectionKey,
@@ -1089,7 +1089,7 @@
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Descending)
         {
-            using (var repository = RepositoryFactory.CreateCustomerRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateCustomerRepository(UowProvider.GetUnitOfWork(), Constants.System.Root))
             {
                 return repository.GetKeysFromCollection(
                     collectionKey,
@@ -1126,10 +1126,11 @@
             Guid collectionKey,
             long page,
             long itemsPerPage,
+            int domainRootStructureID,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Descending)
         {
-            using (var repository = RepositoryFactory.CreateCustomerRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateCustomerRepository(UowProvider.GetUnitOfWork(), domainRootStructureID))
             {
                 return repository.GetKeysNotInCollection(
                     collectionKey,
@@ -1169,10 +1170,11 @@
             string searchTerm,
             long page,
             long itemsPerPage,
+            int domainRootStructureID,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Descending)
         {
-            using (var repository = RepositoryFactory.CreateCustomerRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateCustomerRepository(UowProvider.GetUnitOfWork(), domainRootStructureID))
             {
                 return repository.GetKeysNotInCollection(
                     collectionKey,
@@ -1192,9 +1194,9 @@
         /// <returns>
         /// The collection of all anonymous customers
         /// </returns>
-        internal IEnumerable<IAnonymousCustomer> GetAllAnonymousCustomers()
+        internal IEnumerable<IAnonymousCustomer> GetAllAnonymousCustomers(int domainRootStructureID)
         {
-            using (var repository = RepositoryFactory.CreateAnonymousCustomerRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateAnonymousCustomerRepository(UowProvider.GetUnitOfWork(), domainRootStructureID))
             {
                 return repository.GetAll();
             }
@@ -1207,9 +1209,9 @@
         /// <returns>
         /// The collection of all customers.
         /// </returns>
-        internal IEnumerable<ICustomer> GetAll()
+        public IEnumerable<ICustomer> GetAll(int domainRootStructureID)
         {
-            using (var repository = RepositoryFactory.CreateCustomerRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateCustomerRepository(UowProvider.GetUnitOfWork(), domainRootStructureID))
             {
                 return repository.GetAll();
             }
@@ -1224,9 +1226,9 @@
         /// <returns>
         /// The <see cref="int"/>.
         /// </returns>
-        internal override int Count(IQuery<ICustomer> query)
+        internal override int Count(IQuery<ICustomer> query, int domainRootStructureID)
         {
-            using (var repository = RepositoryFactory.CreateCustomerRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateCustomerRepository(UowProvider.GetUnitOfWork(), domainRootStructureID))
             {
                 return repository.Count(query);
             }
@@ -1250,9 +1252,9 @@
         /// <returns>
         /// The <see cref="Page{Guid}"/>.
         /// </returns>
-        public override Page<Guid> GetPagedKeys(long page, long itemsPerPage, string sortBy = "", SortDirection sortDirection = SortDirection.Descending)
+        public override Page<Guid> GetPagedKeys(long page, long itemsPerPage, int domainRootStructureID, string sortBy = "", SortDirection sortDirection = SortDirection.Descending)
         {
-            using (var repositoy = RepositoryFactory.CreateCustomerRepository(UowProvider.GetUnitOfWork()))
+            using (var repositoy = RepositoryFactory.CreateCustomerRepository(UowProvider.GetUnitOfWork(), domainRootStructureID))
             {
                 var query = Persistence.Querying.Query<ICustomer>.Builder.Where(x => x.Key != Guid.Empty);
 
@@ -1288,10 +1290,11 @@
             string searchTerm,
             long page,
             long itemsPerPage,
+            int domainRootStructureID,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Descending)
         {
-            using (var repository = RepositoryFactory.CreateCustomerRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateCustomerRepository(UowProvider.GetUnitOfWork(), domainRootStructureID))
             {
                 return repository.SearchKeys(searchTerm, page, itemsPerPage, ValidateSortByField(sortBy));
             }
@@ -1322,11 +1325,12 @@
             IQuery<ICustomer> query,
             long page,
             long itemsPerPage,
+            int domainRootStructureID,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Descending)
         {
             return GetPagedKeys(
-                RepositoryFactory.CreateCustomerRepository(UowProvider.GetUnitOfWork()),
+                RepositoryFactory.CreateCustomerRepository(UowProvider.GetUnitOfWork(), domainRootStructureID),
                 query,
                 page,
                 itemsPerPage,
@@ -1404,12 +1408,6 @@
 
             var payments = _paymentService.GetPaymentsByCustomerKey(customer.Key).ToArray();
             if (payments.Any()) _paymentService.Delete(payments);
-        }
-
-        //TODOMS
-        public Page<ICustomer> GetPage(long page, long itemsPerPage, int domainRootStructureID, string sortBy = "", SortDirection sortDirection = SortDirection.Descending)
-        {
-            return this.GetPage(page, itemsPerPage, sortBy, sortDirection);
         }
     }
 }

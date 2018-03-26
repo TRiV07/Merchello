@@ -469,7 +469,7 @@
                 .Append(") [merchProductVariant]")
                 .Append(")")
                 .Append("AND [merchProductVariant].[master] = 1");
-                        
+
             return GetPagedKeys(page, itemsPerPage, sql, orderExpression, sortDirection);
         }
 
@@ -551,15 +551,17 @@
 
             var sql = new Sql();
             sql.Append("SELECT *")
-              .Append("FROM [merchProductVariant]")
-              .Append("WHERE [merchProductVariant].[productKey] IN (")
-              .Append("SELECT DISTINCT([productKey])")
-              .Append("FROM [merchProductVariant]")
-              .Append("WHERE ([merchProductVariant].[onSale] = 0 AND [merchProductVariant].[price] BETWEEN @low AND @high)", new { @low = min * modifier, @high = max * modifier })
-              .Append("OR")
-              .Append("([merchProductVariant].[onSale] = 1 AND [merchProductVariant].[salePrice] BETWEEN @low AND @high)", new { @low = min * modifier, @high = max * modifier })
-              .Append(")")
-              .Append("AND [merchProductVariant].[master] = 1");
+                .Append("FROM [merchProduct]")
+                .Append("INNER JOIN [merchProductVariant] ON [merchProduct].[pk] = [merchProductVariant].[productKey]")
+                .Append("WHERE [merchProductVariant].[productKey] IN (")
+                .Append("SELECT DISTINCT([productKey])")
+                .Append("FROM [merchProductVariant]")
+                .Append("WHERE ([merchProductVariant].[onSale] = 0 AND [merchProductVariant].[price] BETWEEN @low AND @high)", new { @low = min * modifier, @high = max * modifier })
+                .Append("OR")
+                .Append("([merchProductVariant].[onSale] = 1 AND [merchProductVariant].[salePrice] BETWEEN @low AND @high)", new { @low = min * modifier, @high = max * modifier })
+                .Append(")")
+                .Append("AND [merchProductVariant].[master] = 1")
+                .Append("AND [merchProduct].[domainRootStructureID] = @DomainRootStructureID", new { @DomainRootStructureID = _domainRootStructureID });
             return GetPagedKeys(page, itemsPerPage, sql, orderExpression, sortDirection);
         }
 
@@ -629,9 +631,11 @@
         {
             var sql = new Sql();
             sql.Append("SELECT *")
-              .Append("FROM [merchProductVariant]")
-              .Append("WHERE [merchProductVariant].[manufacturer] IN (@manufacturers)", new { @manufacturers = manufacturer})
-              .Append("AND [merchProductVariant].[master] = 1");
+                .Append("FROM [merchProduct]")
+                .Append("INNER JOIN [merchProductVariant] ON [merchProduct].[pk] = [merchProductVariant].[productKey]")
+                .Append("WHERE [merchProductVariant].[manufacturer] IN (@manufacturers)", new { @manufacturers = manufacturer })
+                .Append("AND [merchProductVariant].[master] = 1")
+                .Append("AND [merchProduct].[domainRootStructureID] = @DomainRootStructureID", new { @DomainRootStructureID = _domainRootStructureID });
             return GetPagedKeys(page, itemsPerPage, sql, orderExpression, sortDirection);
         }
 
@@ -696,9 +700,11 @@
         {
             var sql = new Sql();
             sql.Append("SELECT *")
-              .Append("FROM [merchProductVariant]")
-              .Append("WHERE [merchProductVariant].[barcode] IN (@codes)", new { @codes = barcodes })
-              .Append("AND [merchProductVariant].[master] = 1");
+                .Append("FROM [merchProduct]")
+                .Append("INNER JOIN [merchProductVariant] ON [merchProduct].[pk] = [merchProductVariant].[productKey]")
+                .Append("WHERE [merchProductVariant].[barcode] IN (@codes)", new { @codes = barcodes })
+                .Append("AND [merchProductVariant].[master] = 1")
+                .Append("AND [merchProduct].[domainRootStructureID] = @DomainRootStructureID", new { @DomainRootStructureID = _domainRootStructureID });
             return GetPagedKeys(page, itemsPerPage, sql, orderExpression, sortDirection);
         }
 
@@ -732,19 +738,21 @@
         {
             var sql = new Sql();
             sql.Append("SELECT *")
-               .Append("FROM [merchProductVariant]")
-               .Append("WHERE [merchProductVariant].[productKey] IN (")
-               .Append("SELECT DISTINCT([productKey])")
-               .Append("FROM (")
-               .Append("SELECT	[merchProductVariant].[productKey]")
-               .Append("FROM [merchProductVariant]")
-               .Append("INNER JOIN [merchCatalogInventory]")
-               .Append("ON	[merchProductVariant].[pk] = [merchCatalogInventory].[productVariantKey]")
-               .Append("WHERE ([merchCatalogInventory].[count] > 0 AND [merchProductVariant].[trackInventory] = 1)")
-               .Append("OR [merchProductVariant].[trackInventory] = 0")
-               .Append(") [merchProductVariant]")
-               .Append(")")
-               .Append("AND [merchProductVariant].[master] = 1");
+                .Append("FROM [merchProduct]")
+                .Append("INNER JOIN [merchProductVariant] ON [merchProduct].[pk] = [merchProductVariant].[productKey]")
+                .Append("WHERE [merchProductVariant].[productKey] IN (")
+                .Append("SELECT DISTINCT([productKey])")
+                .Append("FROM (")
+                .Append("SELECT	[merchProductVariant].[productKey]")
+                .Append("FROM [merchProductVariant]")
+                .Append("INNER JOIN [merchCatalogInventory]")
+                .Append("ON	[merchProductVariant].[pk] = [merchCatalogInventory].[productVariantKey]")
+                .Append("WHERE ([merchCatalogInventory].[count] > 0 AND [merchProductVariant].[trackInventory] = 1)")
+                .Append("OR [merchProductVariant].[trackInventory] = 0")
+                .Append(") [merchProductVariant]")
+                .Append(")")
+                .Append("AND [merchProductVariant].[master] = 1")
+                .Append("AND [merchProduct].[domainRootStructureID] = @DomainRootStructureID", new { @DomainRootStructureID = _domainRootStructureID });
 
             return GetPagedKeys(page, itemsPerPage, sql, orderExpression, sortDirection);
         }
@@ -775,9 +783,11 @@
         {
             var sql = new Sql();
             sql.Append("SELECT *")
-              .Append("FROM [merchProductVariant]")
-              .Append("WHERE [merchProductVariant].[onSale] = 1")
-              .Append("AND [merchProductVariant].[master] = 1");
+                .Append("FROM [merchProduct]")
+                .Append("INNER JOIN [merchProductVariant] ON [merchProduct].[pk] = [merchProductVariant].[productKey]")
+                .Append("WHERE [merchProductVariant].[onSale] = 1")
+                .Append("AND [merchProductVariant].[master] = 1")
+                .Append("AND [merchProduct].[domainRootStructureID] = @DomainRootStructureID", new { @DomainRootStructureID = _domainRootStructureID });
             return GetPagedKeys(page, itemsPerPage, sql, orderExpression, sortDirection);
         }
 
@@ -843,12 +853,12 @@
             if (this.ExistsInCollection(entityKey, collectionKey)) return;
 
             var dto = new Product2EntityCollectionDto()
-                          {
-                              ProductKey = entityKey,
-                              EntityCollectionKey = collectionKey,
-                              CreateDate = DateTime.Now,
-                              UpdateDate = DateTime.Now
-                          };
+            {
+                ProductKey = entityKey,
+                EntityCollectionKey = collectionKey,
+                CreateDate = DateTime.Now,
+                UpdateDate = DateTime.Now
+            };
 
             Database.Insert(dto);
         }
@@ -877,7 +887,7 @@
                         CreateDate = DateTime.Now,
                         UpdateDate = DateTime.Now
                     });
-                }               
+                }
             }
 
             Database.BulkInsertRecords(dtos);
@@ -913,7 +923,7 @@
         /// Key=ProductKey
         /// Value=collectionKey
         /// </param>
-        public void RemoveFromCollections(Dictionary<Guid , Guid> entityKeycollectionKey)
+        public void RemoveFromCollections(Dictionary<Guid, Guid> entityKeycollectionKey)
         {
             var sql = new Sql();
 
@@ -921,7 +931,7 @@
             {
                 sql.Append(
                     "DELETE [merchProduct2EntityCollection] WHERE [merchProduct2EntityCollection].[productKey] = @pkey AND [merchProduct2EntityCollection].[entityCollectionKey] = @eckey",
-                    new {@pkey = dict.Key, @eckey = dict.Value});
+                    new { @pkey = dict.Key, @eckey = dict.Value });
             }
 
             Database.Execute(sql);
@@ -1058,7 +1068,7 @@
                        .Append(")")
                        .Append("AND [merchProductVariant].[master] = 1")
                     .Append(") AS T1");
- 
+
             }
 
             var dtos = Database.Fetch<CountDto>(sql);
@@ -1193,13 +1203,15 @@
 
             var sql = new Sql();
             sql.Append("SELECT *")
-              .Append("FROM [merchProductVariant]")
-               .Append("WHERE [merchProductVariant].[productKey] NOT IN (")
-               .Append("SELECT DISTINCT([productKey])")
-               .Append("FROM [merchProduct2EntityCollection]")
-               .Append("WHERE [merchProduct2EntityCollection].[entityCollectionKey] = @eckey", new { @eckey = collectionKey })
-               .Append(")")
-               .Append("AND [merchProductVariant].[master] = 1");
+                .Append("FROM [merchProduct]")
+                .Append("INNER JOIN [merchProductVariant] ON [merchProduct].[pk] = [merchProductVariant].[productKey]")
+                .Append("WHERE [merchProductVariant].[productKey] NOT IN (")
+                .Append("SELECT DISTINCT([productKey])")
+                .Append("FROM [merchProduct2EntityCollection]")
+                .Append("WHERE [merchProduct2EntityCollection].[entityCollectionKey] = @eckey", new { @eckey = collectionKey })
+                .Append(")")
+                .Append("AND [merchProductVariant].[master] = 1")
+                .Append("AND [merchProduct].[domainRootStructureID] = @DomainRootStructureID", new { @DomainRootStructureID = _domainRootStructureID });
 
             var pagedKeys = GetPagedKeys(page, itemsPerPage, sql, orderExpression, sortDirection);
             return pagedKeys;
@@ -1236,13 +1248,15 @@
 
             var sql = new Sql();
             sql.Append("SELECT *")
-              .Append("FROM [merchProductVariant]")
-               .Append("WHERE [merchProductVariant].[productKey] NOT IN (")
-               .Append("SELECT DISTINCT([productKey])")
-               .Append("FROM [merchProduct2EntityCollection]")
-               .Append("WHERE [merchProduct2EntityCollection].[entityCollectionKey] IN (@eckeys)", new { @eckeys = collectionKeys })
-               .Append(")")
-               .Append("AND [merchProductVariant].[master] = 1");
+                .Append("FROM [merchProduct]")
+                .Append("INNER JOIN [merchProductVariant] ON [merchProduct].[pk] = [merchProductVariant].[productKey]")
+                .Append("WHERE [merchProductVariant].[productKey] NOT IN (")
+                .Append("SELECT DISTINCT([productKey])")
+                .Append("FROM [merchProduct2EntityCollection]")
+                .Append("WHERE [merchProduct2EntityCollection].[entityCollectionKey] IN (@eckeys)", new { @eckeys = collectionKeys })
+                .Append(")")
+                .Append("AND [merchProductVariant].[master] = 1")
+                .Append("AND [merchProduct].[domainRootStructureID] = @DomainRootStructureID", new { @DomainRootStructureID = _domainRootStructureID });
 
             var pagedKeys = GetPagedKeys(page, itemsPerPage, sql, orderExpression, sortDirection);
             return pagedKeys;
@@ -1354,7 +1368,7 @@
                .Append(")")
                .Append("AND [merchProductVariant].[master] = 1");
 
-           var pagedKeys = GetPagedKeys(page, itemsPerPage, sql, orderExpression, sortDirection);
+            var pagedKeys = GetPagedKeys(page, itemsPerPage, sql, orderExpression, sortDirection);
             return pagedKeys;
         }
 
@@ -1628,8 +1642,8 @@
 
             var factory = new ProductFactory(
                 _productOptionRepository.GetProductAttributeCollectionForVariant(dto.ProductVariantDto.Key),
-                _productVariantRepository.GetCategoryInventoryCollection(dto.ProductVariantDto.Key), 
-                _productOptionRepository.GetProductOptionCollection, 
+                _productVariantRepository.GetCategoryInventoryCollection(dto.ProductVariantDto.Key),
+                _productOptionRepository.GetProductOptionCollection,
                 _productVariantRepository.GetProductVariantCollection,
                 _productVariantRepository.GetDetachedContentCollection(dto.ProductVariantDto.Key));
 
@@ -1758,10 +1772,10 @@
         protected override IEnumerable<string> GetDeleteClauses()
         {
             var list = new List<string>
-                {                    
+                {
                     "DELETE FROM merchCatalogInventory WHERE productVariantKey IN (SELECT pk FROM merchProductVariant WHERE productKey = @Key)",
                     "DELETE FROM merchProductVariantDetachedContent WHERE productVariantKey IN (SELECT pk FROM merchProductVariant WHERE productKey = @Key)",
-                    "DELETE FROM merchProductVariantIndex WHERE productVariantKey IN (SELECT pk FROM merchProductVariant WHERE productKey = @Key)",                    
+                    "DELETE FROM merchProductVariantIndex WHERE productVariantKey IN (SELECT pk FROM merchProductVariant WHERE productKey = @Key)",
                     "DELETE FROM merchProductVariant WHERE productKey = @Key",
                     "DELETE FROM merchProduct2EntityCollection WHERE productKey = @Key",
                     "DELETE FROM merchProduct WHERE pk = @Key"
@@ -1846,7 +1860,7 @@
         /// </param>
         protected override void PersistDeletedItem(IProduct entity)
         {
-           _productOptionRepository.DeleteAllProductOptions(entity);
+            _productOptionRepository.DeleteAllProductOptions(entity);
 
             var deletes = GetDeleteClauses();
             foreach (var delete in deletes)
@@ -1872,7 +1886,7 @@
 
             var dtos = Database.Fetch<ProductDto, ProductVariantDto, ProductVariantIndexDto>(sql);
 
-            return dtos.DistinctBy(x => x.Key).Select(dto => Get(dto.Key));
+            return dtos.DistinctBy(x => x.Key).Select(dto => Get(dto.Key)).ToArray();
         }
 
         /// <summary>

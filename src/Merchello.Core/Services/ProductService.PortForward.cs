@@ -157,10 +157,11 @@
             decimal max,
             long page,
             long itemsPerPage,
+            int domainRootStructureID,
             string orderExpression,
             SortDirection sortDirection = SortDirection.Descending)
         {
-            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork(), UConstants.System.Root))
+            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork(), domainRootStructureID))
             {
                 return repository.GetKeysNotInAnyCollections(collectionKeys, min, max, page, itemsPerPage, orderExpression, sortDirection);
             }
@@ -203,10 +204,11 @@
             decimal max,
             long page,
             long itemsPerPage,
+            int domainRootStructureID,
             string orderExpression,
             SortDirection sortDirection = SortDirection.Descending)
         {
-            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork(), UConstants.System.Root))
+            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork(), domainRootStructureID))
             {
                 return repository.GetKeysNotInAnyCollections(collectionKeys, term, min, max, page, itemsPerPage, orderExpression, sortDirection);
             }

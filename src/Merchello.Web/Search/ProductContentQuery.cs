@@ -160,13 +160,13 @@
                     if (!HasPriceRange)
                     {
                         return HasSearchTerm ?
-                        _query.TypedProductContentPageThatNotInAnyCollections(CollectionKeys, SearchTerm, Page, ItemsPerPage, SortBy, SortDirection) :
-                        _query.TypedProductContentPageThatNotInAnyCollections(CollectionKeys, Page, ItemsPerPage, SortBy, SortDirection);
+                        _query.TypedProductContentPageThatNotInAnyCollections(CollectionKeys, SearchTerm, Page, ItemsPerPage, DomainRootStructureID, SortBy, SortDirection) :
+                        _query.TypedProductContentPageThatNotInAnyCollections(CollectionKeys, Page, ItemsPerPage, DomainRootStructureID, SortBy, SortDirection);
                     }
 
                     return HasSearchTerm ?
-                    _query.TypedProductContentPageThatNotInAnyCollections(CollectionKeys, SearchTerm, MinPrice, MaxPrice, Page, ItemsPerPage, SortBy, SortDirection) :
-                    _query.TypedProductContentPageThatNotInAnyCollections(CollectionKeys, MinPrice, MaxPrice, Page, ItemsPerPage, SortBy, SortDirection);
+                    _query.TypedProductContentPageThatNotInAnyCollections(CollectionKeys, SearchTerm, MinPrice, MaxPrice, Page, ItemsPerPage, DomainRootStructureID, SortBy, SortDirection) :
+                    _query.TypedProductContentPageThatNotInAnyCollections(CollectionKeys, MinPrice, MaxPrice, Page, ItemsPerPage, DomainRootStructureID, SortBy, SortDirection);
 
                 case CollectionClusivity.ExistsInAnyCollectionOrFilter:
 

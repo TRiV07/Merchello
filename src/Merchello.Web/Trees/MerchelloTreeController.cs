@@ -196,7 +196,9 @@
             if (splitId.CollectionId == "customers")
             {
                 menu.Items.Add<NewCollectionAction>(
-                    _textService.Localize("merchelloCustomers/newCustomer", _culture), false)
+                        _textService.Localize("merchelloCustomers/newCustomer", _culture),
+                        hasSeparator: false,
+                        additionalData: new Dictionary<string, object>() { { "dialogData", new { storeId = splitId.StoreId } } })
                     .LaunchDialogView(DialogsPath + "customer.newcustomer.html", _textService.Localize("merchelloCustomers/newCustomer", _culture));
             }
 

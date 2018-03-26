@@ -21,6 +21,7 @@
         internal static readonly List<StaticField> IndexFieldPolicies = new List<StaticField>()
         {
             new StaticField("customerKey", FieldIndexTypes.ANALYZED, false, string.Empty),
+            new StaticField("domainRootStructureID", FieldIndexTypes.ANALYZED, false, "INT"),
             new StaticField("loginName", FieldIndexTypes.ANALYZED, true, string.Empty),
             new StaticField("firstName", FieldIndexTypes.ANALYZED, true, string.Empty),
             new StaticField("lastName", FieldIndexTypes.ANALYZED, true, string.Empty),

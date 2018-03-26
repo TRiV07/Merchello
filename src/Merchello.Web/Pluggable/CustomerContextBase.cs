@@ -10,6 +10,7 @@ namespace Merchello.Web.Pluggable
     using Merchello.Core.Configuration;
     using Merchello.Core.Logging;
     using Merchello.Core.Models;
+    using Merchello.Core.MultiStore;
     using Merchello.Core.Services;
     using Merchello.Web.Models.Customer;
     using Merchello.Web.Workflow;
@@ -351,10 +352,11 @@ namespace Merchello.Web.Pluggable
         /// </param>
         protected void ConvertBasket(ICustomerBase original, string membershipId, string customerLoginName)
         {
+            //TOCHECKMS
             var anonymousBasket = Basket.GetBasket(this._merchelloContext, original);
 
-            var customer = this.CustomerService.GetByLoginName(customerLoginName) ??
-                            this.CustomerService.CreateCustomerWithKey(customerLoginName);
+            var customer = this.CustomerService.GetByLoginName(customerLoginName, original.DomainRootStructureID) ??
+                            this.CustomerService.CreateCustomerWithKey(customerLoginName, original.DomainRootStructureID, string.Empty, string.Empty, customerLoginName);
 
 
             this.ContextData.Key = customer.Key;
@@ -480,7 +482,8 @@ namespace Merchello.Web.Pluggable
         /// </summary>
         private void CreateAnonymousCustomer()
         {
-            var customer = this._customerService.CreateAnonymousCustomerWithKey();
+            var customer = this._customerService.CreateAnonymousCustomerWithKey(
+                ApplicationContext.Current.Services.DomainService.CurrentDomain().RootContentId.Value);
             this.CurrentCustomer = customer;
             this.ContextData = new CustomerContextData()
             {

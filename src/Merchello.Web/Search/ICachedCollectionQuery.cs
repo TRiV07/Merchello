@@ -95,6 +95,7 @@
             Guid collectionKey,
             long page,
             long itemsPerPage,
+            int domainRootStructureID,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Ascending);
 
@@ -127,6 +128,7 @@
             string searchTerm,
             long page,
             long itemsPerPage,
+            int domainRootStructureID,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Ascending);
     }

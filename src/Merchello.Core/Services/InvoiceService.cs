@@ -928,7 +928,7 @@
         /// <returns>
         /// The <see cref="Page{IInvoice}"/>.
         /// </returns>
-        public Page<IInvoice> GetProductsThatExistInAllCollections(
+        public Page<IInvoice> GetEntitiesThatExistInAllCollections(
             IEnumerable<Guid> collectionKeys,
             long page,
             long itemsPerPage,
@@ -1014,7 +1014,7 @@
         /// <returns>
         /// The <see cref="Page"/>.
         /// </returns>
-        public Page<IInvoice> GetProductsThatExistInAllCollections(
+        public Page<IInvoice> GetEntitiesThatExistInAllCollections(
             IEnumerable<Guid> collectionKeys,
             string searchTerm,
             long page,
