@@ -498,7 +498,7 @@ namespace Merchello.Core
                     writer.WriteStartElement("customer");
                     writer.WriteAttributeString("id", ((Customer)customer).ExamineId.ToString(CultureInfo.InvariantCulture));
                     writer.WriteAttributeString("customerKey", customer.Key.ToString());
-                    writer.WriteAttributeString("domainRootStructureID", customer.DomainRootStructureID.ToString());
+                    writer.WriteAttributeString("storeId", customer.StoreId.ToString());
                     writer.WriteAttributeString("loginName", customer.LoginName);
                     writer.WriteAttributeString("firstName", customer.FirstName);
                     writer.WriteAttributeString("lastName", customer.LastName);

@@ -48,7 +48,7 @@
         /// <returns>
         /// The <see cref="Page{TEntity}"/>.
         /// </returns>
-        Page<TEntity> GetPage(long page, long itemsPerPage, int domainRootStructureID, string sortBy = "", SortDirection sortDirection = SortDirection.Descending);
+        Page<TEntity> GetPage(long page, long itemsPerPage, int storeId, string sortBy = "", SortDirection sortDirection = SortDirection.Descending);
 
         /////// <summary>
         /////// Performs a paged query

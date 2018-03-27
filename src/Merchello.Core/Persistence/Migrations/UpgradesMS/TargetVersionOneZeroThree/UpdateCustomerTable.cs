@@ -31,7 +31,7 @@ namespace Merchello.Core.Persistence.Migrations.UpgradesMS.TargetVersionOneZeroT
         {
             if (_databaseSchemaHelper.TableExist("merchCustomer"))
             {
-                Alter.Table("merchCustomer").AddColumn("domainRootStructureID").AsInt32().NotNullable().WithDefaultValue(-1);
+                Alter.Table("merchCustomer").AddColumn("storeId").AsInt32().NotNullable().WithDefaultValue(-1);
 
                 var dbIndexes = SqlSyntax.GetDefinedIndexesDefinitions(Context.Database);
                 if (dbIndexes.Any(x => x.IndexName.InvariantEquals("IX_merchCustomerLoginName")) == true)
@@ -50,7 +50,7 @@ namespace Merchello.Core.Persistence.Migrations.UpgradesMS.TargetVersionOneZeroT
         {
             if (_databaseSchemaHelper.TableExist("merchCustomer"))
             {
-                Delete.Column("domainRootStructureID").FromTable("merchCustomer");
+                Delete.Column("storeId").FromTable("merchCustomer");
             }
         }
     }

@@ -31,7 +31,7 @@ namespace Merchello.Core.Persistence.Migrations.UpgradesMS.TargetVersionOneZeroT
         {
             if (_databaseSchemaHelper.TableExist("merchEntityCollection"))
             {
-                Alter.Table("merchEntityCollection").AddColumn("domainRootStructureID").AsInt32().NotNullable().WithDefaultValue(-1);
+                Alter.Table("merchEntityCollection").AddColumn("storeId").AsInt32().NotNullable().WithDefaultValue(-1);
             }
         }
 
@@ -39,7 +39,7 @@ namespace Merchello.Core.Persistence.Migrations.UpgradesMS.TargetVersionOneZeroT
         {
             if (_databaseSchemaHelper.TableExist("merchEntityCollection"))
             {
-                Delete.Column("domainRootStructureID").FromTable("merchEntityCollection");
+                Delete.Column("storeId").FromTable("merchEntityCollection");
             }
         }
     }

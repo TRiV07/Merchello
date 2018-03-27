@@ -362,7 +362,7 @@ namespace Merchello.Core
                     writer.WriteStartDocument();
                     writer.WriteStartElement("product");
                     writer.WriteAttributeString("key", product.Key.ToString());
-                    writer.WriteAttributeString("domainRootStructureID", product.DomainRootStructureID.ToString());
+                    writer.WriteAttributeString("storeId", product.StoreId.ToString());
                     writer.WriteEndElement(); // product
                     writer.WriteEndDocument();
                     xml = sw.ToString();
@@ -372,14 +372,14 @@ namespace Merchello.Core
             var doc = XDocument.Parse(xml);
             if (doc.Root == null) return XDocument.Parse("<product />");
 
-            doc.Root.Add(((Product)product).MasterVariant.SerializeToXml(product.DomainRootStructureID, product.ProductOptions, product.GetCollectionsContaining().Select(x => x.Key)).Root);
+            doc.Root.Add(((Product)product).MasterVariant.SerializeToXml(product.StoreId, product.ProductOptions, product.GetCollectionsContaining().Select(x => x.Key)).Root);
 
             // Need to filter out the Master variant so that it does not get overwritten in the cases where
             // a product defines options.
             // http://issues.merchello.com/youtrack/issue/M-152
             foreach (var variant in product.ProductVariants.Where(x => ((ProductVariant)x).Master == false))
             {
-                doc.Root.Add(variant.SerializeToXml(product.DomainRootStructureID).Root);
+                doc.Root.Add(variant.SerializeToXml(product.StoreId).Root);
             }
             return doc;
         }
@@ -399,7 +399,7 @@ namespace Merchello.Core
         /// <returns>
         /// The <see cref="XDocument"/>.
         /// </returns>
-        internal static XDocument SerializeToXml(this IProductVariant productVariant, int domainRootStructureID, ProductOptionCollection productOptionCollection = null, IEnumerable<Guid> collections = null)
+        internal static XDocument SerializeToXml(this IProductVariant productVariant, int storeId, ProductOptionCollection productOptionCollection = null, IEnumerable<Guid> collections = null)
         {
             string xml;
             using (var sw = new StringWriter())
@@ -410,7 +410,7 @@ namespace Merchello.Core
                     writer.WriteStartElement("productVariant");
                     writer.WriteAttributeString("id", ((ProductVariant)productVariant).ExamineId.ToString(CultureInfo.InvariantCulture));
                     writer.WriteAttributeString("productKey", productVariant.ProductKey.ToString());
-                    writer.WriteAttributeString("domainRootStructureID", domainRootStructureID.ToString(CultureInfo.InvariantCulture));
+                    writer.WriteAttributeString("storeId", storeId.ToString(CultureInfo.InvariantCulture));
                     writer.WriteAttributeString("productVariantKey", productVariant.Key.ToString());
                     writer.WriteAttributeString("master", ((ProductVariant)productVariant).Master.ToString());
                     writer.WriteAttributeString("name", productVariant.Name);

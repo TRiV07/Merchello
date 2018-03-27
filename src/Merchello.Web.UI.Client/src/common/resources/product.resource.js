@@ -20,8 +20,8 @@
                  **/
                 // TODO this method is obsolete but it is still possible to get here so leave it
                 // Remove in version 3.0.0 or in Angular 2.x refactor
-                add: function (product, domainRootStructureID) {
-                    var url = Umbraco.Sys.ServerVariables['merchelloUrls']['merchelloProductApiBaseUrl'] + 'AddProduct?domainRootStructureID=' + domainRootStructureID;
+                add: function (product, storeId) {
+                    var url = Umbraco.Sys.ServerVariables['merchelloUrls']['merchelloProductApiBaseUrl'] + 'AddProduct?storeId=' + storeId;
                     return umbRequestHelper.resourcePromise(
                         $http.post(url,
                             product
@@ -34,8 +34,8 @@
                  * @name create
                  * @description Creates a new product with an API call to the server
                  **/
-                create: function (product, domainRootStructureID) {
-                    var url = Umbraco.Sys.ServerVariables['merchelloUrls']['merchelloProductApiBaseUrl'] + 'CreateProduct?domainRootStructureID=' + domainRootStructureID;
+                create: function (product, storeId) {
+                    var url = Umbraco.Sys.ServerVariables['merchelloUrls']['merchelloProductApiBaseUrl'] + 'CreateProduct?storeId=' + storeId;
                     angular.forEach(product.detachedContents, function(dc) {
                         dc.detachedDataValues = dc.detachedDataValues.asDetachedValueArray();
                     });
@@ -51,13 +51,13 @@
                  * @name getByKey
                  * @description Gets a value indicating whether or not a SKU exists
                  **/
-                getSkuExists: function (sku, domainRootStructureID) {
+                getSkuExists: function (sku, storeId) {
                     var url = Umbraco.Sys.ServerVariables['merchelloUrls']['merchelloProductApiBaseUrl'] + 'GetSkuExists';
                     return umbRequestHelper.resourcePromise(
                         $http({
                             url: url,
                             method: "GET",
-                            params: { sku: sku, domainRootStructureID: domainRootStructureID }
+                            params: { sku: sku, storeId: storeId }
                         }),
                         'Failed to test SKU');
                 },
@@ -82,11 +82,11 @@
                  * @name getBySku
                  * @description Gets a product via it's SKU with an API call to the server
                  **/
-                getBySku: function (sku, domainRootStructureID) {
+                getBySku: function (sku, storeId) {
                     var url = Umbraco.Sys.ServerVariables['merchelloUrls']['merchelloProductApiBaseUrl'] + 'GetProductBySku';
                     return umbRequestHelper.resourcePromise(
                         $http({
-                            url: url + '?sku=' + sku + "&domainRootStructureID=" + domainRootStructureID,
+                            url: url + '?sku=' + sku + "&storeId=" + storeId,
                             method: "GET"
                         }),
                         'Failed to retreive data for product sku ' + sku);
@@ -122,18 +122,18 @@
                  * @name getVariantBySku
                  * @description Gets a product variant via it's sku with an API call to the server
                  **/
-                getVariantBySku: function (sku, domainRootStructureID) {
+                getVariantBySku: function (sku, storeId) {
                     var url = Umbraco.Sys.ServerVariables['merchelloUrls']['merchelloProductApiBaseUrl'] + 'GetProductVariantBySku';
                     return umbRequestHelper.resourcePromise(
                         $http({
-                            url: url + '?sku=' + sku + "&domainRootStructureID=" + domainRootStructureID,
+                            url: url + '?sku=' + sku + "&storeId=" + storeId,
                             method: "GET"
                         }), 'Failed to retreive data for product variant sku ' + sku);
                 },
 
-                getManufacturers: function (domainRootStructureID)
+                getManufacturers: function (storeId)
                 {
-                    var url = Umbraco.Sys.ServerVariables['merchelloUrls']['merchelloProductApiBaseUrl'] + 'GetAllManufacturers?domainRootStructureID=' + domainRootStructureID;
+                    var url = Umbraco.Sys.ServerVariables['merchelloUrls']['merchelloProductApiBaseUrl'] + 'GetAllManufacturers?storeId=' + storeId;
                     return umbRequestHelper.resourcePromise(
                         $http({url: url, method: 'GET' }), 'Failed to retreive list of manufacturers'
                     );

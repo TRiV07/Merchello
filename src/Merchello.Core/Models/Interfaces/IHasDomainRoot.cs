@@ -16,6 +16,6 @@ namespace Merchello.Core.Models.EntityBase
         /// Gets the domain root structure ID
         /// </summary>
         [DataMember]
-        int DomainRootStructureID { get; }
+        int StoreId { get; }
     }
 }

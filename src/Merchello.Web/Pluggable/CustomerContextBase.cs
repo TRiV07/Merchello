@@ -355,8 +355,8 @@ namespace Merchello.Web.Pluggable
             //TOCHECKMS
             var anonymousBasket = Basket.GetBasket(this._merchelloContext, original);
 
-            var customer = this.CustomerService.GetByLoginName(customerLoginName, original.DomainRootStructureID) ??
-                            this.CustomerService.CreateCustomerWithKey(customerLoginName, original.DomainRootStructureID, string.Empty, string.Empty, customerLoginName);
+            var customer = this.CustomerService.GetByLoginName(customerLoginName, original.StoreId) ??
+                            this.CustomerService.CreateCustomerWithKey(customerLoginName, original.StoreId, string.Empty, string.Empty, customerLoginName);
 
 
             this.ContextData.Key = customer.Key;

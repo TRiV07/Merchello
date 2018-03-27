@@ -13,8 +13,8 @@
         /// <summary>
         /// Initializes a new instance of the <see cref="AnonymousCustomer"/> class.
         /// </summary>
-        public AnonymousCustomer(int domainRootStructureID)
-            : this(domainRootStructureID, new ExtendedDataCollection())
+        public AnonymousCustomer(int storeId)
+            : this(storeId, new ExtendedDataCollection())
         {
         }
 
@@ -24,8 +24,8 @@
         /// <param name="extendedData">
         /// The extended data.
         /// </param>
-        public AnonymousCustomer(int domainRootStructureID, ExtendedDataCollection extendedData)
-            : base(true, domainRootStructureID, extendedData)
+        public AnonymousCustomer(int storeId, ExtendedDataCollection extendedData)
+            : base(true, storeId, extendedData)
         {
         }
     }

@@ -26,7 +26,7 @@
         {
             Key = masterVariant.ProductKey;
             ProductVariantKey = masterVariant.Key;
-            DomainRootStructureID = masterVariant.DomainRootStructureID;
+            StoreId = masterVariant.StoreId;
             VersionKey = masterVariant.VersionKey;
             Name = masterVariant.Name;
             Sku = masterVariant.Sku;

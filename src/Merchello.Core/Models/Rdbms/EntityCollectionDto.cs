@@ -1,5 +1,6 @@
 ﻿namespace Merchello.Core.Models.Rdbms
 {
+    using Merchello.Core.Models.EntityBase;
     using System;
 
     using Umbraco.Core.Persistence;
@@ -11,7 +12,7 @@
     [TableName("merchEntityCollection")]
     [PrimaryKey("pk", autoIncrement = false)]
     [ExplicitColumns]
-    internal class EntityCollectionDto
+    internal class EntityCollectionDto : IHasDomainRoot
     {
         /// <summary>
         /// Gets or sets the key.
@@ -32,9 +33,9 @@
         /// <summary>
         /// Gets or sets domain root structure ID
         /// </summary>
-        [Column("domainRootStructureID")]
+        [Column("storeId")]
         [Constraint(Default = "-1")]
-        public int DomainRootStructureID { get; set; }
+        public int StoreId { get; set; }
 
         /// <summary>
         /// Gets or sets the entity type field key.

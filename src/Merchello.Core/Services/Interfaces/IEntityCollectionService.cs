@@ -36,7 +36,7 @@
             EntityType entityType,
             Guid providerKey,
             string name,
-            int domainRootStructureID,
+            int storeId,
             bool raiseEvents = true);
 
         /// <summary>
@@ -61,7 +61,7 @@
             EntityType entityType,
             Guid providerKey,
             string name,
-            int domainRootStructureID,
+            int storeId,
             bool raiseEvents = true);
 
 
@@ -172,7 +172,7 @@
         /// <returns>
         /// The <see cref="IEnumerable{IEntityCollection}"/>.
         /// </returns>
-        IEnumerable<IEntityCollection> GetByEntityTfKey(Guid entityTfKey, int domainRootStructureID);
+        IEnumerable<IEntityCollection> GetByEntityTfKey(Guid entityTfKey, int storeId);
 
         /// <summary>
         /// The get by provider key.
@@ -183,7 +183,7 @@
         /// <returns>
         /// The <see cref="IEnumerable{IEntityCollection}"/>.
         /// </returns>
-        IEnumerable<IEntityCollection> GetByProviderKey(Guid providerKey, int domainRootStructureID);
+        IEnumerable<IEntityCollection> GetByProviderKey(Guid providerKey, int storeId);
 
         /// <summary>
         /// Gets an entity filter group by key.
@@ -205,7 +205,7 @@
         /// <returns>
         /// The <see cref="IEnumerable{IEntityCollection}"/>.
         /// </returns>
-        IEnumerable<IEntityCollection> GetAll(int domainRootStructureID, params Guid[] keys);
+        IEnumerable<IEntityCollection> GetAll(int storeId, params Guid[] keys);
 
         /// <summary>
         /// The get children.
@@ -238,7 +238,7 @@
         /// <returns>
         /// The <see cref="IEnumerable{IEntityCollection}"/>.
         /// </returns>
-        IEnumerable<IEntityCollection> GetRootLevelEntityCollections(int domainRootStructureID);
+        IEnumerable<IEntityCollection> GetRootLevelEntityCollections(int storeId);
 
         /// <summary>
         /// The get root level entity collections.
@@ -249,7 +249,7 @@
         /// <returns>
         /// The <see cref="IEnumerable{IEntityCollection}"/>.
         /// </returns>
-        IEnumerable<IEntityCollection> GetRootLevelEntityCollections(EntityType entityType, int domainRootStructureID);
+        IEnumerable<IEntityCollection> GetRootLevelEntityCollections(EntityType entityType, int storeId);
 
         /// <summary>
         /// The get root level entity collections.
@@ -263,7 +263,7 @@
         /// <returns>
         /// The <see cref="IEnumerable{IEntityCollection}"/>.
         /// </returns>
-        IEnumerable<IEntityCollection> GetRootLevelEntityCollections(EntityType entityType, Guid providerKey, int domainRootStructureID);
+        IEnumerable<IEntityCollection> GetRootLevelEntityCollections(EntityType entityType, Guid providerKey, int storeId);
 
         /// <summary>
         /// The get root level entity collections.
@@ -274,7 +274,7 @@
         /// <returns>
         /// The <see cref="IEnumerable{IEntityCollection}"/>.
         /// </returns>
-        IEnumerable<IEntityCollection> GetRootLevelEntityCollections(Guid entityTfKey, int domainRootStructureID);
+        IEnumerable<IEntityCollection> GetRootLevelEntityCollections(Guid entityTfKey, int storeId);
 
         /// <summary>
         /// The get root level entity collections.
@@ -288,7 +288,7 @@
         /// <returns>
         /// The <see cref="IEnumerable{IEntityCollection}"/>.
         /// </returns>
-        IEnumerable<IEntityCollection> GetRootLevelEntityCollections(Guid entityTfKey, Guid providerKey, int domainRootStructureID);
+        IEnumerable<IEntityCollection> GetRootLevelEntityCollections(Guid entityTfKey, Guid providerKey, int storeId);
 
         /// <summary>
         /// Gets a Page of collections from collection.
@@ -347,6 +347,6 @@
         /// <returns>
         /// The count of collections managed by a provider
         /// </returns>
-        int CollectionCountManagedByProvider(Guid providerKey, int domainRootStructureID);
+        int CollectionCountManagedByProvider(Guid providerKey, int storeId);
     }
 }

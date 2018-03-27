@@ -20,7 +20,7 @@
         /// <param name="validate">Function to execute to validate the next number</param>
         /// <param name="invoicesCount">The number of invoices needing invoice numbers.  Useful when saving multiple new invoices.</param>
         /// <returns>The next invoice number</returns>
-        int GetNextInvoiceNumber(Guid storeSettingKey, int domainRootStructureID, Func<int> validate, int invoicesCount = 1);
+        int GetNextInvoiceNumber(Guid storeSettingKey, int storeId, Func<int> validate, int invoicesCount = 1);
 
         /// <summary>
         /// Gets the next order number
@@ -29,7 +29,7 @@
         /// <param name="validate">Function to execute to validate the next number</param>
         /// <param name="ordersCount">The number of orders needing invoice orders.  Useful when saving multiple new orders.</param>
         /// <returns>The next order number</returns>
-        int GetNextOrderNumber(Guid storeSettingKey, int domainRootStructureID, Func<int> validate, int ordersCount = 1);
+        int GetNextOrderNumber(Guid storeSettingKey, int storeId, Func<int> validate, int ordersCount = 1);
 
 
         /// <summary>
@@ -39,7 +39,7 @@
         /// <param name="validate">Function to execute to validate the next number</param>
         /// <param name="shipmentsCount">The number of orders needing invoice orders.  Useful when saving multiple new orders.</param>
         /// <returns>The next order number</returns>
-        int GetNextShipmentNumber(Guid storeSettingKey, int domainRootStructureID, Func<int> validate, int shipmentsCount = 1);
+        int GetNextShipmentNumber(Guid storeSettingKey, int storeId, Func<int> validate, int shipmentsCount = 1);
 
         /// <summary>
         /// Gets the complete collection of registered type fields

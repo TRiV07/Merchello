@@ -67,7 +67,7 @@
         /// <param name="loginName">
         /// The login Name associated with the membership provider users
         /// </param>
-        internal Customer(string loginName, int domainRootStructureID) : base(false, domainRootStructureID)
+        internal Customer(string loginName, int storeId) : base(false, storeId)
         {
             Ensure.ParameterNotNullOrEmpty(loginName, "loginName");
 

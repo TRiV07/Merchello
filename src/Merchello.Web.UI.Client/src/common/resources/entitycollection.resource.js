@@ -30,12 +30,12 @@ angular.module('merchello.resources').factory('entityCollectionResource',
                         }),
                         'Failed to get valid sortable provider keys');
                 },
-                getRootCollectionsByEntityType: function (entityType, domainRootStructureID) {
+                getRootCollectionsByEntityType: function (entityType, storeId) {
                     return umbRequestHelper.resourcePromise(
                         $http({
                             url: baseUrl + 'GetRootEntityCollections',
                             method: "GET",
-                            params: { entityType: entityType, domainRootStructureID: domainRootStructureID }
+                            params: { entityType: entityType, storeId: storeId }
                         }),
                         'Failed to get entity collection by the entity type');
                 },
@@ -60,33 +60,33 @@ angular.module('merchello.resources').factory('entityCollectionResource',
                         'Failed to get entity collections for entity');
                 },
                 // getEntitySpecifiedFilterCollections
-                getEntityFilterGroups: function (entityType, domainRootStructureID) {
+                getEntityFilterGroups: function (entityType, storeId) {
                     return umbRequestHelper.resourcePromise(
                         $http({
                             url: baseUrl + 'GetEntityFilterGroups',
                             method: "GET",
-                            params: { entityType: entityType, domainRootStructureID: domainRootStructureID }
+                            params: { entityType: entityType, storeId: storeId }
                         }),
                         'Failed to get entity specified filter by the entityType');
                 },
                 // getEntitySpecifiedFilterCollectionProviders
-                getEntityFilterGroupProviders: function (entityType, domainRootStructureID) {
+                getEntityFilterGroupProviders: function (entityType, storeId) {
 
                     return umbRequestHelper.resourcePromise(
                         $http({
                             url: baseUrl + 'GetEntityFilterGroupProviders',
                             method: "GET",
-                            params: { entityType: entityType, domainRootStructureID: domainRootStructureID }
+                            params: { entityType: entityType, storeId: storeId }
                         }),
                         'Failed to get entity specified filter providers by the entityType');
                 },
                 // getEntitySpecifiedFilterCollectionAttributeProvider
-                getEntityFilterGroupFilterProvider: function (collectionKey, domainRootStructureID) {
+                getEntityFilterGroupFilterProvider: function (collectionKey, storeId) {
                     return umbRequestHelper.resourcePromise(
                         $http({
                             url: baseUrl + 'GetEntityFilterGroupFilterProvider',
                             method: "GET",
-                            params: { key: collectionKey, domainRootStructureID: domainRootStructureID }
+                            params: { key: collectionKey, storeId: storeId }
                         }),
                         'Failed to get specified filter attribute provider by the entityType');
                 },
@@ -110,26 +110,26 @@ angular.module('merchello.resources').factory('entityCollectionResource',
                         }),
                         'Failed to get specified filter attribute provider by the entityType');
                 },
-                getDefaultEntityCollectionProviders: function (domainRootStructureID) {
+                getDefaultEntityCollectionProviders: function (storeId) {
                     return umbRequestHelper.resourcePromise(
                         $http({
                             url: baseUrl + 'GetDefaultEntityCollectionProviders',
                             method: "GET",
-                            params: { domainRootStructureID: domainRootStructureID }
+                            params: { storeId: storeId }
                         }),
                         'Failed to get default entity collection providers');
                 },
-                getEntityCollectionProviders: function (domainRootStructureID) {
+                getEntityCollectionProviders: function (storeId) {
                     return umbRequestHelper.resourcePromise(
                         $http({
                             url: baseUrl + 'GetEntityCollectionProviders',
                             method: "GET",
-                            params: { domainRootStructureID: domainRootStructureID }
+                            params: { storeId: storeId }
                         }),
                         'Failed to get entity collection providers');
                 },
-                addEntityCollection: function (entityCollection, domainRootStructureID) {
-                    var url = baseUrl + 'PostAddEntityCollection?domainRootStructureID=' + domainRootStructureID;
+                addEntityCollection: function (entityCollection, storeId) {
+                    var url = baseUrl + 'PostAddEntityCollection?storeId=' + storeId;
                     entityCollection.extendedData = entityCollection.extendedData.toArray();
 
                     return umbRequestHelper.resourcePromise(

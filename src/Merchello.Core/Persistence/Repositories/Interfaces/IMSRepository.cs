@@ -9,7 +9,7 @@ namespace Merchello.Core.Persistence.Repositories.Interfaces
 {
     interface IMSRepository<in TId, TEntity> : IRepository<TId, TEntity>
     {
-        TEntity Get(Guid key, int domainRootStructureID);
-        IEnumerable<TEntity> GetAll(int domainRootStructureID, params Guid[] keys);
+        TEntity Get(Guid key, int storeId);
+        IEnumerable<TEntity> GetAll(int storeId, params Guid[] keys);
     }
 }

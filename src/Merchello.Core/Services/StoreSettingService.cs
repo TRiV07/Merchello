@@ -259,7 +259,7 @@
                 Name = name,
                 Value = value,
                 TypeName = typeName,
-                DomainRootStructureID = _domainService.CurrentDomain()?.RootContentId ?? 0
+                StoreId = _domainService.CurrentDomain()?.RootContentId ?? 0
             };
 
             if (raiseEvents)

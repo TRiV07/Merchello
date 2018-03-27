@@ -143,7 +143,7 @@ angular.module('merchello.directives').directive('merchelloListView',
                     var query = queryDisplayBuilder.createDefault();
                     query.currentPage = page;
                     query.itemsPerPage = perPage;
-                    query.domainRootStructureID = $routeParams.storeId;
+                    query.storeId = $routeParams.storeId;
                     query.sortBy = sortBy;
                     query.sortDirection = sortDirection;
                     query.addFilterTermParam(scope.options.filter);

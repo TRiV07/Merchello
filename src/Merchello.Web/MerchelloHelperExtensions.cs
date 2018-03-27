@@ -77,12 +77,13 @@
         /// <param name="slug">
         /// The slug.
         /// </param>
+        /// <param name="storeId"></param>
         /// <returns>
         /// The <see cref="IProductContent"/>.
         /// </returns>
-        public static IProductContent TypedProductContentBySlug(this MerchelloHelper merchello, string slug, int domainRootStructureID)
+        public static IProductContent TypedProductContentBySlug(this MerchelloHelper merchello, string slug, int storeId)
         {
-            return merchello.Query.Product.TypedProductContentBySlug(slug, domainRootStructureID);
+            return merchello.Query.Product.TypedProductContentBySlug(slug, storeId);
         }
 
         /// <summary>
@@ -97,9 +98,9 @@
         /// <returns>
         /// The <see cref="IProductContent"/>.
         /// </returns>
-        public static IProductContent TypeProductContentBySku(this MerchelloHelper merchello, string sku, int domainRootStructureID)
+        public static IProductContent TypeProductContentBySku(this MerchelloHelper merchello, string sku, int storeId)
         {
-            return merchello.Query.Product.TypedProductContentBySku(sku, domainRootStructureID);
+            return merchello.Query.Product.TypedProductContentBySku(sku, storeId);
         }
 
         /// <summary>

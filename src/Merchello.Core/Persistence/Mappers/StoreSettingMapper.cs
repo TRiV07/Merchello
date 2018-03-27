@@ -20,7 +20,7 @@ namespace Merchello.Core.Persistence.Mappers
             CacheMap<StoreSetting, StoreSettingDto>(src => src.TypeName, dto => dto.TypeName);
             CacheMap<StoreSetting, StoreSettingDto>(src => src.UpdateDate, dto => dto.UpdateDate);
             CacheMap<StoreSetting, StoreSettingDto>(src => src.CreateDate, dto => dto.CreateDate);
-            CacheMap<StoreSetting, StoreSettingDto>(src => src.DomainRootStructureID, dto => dto.DomainRootStructureID);
+            CacheMap<StoreSetting, StoreSettingDto>(src => src.StoreId, dto => dto.StoreId);
         }
     }
 }

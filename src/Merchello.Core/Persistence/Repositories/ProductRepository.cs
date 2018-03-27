@@ -36,7 +36,7 @@
         /// <summary>
         /// The domain root structure ID.
         /// </summary>
-        private readonly int _domainRootStructureID;
+        private readonly int _storeId;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProductRepository"/> class.
@@ -56,10 +56,10 @@
         /// <param name="productOptionRepository">
         /// The product option Repository.
         /// </param>
-        /// <param name="domainRootStructureID">
+        /// <param name="storeId">
         /// The domain root structure ID.
         /// </param>
-        public ProductRepository(IDatabaseUnitOfWork work, ILogger logger, ISqlSyntaxProvider sqlSyntax, IProductVariantRepository productVariantRepository, IProductOptionRepository productOptionRepository, int domainRootStructureID)
+        public ProductRepository(IDatabaseUnitOfWork work, ILogger logger, ISqlSyntaxProvider sqlSyntax, IProductVariantRepository productVariantRepository, IProductOptionRepository productOptionRepository, int storeId)
             : base(work, logger, sqlSyntax)
         {
             Mandate.ParameterNotNull(productVariantRepository, "productVariantRepository");
@@ -67,7 +67,7 @@
 
             _productVariantRepository = productVariantRepository;
             _productOptionRepository = productOptionRepository;
-            _domainRootStructureID = domainRootStructureID;
+            _storeId = storeId;
         }
 
 
@@ -213,7 +213,7 @@
                 .Append("FROM [merchProduct]")
                 .Append("INNER JOIN [merchProductVariant] ON [merchProduct].[pk] = [merchProductVariant].[productKey]")
                 .Append("INNER JOIN [merchProductVariantDetachedContent] ON [merchProductVariant].[pk] = [merchProductVariantDetachedContent].[productVariantKey]")
-                .Append("WHERE [merchProductVariantDetachedContent].[slug] = @Slug AND [merchProduct].[domainRootStructureID] = @DomainRootStructureID", new { @Slug = slug, @DomainRootStructureID = _domainRootStructureID });
+                .Append("WHERE [merchProductVariantDetachedContent].[slug] = @Slug AND [merchProduct].[storeId] = @StoreId", new { Slug = slug, StoreId = _storeId });
 
             return Database.Fetch<Guid>(sql).FirstOrDefault();
         }
@@ -561,7 +561,7 @@
                 .Append("([merchProductVariant].[onSale] = 1 AND [merchProductVariant].[salePrice] BETWEEN @low AND @high)", new { @low = min * modifier, @high = max * modifier })
                 .Append(")")
                 .Append("AND [merchProductVariant].[master] = 1")
-                .Append("AND [merchProduct].[domainRootStructureID] = @DomainRootStructureID", new { @DomainRootStructureID = _domainRootStructureID });
+                .Append("AND [merchProduct].[storeId] = @StoreId", new { @StoreId = _storeId });
             return GetPagedKeys(page, itemsPerPage, sql, orderExpression, sortDirection);
         }
 
@@ -635,7 +635,7 @@
                 .Append("INNER JOIN [merchProductVariant] ON [merchProduct].[pk] = [merchProductVariant].[productKey]")
                 .Append("WHERE [merchProductVariant].[manufacturer] IN (@manufacturers)", new { @manufacturers = manufacturer })
                 .Append("AND [merchProductVariant].[master] = 1")
-                .Append("AND [merchProduct].[domainRootStructureID] = @DomainRootStructureID", new { @DomainRootStructureID = _domainRootStructureID });
+                .Append("AND [merchProduct].[storeId] = @StoreId", new { @StoreId = _storeId });
             return GetPagedKeys(page, itemsPerPage, sql, orderExpression, sortDirection);
         }
 
@@ -704,7 +704,7 @@
                 .Append("INNER JOIN [merchProductVariant] ON [merchProduct].[pk] = [merchProductVariant].[productKey]")
                 .Append("WHERE [merchProductVariant].[barcode] IN (@codes)", new { @codes = barcodes })
                 .Append("AND [merchProductVariant].[master] = 1")
-                .Append("AND [merchProduct].[domainRootStructureID] = @DomainRootStructureID", new { @DomainRootStructureID = _domainRootStructureID });
+                .Append("AND [merchProduct].[storeId] = @StoreId", new { @StoreId = _storeId });
             return GetPagedKeys(page, itemsPerPage, sql, orderExpression, sortDirection);
         }
 
@@ -752,7 +752,7 @@
                 .Append(") [merchProductVariant]")
                 .Append(")")
                 .Append("AND [merchProductVariant].[master] = 1")
-                .Append("AND [merchProduct].[domainRootStructureID] = @DomainRootStructureID", new { @DomainRootStructureID = _domainRootStructureID });
+                .Append("AND [merchProduct].[storeId] = @StoreId", new { @StoreId = _storeId });
 
             return GetPagedKeys(page, itemsPerPage, sql, orderExpression, sortDirection);
         }
@@ -787,7 +787,7 @@
                 .Append("INNER JOIN [merchProductVariant] ON [merchProduct].[pk] = [merchProductVariant].[productKey]")
                 .Append("WHERE [merchProductVariant].[onSale] = 1")
                 .Append("AND [merchProductVariant].[master] = 1")
-                .Append("AND [merchProduct].[domainRootStructureID] = @DomainRootStructureID", new { @DomainRootStructureID = _domainRootStructureID });
+                .Append("AND [merchProduct].[storeId] = @StoreId", new { @StoreId = _storeId });
             return GetPagedKeys(page, itemsPerPage, sql, orderExpression, sortDirection);
         }
 
@@ -1211,7 +1211,7 @@
                 .Append("WHERE [merchProduct2EntityCollection].[entityCollectionKey] = @eckey", new { @eckey = collectionKey })
                 .Append(")")
                 .Append("AND [merchProductVariant].[master] = 1")
-                .Append("AND [merchProduct].[domainRootStructureID] = @DomainRootStructureID", new { @DomainRootStructureID = _domainRootStructureID });
+                .Append("AND [merchProduct].[storeId] = @StoreId", new { @StoreId = _storeId });
 
             var pagedKeys = GetPagedKeys(page, itemsPerPage, sql, orderExpression, sortDirection);
             return pagedKeys;
@@ -1256,7 +1256,7 @@
                 .Append("WHERE [merchProduct2EntityCollection].[entityCollectionKey] IN (@eckeys)", new { @eckeys = collectionKeys })
                 .Append(")")
                 .Append("AND [merchProductVariant].[master] = 1")
-                .Append("AND [merchProduct].[domainRootStructureID] = @DomainRootStructureID", new { @DomainRootStructureID = _domainRootStructureID });
+                .Append("AND [merchProduct].[storeId] = @StoreId", new { @StoreId = _storeId });
 
             var pagedKeys = GetPagedKeys(page, itemsPerPage, sql, orderExpression, sortDirection);
             return pagedKeys;
@@ -1744,9 +1744,9 @@
                .On<ProductVariantDto, ProductVariantIndexDto>(SqlSyntax, left => left.Key, right => right.ProductVariantKey)
                .Where<ProductVariantDto>(x => x.Master, SqlSyntax);
 
-            if (_domainRootStructureID != Constants.System.Root)
+            if (_storeId != Constants.System.Root)
             {
-                sql.Where<ProductDto>(x => x.DomainRootStructureID == _domainRootStructureID, SqlSyntax);
+                sql.Where<ProductDto>(x => x.StoreId == _storeId, SqlSyntax);
             }
 
             return sql;

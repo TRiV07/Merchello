@@ -34,7 +34,7 @@
         /// <summary>
         /// The domain root structure ID.
         /// </summary>
-        private int _domainRootStructureID;
+        private int _storeId;
 
         /// <inheritdoc/>
         [DataMember]
@@ -83,16 +83,16 @@
 
         /// <inheritdoc/>
         [DataMember]
-        public int DomainRootStructureID
+        public int StoreId
         {
             get
             {
-                return _domainRootStructureID;
+                return _storeId;
             }
 
             set
             {
-                SetPropertyValueAndDetectChanges(value, ref _domainRootStructureID, _ps.Value.DomainRootStructureIDSelector);
+                SetPropertyValueAndDetectChanges(value, ref _storeId, _ps.Value.StoreIdSelector);
             }
         }
 
@@ -119,7 +119,7 @@
             /// <summary>
             /// The domain root structure ID selector.
             /// </summary>
-            public readonly PropertyInfo DomainRootStructureIDSelector = ExpressionHelper.GetPropertyInfo<StoreSetting, int>(x => x.DomainRootStructureID);
+            public readonly PropertyInfo StoreIdSelector = ExpressionHelper.GetPropertyInfo<StoreSetting, int>(x => x.StoreId);
         }
     }
 }

@@ -31,7 +31,7 @@
         /// <summary>
         /// The domain root structure ID.
         /// </summary>
-        protected readonly int _domainRootStructureID;
+        protected readonly int _storeId;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PagedMSRepositoryBase{TEntity,TDto}"/> class. 
@@ -45,10 +45,10 @@
         /// <param name="sqlSyntax">
         /// The SQL Syntax.
         /// </param>
-        protected PagedMSRepositoryBase(IDatabaseUnitOfWork work, ILogger logger, ISqlSyntaxProvider sqlSyntax, int domainRootStructureID) 
+        protected PagedMSRepositoryBase(IDatabaseUnitOfWork work, ILogger logger, ISqlSyntaxProvider sqlSyntax, int storeId) 
             : base(work, logger, sqlSyntax)
         {
-            _domainRootStructureID = domainRootStructureID;
+            _storeId = storeId;
         }
 
         /// <summary>
@@ -77,9 +77,9 @@
             var sqlClause = new Sql();
             sqlClause.Select("*").From<TDto>(SqlSyntax);
 
-            if (_domainRootStructureID != UConstants.System.Root)
+            if (_storeId != UConstants.System.Root)
             {
-                sqlClause.Where<TDto>(x => x.DomainRootStructureID == _domainRootStructureID, SqlSyntax);
+                sqlClause.Where<TDto>(x => x.StoreId == _storeId, SqlSyntax);
             }
 
             var translator = new SqlTranslator<TEntity>(sqlClause, query);
@@ -116,9 +116,9 @@
             var sqlClause = new Sql();
             sqlClause.Select("*").From<TDto>(SqlSyntax);
 
-            if (_domainRootStructureID != UConstants.System.Root)
+            if (_storeId != UConstants.System.Root)
             {
-                sqlClause.Where<TDto>(x => x.DomainRootStructureID == _domainRootStructureID, SqlSyntax);
+                sqlClause.Where<TDto>(x => x.StoreId == _storeId, SqlSyntax);
             }
 
             var translator = new SqlTranslator<TEntity>(sqlClause, query);

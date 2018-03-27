@@ -51,7 +51,7 @@
         /// <param name="sqlSyntax">
         /// The SQL Syntax.
         /// </param>
-        /// <param name="domainRootStructureID">
+        /// <param name="storeId">
         /// The domain root structure ID.
         /// </param>
         public CustomerRepository(
@@ -60,8 +60,8 @@
             INoteRepository noteRepository,
             ILogger logger, 
             ISqlSyntaxProvider sqlSyntax,
-            int domainRootStructureID) 
-            : base(work, logger, sqlSyntax, domainRootStructureID)
+            int storeId) 
+            : base(work, logger, sqlSyntax, storeId)
         {
             Mandate.ParameterNotNull(customerAddressRepository, "customerAddressRepository");
             Mandate.ParameterNotNull(noteRepository, "noteRepository");
@@ -397,7 +397,7 @@
                .Append("WHERE [merchCustomer2EntityCollection].[entityCollectionKey] = @eckey", new { @eckey = collectionKey })
                .Append(")");
 
-            sql.Append("AND [merchCustomer].[domainRootStructureID] = @DomainRootStructureID", new { @DomainRootStructureID = _domainRootStructureID });
+            sql.Append("AND [merchCustomer].[storeId] = @storeId", new { storeId = _storeId });
 
             return GetPagedKeys(page, itemsPerPage, sql, orderExpression, sortDirection);
         }
@@ -439,7 +439,7 @@
                .Append("WHERE [merchCustomer2EntityCollection].[entityCollectionKey] IN (@eckeys)", new { @eckeys = collectionKeys })
                .Append(")");
 
-            sql.Append("AND [merchCustomer].[domainRootStructureID] = @DomainRootStructureID", new { @DomainRootStructureID = _domainRootStructureID });
+            sql.Append("AND [merchCustomer].[storeId] = @storeId", new { storeId = _storeId });
 
             return GetPagedKeys(page, itemsPerPage, sql, orderExpression, sortDirection);
         }
@@ -832,9 +832,9 @@
                 .InnerJoin<CustomerIndexDto>(SqlSyntax)
                 .On<CustomerDto, CustomerIndexDto>(SqlSyntax, left => left.Key, right => right.CustomerKey);
 
-            if (_domainRootStructureID != Constants.System.Root)
+            if (_storeId != Constants.System.Root)
             {
-                sql.Where<CustomerDto>(x => x.DomainRootStructureID == _domainRootStructureID, SqlSyntax);
+                sql.Where<CustomerDto>(x => x.StoreId == _storeId, SqlSyntax);
             }
 
             return sql;
@@ -969,9 +969,9 @@
 
             var sql = new Sql();
             sql.Select("*").From<CustomerDto>(SqlSyntax);
-            if (_domainRootStructureID != Constants.System.Root)
+            if (_storeId != Constants.System.Root)
             {
-                sql.Where<CustomerDto>(x => x.DomainRootStructureID == _domainRootStructureID, SqlSyntax);
+                sql.Where<CustomerDto>(x => x.StoreId == _storeId, SqlSyntax);
             }
 
             if (terms.Any())

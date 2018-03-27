@@ -1,5 +1,6 @@
 ﻿namespace Merchello.Core.Models.Rdbms
 {
+    using Merchello.Core.Models.EntityBase;
     using System;
     using Umbraco.Core.Persistence;
     using Umbraco.Core.Persistence.DatabaseAnnotations;
@@ -10,7 +11,7 @@
     [TableName("merchAnonymousCustomer")]
     [PrimaryKey("pk", autoIncrement = false)]
     [ExplicitColumns]
-    internal class AnonymousCustomerDto
+    internal class AnonymousCustomerDto : IHasDomainRoot
     {
         /// <summary>
         /// Gets or sets the key.
@@ -23,9 +24,9 @@
         /// <summary>
         /// Gets or sets domain root structure ID
         /// </summary>
-        [Column("domainRootStructureID")]
+        [Column("storeId")]
         [Constraint(Default = "-1")]
-        public int DomainRootStructureID { get; set; }
+        public int StoreId { get; set; }
 
         /// <summary>
         /// Gets or sets the last activity date.

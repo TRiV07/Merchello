@@ -26,7 +26,7 @@
         /// <summary>
         /// The domain root structure ID.
         /// </summary>
-        private readonly int _domainRootStructureID;
+        private readonly int _storeId;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AnonymousCustomerRepository"/> class.
@@ -40,10 +40,10 @@
         /// <param name="sqlSyntax">
         /// The SQL Syntax.
         /// </param>
-        /// <param name="domainRootStructureID">
+        /// <param name="storeId">
         /// The domain root structure ID.
         /// </param>
-        public AnonymousCustomerRepository(IDatabaseUnitOfWork work, ILogger logger, ISqlSyntaxProvider sqlSyntax, int domainRootStructureID)
+        public AnonymousCustomerRepository(IDatabaseUnitOfWork work, ILogger logger, ISqlSyntaxProvider sqlSyntax, int storeId)
             : base(work, logger, sqlSyntax)
         {
         }
@@ -127,9 +127,9 @@
             sql.Select(isCount ? "COUNT(*)" : "*")
                .From<AnonymousCustomerDto>(SqlSyntax);
 
-            if (_domainRootStructureID != Constants.System.Root)
+            if (_storeId != Constants.System.Root)
             {
-                sql.Where<AnonymousCustomerDto>(x => x.DomainRootStructureID == _domainRootStructureID, SqlSyntax);
+                sql.Where<AnonymousCustomerDto>(x => x.StoreId == _storeId, SqlSyntax);
             }
 
             return sql;

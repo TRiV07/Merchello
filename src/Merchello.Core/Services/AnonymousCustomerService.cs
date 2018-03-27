@@ -162,9 +162,9 @@
         /// <returns>
         /// The <see cref="IAnonymousCustomer"/>.
         /// </returns>
-        public IAnonymousCustomer CreateAnonymousCustomerWithKey(int domainRootStructureID)
+        public IAnonymousCustomer CreateAnonymousCustomerWithKey(int storeId)
         {
-            var anonymous = new AnonymousCustomer(domainRootStructureID);
+            var anonymous = new AnonymousCustomer(storeId);
 
             if (Creating.IsRaisedEventCancelled(new Events.NewEventArgs<IAnonymousCustomer>(anonymous), this))
             {
@@ -175,7 +175,7 @@
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreateAnonymousCustomerRepository(uow, domainRootStructureID))
+                using (var repository = RepositoryFactory.CreateAnonymousCustomerRepository(uow, storeId))
                 {
                     repository.AddOrUpdate(anonymous);
                     uow.Commit();
@@ -283,9 +283,9 @@
         /// <remarks>
         /// For maintenance routines
         /// </remarks>
-        public IEnumerable<IAnonymousCustomer> GetAnonymousCustomersCreatedBefore(DateTime createdDate, int domainRootStructureID)
+        public IEnumerable<IAnonymousCustomer> GetAnonymousCustomersCreatedBefore(DateTime createdDate, int storeId)
         {
-            using (var repository = RepositoryFactory.CreateAnonymousCustomerRepository(UowProvider.GetUnitOfWork(), domainRootStructureID))
+            using (var repository = RepositoryFactory.CreateAnonymousCustomerRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 var query = Query<IAnonymousCustomer>.Builder.Where(x => x.CreateDate <= createdDate);
 

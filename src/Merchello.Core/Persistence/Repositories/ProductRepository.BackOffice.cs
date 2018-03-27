@@ -17,7 +17,7 @@
         {
             var sql = new Sql().Select("*")
                 .From<ProductDto>(SqlSyntax)
-                .Where<ProductDto>(x => x.DomainRootStructureID == _domainRootStructureID, SqlSyntax)
+                .Where<ProductDto>(x => x.StoreId == _storeId, SqlSyntax)
                 .OrderByDescending<ProductDto>(x => x.UpdateDate, SqlSyntax);
 
             var results = Database.Page<ProductDto>(page, itemsPerPage, sql);

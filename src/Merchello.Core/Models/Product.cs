@@ -20,7 +20,7 @@
         /// <summary>
         /// The domain root structure ID.
         /// </summary>
-        private int _domainRootStructureID;
+        private int _storeId;
 
         /// <summary>
         /// The property selectors.
@@ -52,10 +52,10 @@
             : this(variant, new ProductOptionCollection(), new ProductVariantCollection())
         {
         }
-        public Product(IProductVariant variant, int domainRootStructureID)
+        public Product(IProductVariant variant, int storeId)
             : this(variant)
         {
-            DomainRootStructureID = domainRootStructureID;
+            StoreId = storeId;
         }
 
         /// <summary>
@@ -88,16 +88,16 @@
 
         /// <inheritdoc/>
         [DataMember]
-        public int DomainRootStructureID
+        public int StoreId
         {
             get
             {
-                return _domainRootStructureID;
+                return _storeId;
             }
 
             set
             {
-                SetPropertyValueAndDetectChanges(value, ref _domainRootStructureID, _ps.Value.DomainRootStructureIDSelector);
+                SetPropertyValueAndDetectChanges(value, ref _storeId, _ps.Value.StoreIdSelector);
             }
         }
 
@@ -571,7 +571,7 @@
             /// <summary>
             /// The domain root structure ID selector.
             /// </summary>
-            public readonly PropertyInfo DomainRootStructureIDSelector = ExpressionHelper.GetPropertyInfo<Product, int>(x => x.DomainRootStructureID);
+            public readonly PropertyInfo StoreIdSelector = ExpressionHelper.GetPropertyInfo<Product, int>(x => x.StoreId);
         }
     }
 }

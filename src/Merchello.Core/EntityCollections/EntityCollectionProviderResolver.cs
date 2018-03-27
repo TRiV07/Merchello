@@ -392,11 +392,11 @@
         /// <returns>
         /// The <see cref="bool"/>.
         /// </returns>
-        private bool EnusureUniqueProvider(Guid providerKey, int domainRootStructureID)
+        private bool EnusureUniqueProvider(Guid providerKey, int storeId)
         {
             //if (_entityCollectionProviderCache.Any(x => x.Value.GetCustomAttribute<EntityCollectionProviderAttribute>(false).Key == providerKey)) return false;
            
-            return _merchelloContext.Services.EntityCollectionService.CollectionCountManagedByProvider(providerKey, domainRootStructureID) <= 1;
+            return _merchelloContext.Services.EntityCollectionService.CollectionCountManagedByProvider(providerKey, storeId) <= 1;
         }
 
         /// <summary>

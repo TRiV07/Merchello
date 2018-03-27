@@ -37,7 +37,7 @@
         /// <summary>
         /// The domain root structure ID.
         /// </summary>
-        private readonly int _domainRootStructureID;
+        private readonly int _storeId;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProductVariantRepository"/> class.
@@ -54,13 +54,13 @@
         /// <param name="productOptionRepository">
         /// The <see cref="IProductOptionRepository"/>.
         /// </param>
-        public ProductVariantRepository(IDatabaseUnitOfWork work, ILogger logger, ISqlSyntaxProvider sqlSyntax, IProductOptionRepository productOptionRepository, int domainRootStructureID)
+        public ProductVariantRepository(IDatabaseUnitOfWork work, ILogger logger, ISqlSyntaxProvider sqlSyntax, IProductOptionRepository productOptionRepository, int storeId)
             : base(work, logger, sqlSyntax, () => new ProductVariantFactory())
         {
             Mandate.ParameterNotNull(productOptionRepository, "productOptionRepository");
 
             _productOptionRepository = productOptionRepository;
-            _domainRootStructureID = domainRootStructureID;
+            _storeId = storeId;
         }
 
         /// <summary>
@@ -1206,9 +1206,9 @@
                 .InnerJoin<ProductVariantIndexDto>(SqlSyntax)
                 .On<ProductVariantDto, ProductVariantIndexDto>(SqlSyntax, left => left.Key, right => right.ProductVariantKey);
 
-            if (_domainRootStructureID != Constants.System.Root)
+            if (_storeId != Constants.System.Root)
             {
-                sql.Where<ProductDto>(x => x.DomainRootStructureID == _domainRootStructureID, SqlSyntax);
+                sql.Where<ProductDto>(x => x.StoreId == _storeId, SqlSyntax);
             }
 
             return sql;
@@ -1518,8 +1518,8 @@
                 INNER JOIN [merchProductVariantDetachedContent] ON [merchProductVariant].[pk] = [merchProductVariantDetachedContent].[productVariantKey]
                 WHERE [merchProductVariantDetachedContent].[slug] = @Slug
                 AND [merchProductVariantDetachedContent].[productVariantKey] != @Pvk
-                AND [merchProduct].[domainRootStructureID] = @DomainRootStructureID",
-                new { @Slug = modSlug, @Pvk = detachedContent.ProductVariantKey, @DomainRootStructureID = _domainRootStructureID });
+                AND [merchProduct].[storeId] = @StoreId",
+                new { @Slug = modSlug, @Pvk = detachedContent.ProductVariantKey, @StoreId = _storeId });
             if (count > 0) modSlug = EnsureSlug(detachedContent, slug, interval + 1);
             return modSlug;
         }

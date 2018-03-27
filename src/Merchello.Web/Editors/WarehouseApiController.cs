@@ -70,9 +70,9 @@
         /// <returns>
         /// The <see cref="WarehouseDisplay"/>.
         /// </returns>
-        public WarehouseDisplay GetDefaultWarehouse(int domainRootStructureID)
+        public WarehouseDisplay GetDefaultWarehouse(int storeId)
         {
-            IWarehouse warehouse = _warehouseService.GetDefaultWarehouse(domainRootStructureID);
+            IWarehouse warehouse = _warehouseService.GetDefaultWarehouse(storeId);
 
             if (warehouse == null)
             {

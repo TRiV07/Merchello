@@ -1,5 +1,6 @@
 ﻿namespace Merchello.Core.Models.Rdbms
 {
+    using Merchello.Core.Models.EntityBase;
     using System;
 
     using Umbraco.Core.Persistence;
@@ -11,21 +12,21 @@
     [TableName("merchStoreSetting")]
     [PrimaryKey("pk", autoIncrement = false)]
     [ExplicitColumns]
-    internal class StoreSettingDto
+    internal class StoreSettingDto : IHasDomainRoot
     {
         /// <summary>
         /// Gets or sets the key.
         /// </summary>
         [Column("pk")]
-        [PrimaryKeyColumn(AutoIncrement = false, Clustered = true, Name = "PK_merchStoreSetting", OnColumns = "pk, domainRootStructureID")]
+        [PrimaryKeyColumn(AutoIncrement = false, Clustered = true, Name = "PK_merchStoreSetting", OnColumns = "pk, storeId")]
         public Guid Key { get; set; }
 
         /// <summary>
         /// Gets or sets domain root structure ID
         /// </summary>
-        [Column("domainRootStructureID")]
+        [Column("storeId")]
         [Constraint(Default = "-1")]
-        public int DomainRootStructureID { get; set; }
+        public int StoreId { get; set; }
 
         /// <summary>
         /// Gets or sets the name.

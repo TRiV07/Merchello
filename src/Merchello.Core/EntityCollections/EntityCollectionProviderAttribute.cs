@@ -148,6 +148,6 @@
         /// </summary>
         public string EditorView { get; private set; }
 
-        public int DomainRootStructureID { get; set; }
+        public int StoreId { get; set; }
     }
 }

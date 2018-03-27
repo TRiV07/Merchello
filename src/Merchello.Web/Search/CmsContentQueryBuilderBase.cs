@@ -43,7 +43,7 @@
         /// </summary>
         public long ItemsPerPage { get; set; }
 
-        public int DomainRootStructureID { get; set; }
+        public int StoreId { get; set; }
 
         /// <summary>
         /// Gets or sets the search term.

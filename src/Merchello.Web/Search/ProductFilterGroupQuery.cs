@@ -101,14 +101,14 @@
         /// <returns>
         /// The <see cref="IEnumerable{IProductFilterGroup}"/>.
         /// </returns>
-        public IEnumerable<IProductFilterGroup> GetAll(int domainRootStructureID, params Guid[] keys)
+        public IEnumerable<IProductFilterGroup> GetAll(int storeId, params Guid[] keys)
         {
-            var cacheKey = this.GetCacheKey("GetAll", domainRootStructureID, keys);
+            var cacheKey = this.GetCacheKey("GetAll", storeId, keys);
 
             var filterGroups = (IEnumerable<IProductFilterGroup>)this.Cache.GetCacheItem(cacheKey);
             if (filterGroups != null) return filterGroups;
 
-            var collections = ((EntityCollectionService)this.Service).GetEntityFilterGroupsByProviderKeys(this._filterProviderKeys, domainRootStructureID);
+            var collections = ((EntityCollectionService)this.Service).GetEntityFilterGroupsByProviderKeys(this._filterProviderKeys, storeId);
 
             return Map(keys.Any() ? 
                             collections.Where(x => keys.Any(y => y == x.Key)) : 
@@ -168,9 +168,9 @@
         }
 
         /// <inheritdoc/>
-        public IEnumerable<IPrimedProductFilterGroup> GetFilterGroupsForCollectionContext(int domainRootStructureID, params Guid[] collectionKeys)
+        public IEnumerable<IPrimedProductFilterGroup> GetFilterGroupsForCollectionContext(int storeId, params Guid[] collectionKeys)
         {
-            var tree = _primedTree.GetTree(domainRootStructureID);
+            var tree = _primedTree.GetTree(storeId);
 
             return tree.Children.Select(x => x.Value.Item);
         }
@@ -220,9 +220,9 @@
         /// <returns>
         /// The <see cref="IEnumerable{IProductFilterGroup}"/>.
         /// </returns>
-        private IEnumerable<IProductFilterGroup> All(int domainRootStructureID)
+        private IEnumerable<IProductFilterGroup> All(int storeId)
         {
-            return GetAll(domainRootStructureID);
+            return GetAll(storeId);
         }
 
         /// <summary>

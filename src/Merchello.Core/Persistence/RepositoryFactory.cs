@@ -194,9 +194,9 @@
         /// <returns>
         /// The <see cref="ICustomerRepository"/>.
         /// </returns>
-        internal virtual ICustomerRepository CreateCustomerRepository(IDatabaseUnitOfWork uow, int domainRootStructureID)
+        internal virtual ICustomerRepository CreateCustomerRepository(IDatabaseUnitOfWork uow, int storeId)
         {
-            return new CustomerRepository(uow, CreateCustomerAddressRepository(uow), CreateNoteRepository(uow), _logger, _sqlSyntax, domainRootStructureID);
+            return new CustomerRepository(uow, CreateCustomerAddressRepository(uow), CreateNoteRepository(uow), _logger, _sqlSyntax, storeId);
         }
 
         /// <summary>
@@ -208,9 +208,9 @@
         /// <returns>
         /// The <see cref="IAnonymousCustomerRepository"/>.
         /// </returns>
-        internal virtual IAnonymousCustomerRepository CreateAnonymousCustomerRepository(IDatabaseUnitOfWork uow, int domainRootStructureID)
+        internal virtual IAnonymousCustomerRepository CreateAnonymousCustomerRepository(IDatabaseUnitOfWork uow, int storeId)
         {
-            return new AnonymousCustomerRepository(uow, _logger, _sqlSyntax, domainRootStructureID);                
+            return new AnonymousCustomerRepository(uow, _logger, _sqlSyntax, storeId);                
         }
 
         /// <summary>
@@ -264,9 +264,9 @@
         /// <returns>
         /// The <see cref="IEntityCollectionRepository"/>.
         /// </returns>
-        internal virtual IEntityCollectionRepository CreateEntityCollectionRepository(IDatabaseUnitOfWork uow, int domainRootStructureID)
+        internal virtual IEntityCollectionRepository CreateEntityCollectionRepository(IDatabaseUnitOfWork uow, int storeId)
         {
-            return new EntityCollectionRepository(uow, _logger, _sqlSyntax, domainRootStructureID);
+            return new EntityCollectionRepository(uow, _logger, _sqlSyntax, storeId);
         }
 
         /// <summary>
@@ -487,18 +487,18 @@
         /// <param name="uow">
         /// The database unit of work
         /// </param>
-        /// <param name="domainRootStructureID">
+        /// <param name="storeId">
         /// The domain root structure ID
         /// </param>
         /// <returns>
         /// The <see cref="IProductRepository"/>.
         /// </returns>
-        internal virtual IProductRepository CreateProductRepository(IDatabaseUnitOfWork uow, int domainRootStructureID)
+        internal virtual IProductRepository CreateProductRepository(IDatabaseUnitOfWork uow, int storeId)
         {
             return new ProductRepository(uow, _logger, _sqlSyntax,
-                CreateProductVariantRepository(uow, domainRootStructureID),
+                CreateProductVariantRepository(uow, storeId),
                 CreateProductOptionRepository(uow),
-                domainRootStructureID);
+                storeId);
         }
 
         /// <summary>
@@ -524,11 +524,11 @@
         /// <returns>
         /// The <see cref="IProductVariantRepository"/>.
         /// </returns>
-        internal virtual IProductVariantRepository CreateProductVariantRepository(IDatabaseUnitOfWork uow, int domainRootStructureID)
+        internal virtual IProductVariantRepository CreateProductVariantRepository(IDatabaseUnitOfWork uow, int storeId)
         {
             return new ProductVariantRepository(uow, _logger, _sqlSyntax,
                 CreateProductOptionRepository(uow),
-                domainRootStructureID);
+                storeId);
         }
 
         /// <summary>
@@ -642,9 +642,9 @@
         /// <returns>
         /// The <see cref="IWarehouseRepository"/>.
         /// </returns>
-        internal virtual IWarehouseRepository CreateWarehouseRepository(IDatabaseUnitOfWork uow, int domainRootStructureID)
+        internal virtual IWarehouseRepository CreateWarehouseRepository(IDatabaseUnitOfWork uow, int storeId)
         {
-            return new WarehouseRepository(uow, this.CreateWarehouseCatalogRepository(uow), _logger, _sqlSyntax, domainRootStructureID);
+            return new WarehouseRepository(uow, this.CreateWarehouseCatalogRepository(uow), _logger, _sqlSyntax, storeId);
         }
 
         /// <summary>

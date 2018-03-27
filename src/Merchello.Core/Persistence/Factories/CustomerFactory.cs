@@ -41,7 +41,7 @@
         /// </returns>
         public ICustomer BuildEntity(CustomerDto dto, IEnumerable<ICustomerAddress> addresses, IEnumerable<INote> notes)
         {
-            var customer = new Customer(dto.LoginName, dto.DomainRootStructureID)
+            var customer = new Customer(dto.LoginName, dto.StoreId)
             {
                 Key = dto.Key,
                 FirstName = dto.FirstName,
@@ -75,7 +75,7 @@
             var dto = new CustomerDto()
                 {
                     Key = entity.Key,
-                    DomainRootStructureID = entity.DomainRootStructureID,
+                    StoreId = entity.StoreId,
                     LoginName = entity.LoginName,
                     FirstName = entity.FirstName,
                     LastName = entity.LastName,

@@ -7,8 +7,8 @@
 
     internal interface IVirtualProductContentCache : IVirtualContentCache<IProductContent, IProduct>
     {
-        IProductContent GetBySlug(string slug, int domainRootStructureID, Func<string, int, IProductContent> get);
+        IProductContent GetBySlug(string slug, int storeId, Func<string, int, IProductContent> get);
 
-        IProductContent GetBySku(string sku, int domainRootStructureID, Func<string, int, IProductContent> get);
+        IProductContent GetBySku(string sku, int storeId, Func<string, int, IProductContent> get);
     }
 }

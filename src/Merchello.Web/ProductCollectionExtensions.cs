@@ -183,9 +183,9 @@ namespace Merchello.Web
         /// <returns>
         /// The <see cref="IEnumerable{IProductContent}"/>.
         /// </returns>
-        public static IEnumerable<IProductContent> GetProducts(this IProductCollection value, int domainRootStructureID, bool enableDataModifiers = true)
+        public static IEnumerable<IProductContent> GetProducts(this IProductCollection value, int storeId, bool enableDataModifiers = true)
         {
-            return value.GetProducts(1, long.MaxValue, domainRootStructureID, enableDataModifiers: enableDataModifiers);
+            return value.GetProducts(1, long.MaxValue, storeId, enableDataModifiers: enableDataModifiers);
         }
 
         /// <summary>
@@ -216,12 +216,12 @@ namespace Merchello.Web
             this IProductCollection value,
             long page,
             long itemsPerPage,
-            int domainRootStructureID,
+            int storeId,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Ascending,
             bool enableDataModifiers = true)
         {
-            return value.GetProductsPaged(page, itemsPerPage, domainRootStructureID, sortBy, sortDirection, enableDataModifiers).Items;
+            return value.GetProductsPaged(page, itemsPerPage, storeId, sortBy, sortDirection, enableDataModifiers).Items;
         }
 
         /// <summary>
@@ -252,13 +252,13 @@ namespace Merchello.Web
             this IProductCollection value,
             long page,
             long itemsPerPage,
-            int domainRootStructureID,
+            int storeId,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Ascending,
             bool enableDataModifiers = true)
         {
             var merchelloHelper = new MerchelloHelper(enableDataModifiers);
-            return value.GetProducts(merchelloHelper, page, itemsPerPage, domainRootStructureID, sortBy, sortDirection);
+            return value.GetProducts(merchelloHelper, page, itemsPerPage, storeId, sortBy, sortDirection);
         }
 
 
@@ -306,7 +306,7 @@ namespace Merchello.Web
             MerchelloHelper merchelloHelper,
             long page,
             long itemsPerPage,
-            int domainRootStructureID,
+            int storeId,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Ascending)
         {
@@ -330,7 +330,7 @@ namespace Merchello.Web
                     .Page(page)
                     .ConstrainBy(value)
                     .ItemsPerPage(itemsPerPage)
-                    .DomainRootStructureID(domainRootStructureID)
+                    .StoreId(storeId)
                     .OrderBy(order, sortDirection)
                     .Execute();
         }

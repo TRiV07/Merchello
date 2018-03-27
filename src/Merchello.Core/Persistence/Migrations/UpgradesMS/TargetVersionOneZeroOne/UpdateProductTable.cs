@@ -30,12 +30,7 @@ namespace Merchello.Core.Persistence.Migrations.UpgradesMS.TargetVersionOneZeroO
         {
             if (_databaseSchemaHelper.TableExist("merchProduct"))
             {
-                Alter.Table("merchProduct").AddColumn("domainRootStructureID").AsInt32().NotNullable().WithDefaultValue(-1);
-
-                //Delete.PrimaryKey("PK_merchProduct").FromTable("merchProduct");
-
-                //Create.PrimaryKey("PK_merchProduct").OnTable("merchProduct")
-                //    .Columns(new string[] { "pk", "domainRootStructureID" });
+                Alter.Table("merchProduct").AddColumn("storeId").AsInt32().NotNullable().WithDefaultValue(-1);
             }
         }
 
@@ -43,12 +38,7 @@ namespace Merchello.Core.Persistence.Migrations.UpgradesMS.TargetVersionOneZeroO
         {
             if (_databaseSchemaHelper.TableExist("merchProduct"))
             {
-                //Delete.PrimaryKey("PK_merchProduct").FromTable("merchProduct");
-
-                //Create.PrimaryKey("PK_merchProduct").OnTable("merchProduct")
-                //    .Column("pk");
-
-                Delete.Column("domainRootStructureID").FromTable("merchProduct");
+                Delete.Column("storeId").FromTable("merchProduct");
             }
         }
     }

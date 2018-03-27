@@ -49,11 +49,11 @@
         /// <param name="validate">Function to execute to validate the next number</param>
         /// <param name="invoicesCount">The number of invoices needing invoice numbers.  Useful when saving multiple new invoices.</param>
         /// <returns>The next invoice number</returns>
-        public int GetNextInvoiceNumber(Guid storeSettingKey, int domainRootStructureID, Func<int> validate, int invoicesCount = 1)
+        public int GetNextInvoiceNumber(Guid storeSettingKey, int storeId, Func<int> validate, int invoicesCount = 1)
         {
             Mandate.ParameterCondition(1 <= invoicesCount, "invoicesCount");
 
-            var setting = Get(storeSettingKey, domainRootStructureID);
+            var setting = Get(storeSettingKey, storeId);
             if (string.IsNullOrEmpty(setting.Value)) setting.Value = "1";
             var nextInvoiceNumber = int.Parse(setting.Value);
             var max = validate();
@@ -75,11 +75,11 @@
         /// <param name="validate">Function to execute to validate the next number</param>
         /// <param name="ordersCount">The number of orders needing invoice orders.  Useful when saving multiple new orders.</param>
         /// <returns>The next order number</returns>
-        public int GetNextOrderNumber(Guid storeSettingKey, int domainRootStructureID, Func<int> validate, int ordersCount = 1)
+        public int GetNextOrderNumber(Guid storeSettingKey, int storeId, Func<int> validate, int ordersCount = 1)
         {
             Mandate.ParameterCondition(1 >= ordersCount, "ordersCount");
 
-            var setting = Get(storeSettingKey, domainRootStructureID);
+            var setting = Get(storeSettingKey, storeId);
             if (string.IsNullOrEmpty(setting.Value)) setting.Value = "1";
             var max = validate();
             if (max == 0) max++;
@@ -101,11 +101,11 @@
         /// <param name="validate">Function to execute to validate the next number</param>
         /// <param name="shipmentsCount">The number of shipments needing invoice orders.  Useful when saving multiple new shipments.</param>
         /// <returns>The next shipment number</returns>
-        public int GetNextShipmentNumber(Guid storeSettingKey, int domainRootStructureID, Func<int> validate, int shipmentsCount = 1)
+        public int GetNextShipmentNumber(Guid storeSettingKey, int storeId, Func<int> validate, int shipmentsCount = 1)
         {
             Mandate.ParameterCondition(1 >= shipmentsCount, "shipmentsCount");
 
-            var setting = Get(storeSettingKey, domainRootStructureID);
+            var setting = Get(storeSettingKey, storeId);
             if (string.IsNullOrEmpty(setting.Value)) setting.Value = "1";
             var max = validate();
             if (max == 0) max++;
@@ -132,10 +132,10 @@
             return dtos.Select(dto => new TypeField(dto.Alias, dto.Name, dto.Key));
         }
 
-        protected override IStoreSetting PerformGet(Guid key, int domainRootStructureID)
+        protected override IStoreSetting PerformGet(Guid key, int storeId)
         {
             var sql = GetBaseQuery(false)
-               .Where(GetBaseMSWhereClause(), new { Key = key, domainRootStructureID });
+               .Where(GetBaseMSWhereClause(), new { Key = key, storeId });
 
             var dto = Database.Fetch<StoreSettingDto>(sql).FirstOrDefault();
 
@@ -149,7 +149,7 @@
             return setting;
         }
 
-        protected override IEnumerable<IStoreSetting> PerformGetAll(int domainRootStructureID, params Guid[] keys)
+        protected override IEnumerable<IStoreSetting> PerformGetAll(int storeId, params Guid[] keys)
         {
             var dtos = new List<StoreSettingDto>();
 
@@ -162,14 +162,14 @@
                 foreach (var keyList in keyLists)
                 {
                     dtos.AddRange(Database.Fetch<StoreSettingDto>(GetBaseQuery(false)
-                        .Where("domainRootStructureID = @domainRootStructureID", new { domainRootStructureID })
+                        .Where("storeId = @StoreId", new { StoreId = storeId })
                         .WhereIn<StoreSettingDto>(x => x.Key, keyList, SqlSyntax)));
                 }
             }
             else
             {
                 dtos = Database.Fetch<StoreSettingDto>(GetBaseQuery(false)
-                    .Where("domainRootStructureID = @domainRootStructureID", new { domainRootStructureID }));
+                    .Where("storeId = @StoreId", new { StoreId = storeId }));
             }
 
             var factory = new StoreSettingFactory();
@@ -293,7 +293,7 @@
 
         protected override string GetBaseMSWhereClause()
         {
-            return "merchStoreSetting.pk = @Key AND domainRootStructureID = @domainRootStructureID";
+            return "merchStoreSetting.pk = @Key AND storeId = @StoreId";
         }
 
         /// <summary>
@@ -306,7 +306,7 @@
         {
             var list = new List<string>
             {
-                "DELETE FROM merchStoreSetting WHERE pk = @Key AND domainRootStructureID = @DomainRootStructureID"
+                "DELETE FROM merchStoreSetting WHERE pk = @Key AND storeId = @StoreId"
             };
 
             return list;
@@ -345,32 +345,16 @@
 
             var factory = new StoreSettingFactory();
             var dto = factory.BuildDto(entity);
-
-            //Database.Update(dto);
-            Database.Delete<StoreSettingDto>("WHERE pk = @Key AND domainRootStructureID = @DomainRootStructureID", new { dto.Key, dto.DomainRootStructureID });
+            
+            Database.Delete<StoreSettingDto>("WHERE pk = @Key AND storeId = @StoreId", new { dto.Key, dto.StoreId });
             Database.Insert(dto);
-
-            //We need to do a special InsertOrUpdate here because we know that the PreviewXmlDto table has a composite key and thus
-            // a unique constraint which can be violated if 2+ threads try to execute the same insert sql at the same time.
-            //Database.Update(
-            //    //Since the table has a composite key, we need to specify an explit update statement
-            //    "SET name = @Name, value = @Value, typeName = @TypeName, updateDate = @UpdateDate WHERE pk=@Key AND domainRootStructureID=@DomainRootStructureID",
-            //    new
-            //    {
-            //        dto.Name,
-            //        dto.Value,
-            //        dto.TypeName,
-            //        dto.UpdateDate,
-            //        dto.Key,
-            //        dto.DomainRootStructureID
-            //    });
 
             entity.ResetDirtyProperties();
         }
 
         protected override void PersistDeletedItem(IStoreSetting entity)
         {
-            Database.Delete<StoreSettingDto>("WHERE pk = @Key AND domainRootStructureID = @DomainRootStructureID", new { entity.Key, entity.DomainRootStructureID });
+            Database.Delete<StoreSettingDto>("WHERE pk = @Key AND storeId = @StoreId", new { entity.Key, entity.StoreId });
             entity.ResetDirtyProperties();
         }
     }

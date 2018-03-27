@@ -126,7 +126,7 @@
         {
             if (!this.ValidateSku()) return Attempt<IProduct>.Fail(new InvalidSkuException("A product or product variant already exists with the sku: " + _sku + ". SKUs must be unique."));
 
-            var clone = _merchelloContext.Services.ProductService.CreateProduct(_name, _sku, _original.Price, _original.DomainRootStructureID, false);
+            var clone = _merchelloContext.Services.ProductService.CreateProduct(_name, _sku, _original.Price, _original.StoreId, false);
             clone.Barcode = _original.Barcode;
             clone.Available = false;
             clone.CostOfGoods = _original.CostOfGoods;
@@ -165,7 +165,7 @@
         /// </returns>
         private bool ValidateSku()
         {
-            return !_merchelloContext.Services.ProductService.SkuExists(_sku, _original.DomainRootStructureID);
+            return !_merchelloContext.Services.ProductService.SkuExists(_sku, _original.StoreId);
         }
     }
 }

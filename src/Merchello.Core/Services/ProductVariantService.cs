@@ -201,7 +201,7 @@
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreateProductVariantRepository(uow, product.DomainRootStructureID))
+                using (var repository = RepositoryFactory.CreateProductVariantRepository(uow, product.StoreId))
                 {
                     repository.AddOrUpdate(productVariant);
                     uow.Commit();
@@ -352,11 +352,11 @@
         /// </summary>
         /// <param name="productVariant"></param>
         /// <returns></returns>
-        public int GetDomainRootStructureId(IProductVariant productVariant)
+        public int GetStoreId(IProductVariant productVariant)
         {
             using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork(), Constants.System.Root))
             {
-                return repository.Get(productVariant.ProductKey)?.DomainRootStructureID ?? 0;
+                return repository.Get(productVariant.ProductKey)?.StoreId ?? 0;
             }
         }
 
@@ -369,9 +369,9 @@
         /// <returns>
         /// The <see cref="IProductVariant"/>.
         /// </returns>
-        public IProductVariant GetBySku(string sku, int domainRootStructureID)
+        public IProductVariant GetBySku(string sku, int storeId)
         {
-            using (var repository = RepositoryFactory.CreateProductVariantRepository(UowProvider.GetUnitOfWork(), domainRootStructureID))
+            using (var repository = RepositoryFactory.CreateProductVariantRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 return repository.GetBySku(sku);
 
@@ -423,9 +423,9 @@
         /// </summary>
         /// <param name="sku">The SKU to be tested</param>
         /// <returns>A value indicating whether or not the SKU exists</returns>
-        public bool SkuExists(string sku, int domainRootStructureID)
+        public bool SkuExists(string sku, int storeId)
         {
-            using (var repository = RepositoryFactory.CreateProductVariantRepository(UowProvider.GetUnitOfWork(), domainRootStructureID))
+            using (var repository = RepositoryFactory.CreateProductVariantRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 return repository.SkuExists(sku);
             }
@@ -571,7 +571,7 @@
         /// </returns>
         private IProductVariant GetProductVariantWithAttributes(IProduct product, List<IProductVariant> variants, Guid[] attributeKeys)
         {
-            using (var repository = RepositoryFactory.CreateProductVariantRepository(UowProvider.GetUnitOfWork(), product.DomainRootStructureID))
+            using (var repository = RepositoryFactory.CreateProductVariantRepository(UowProvider.GetUnitOfWork(), product.StoreId))
             {
                 return repository.GetProductVariantWithAttributes(product, variants, attributeKeys);
             }
@@ -589,7 +589,7 @@
         /// <returns>True/false indicating whether or not a <see cref="IProductVariant"/> already exists with the <see cref="ProductAttributeCollection"/> passed</returns>
         private bool ProductVariantWithAttributesExists(IProduct product, List<IProductVariant> variants, ProductAttributeCollection attributes)
         {
-            using (var repository = RepositoryFactory.CreateProductVariantRepository(UowProvider.GetUnitOfWork(), product.DomainRootStructureID))
+            using (var repository = RepositoryFactory.CreateProductVariantRepository(UowProvider.GetUnitOfWork(), product.StoreId))
             {
                 return repository.ProductVariantWithAttributesExists(product, variants, attributes);
             }

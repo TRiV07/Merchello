@@ -81,9 +81,9 @@
         /// <returns>
         /// The <see cref="EntityCollectionProviderDisplay"/>.
         /// </returns>
-        public static EntityCollectionProviderDisplay ToEntityCollectionProviderDisplay(this EntityCollectionProviderAttribute att, int domainRootStructureID)
+        public static EntityCollectionProviderDisplay ToEntityCollectionProviderDisplay(this EntityCollectionProviderAttribute att, int storeId)
         {
-            att.DomainRootStructureID = domainRootStructureID;
+            att.StoreId = storeId;
             return AutoMapper.Mapper.Map<EntityCollectionProviderDisplay>(att);
         }
     }

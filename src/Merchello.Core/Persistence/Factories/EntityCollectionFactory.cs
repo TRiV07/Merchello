@@ -30,7 +30,7 @@
                 {
                     Key = dto.Key,
                     ParentKey = dto.ParentKey,
-                    DomainRootStructureID = dto.DomainRootStructureID,
+                    StoreId = dto.StoreId,
                     Name = dto.Name,
                     SortOrder = dto.SortOrder,
                     IsFilter = dto.IsFilter,
@@ -59,7 +59,7 @@
                 {
                     Key = entity.Key,
                     ParentKey = entity.ParentKey == Guid.Empty ? null : entity.ParentKey,
-                    DomainRootStructureID = entity.DomainRootStructureID,
+                    StoreId = entity.StoreId,
                     EntityTfKey = entity.EntityTfKey,
                     Name = entity.Name,
                     SortOrder = entity.SortOrder,

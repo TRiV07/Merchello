@@ -76,7 +76,7 @@
             string methodName,
             long page,
             long itemsPerPage,
-            int domainRootStructureID,
+            int storeId,
             string sortBy,
             SortDirection sortDirection,
             IDictionary<string, string> args = null);

@@ -162,7 +162,7 @@
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreateWarehouseRepository(uow, warehouse.DomainRootStructureID))
+                using (var repository = RepositoryFactory.CreateWarehouseRepository(uow, warehouse.StoreId))
                 {
                     repository.AddOrUpdate(warehouse);
                     uow.Commit();
@@ -204,9 +204,9 @@
         /// Gets the default <see cref="IWarehouse"/>
         /// </summary>
         /// <returns>The default <see cref="IWarehouse"/></returns>
-        public IWarehouse GetDefaultWarehouse(int domainRootStructureID)
+        public IWarehouse GetDefaultWarehouse(int storeId)
         {
-            using (var repository = RepositoryFactory.CreateWarehouseRepository(UowProvider.GetUnitOfWork(), domainRootStructureID))
+            using (var repository = RepositoryFactory.CreateWarehouseRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 var query = Query<IWarehouse>.Builder.Where(x => x.IsDefault);
                 return repository.GetByQuery(query).FirstOrDefault();

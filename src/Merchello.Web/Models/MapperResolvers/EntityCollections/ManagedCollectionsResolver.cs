@@ -39,7 +39,7 @@
         /// </returns>
         protected override IEnumerable<EntityCollectionDisplay> ResolveCore(EntityCollectionProviderAttribute source)
         {
-            return _entityCollectionService.GetByProviderKey(source.Key, source.DomainRootStructureID).Select(x => x.ToEntityCollectionDisplay());
+            return _entityCollectionService.GetByProviderKey(source.Key, source.StoreId).Select(x => x.ToEntityCollectionDisplay());
         }
     }
 }

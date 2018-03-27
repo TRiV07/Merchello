@@ -211,16 +211,17 @@
         /// <param name="sku">
         /// The SKU.
         /// </param>
+        /// <param name="storeId"></param>
         /// <returns>
         /// The <see cref="ProductVariantDisplay"/>.
         /// </returns>
-        private ProductVariantDisplay GetProductVariant(string sku, int domainRootStructureID)
+        private ProductVariantDisplay GetProductVariant(string sku, int storeId)
         {
-            var variant = _merchello.Query.Product.GetProductVariantBySku(sku, domainRootStructureID);
+            var variant = _merchello.Query.Product.GetProductVariantBySku(sku, storeId);
 
             if (variant != null) return variant;
 
-            var product = this._merchello.Query.Product.GetBySku(sku, domainRootStructureID);
+            var product = this._merchello.Query.Product.GetBySku(sku, storeId);
 
             return product != null ? product.AsMasterVariantDisplay() : null;
         }

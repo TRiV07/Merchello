@@ -83,11 +83,11 @@
         public Page<Guid> GetPagedEntityKeysNotInCollection(
             long page,
             long itemsPerPage,
-            int domainRootStructureID,
+            int storeId,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Ascending)
         {
-            return this.PerformGetPagedEntityKeysNotInCollection(page, itemsPerPage, domainRootStructureID, sortBy, sortDirection);
+            return this.PerformGetPagedEntityKeysNotInCollection(page, itemsPerPage, storeId, sortBy, sortDirection);
         }
 
         /// <summary>
@@ -115,11 +115,11 @@
             Dictionary<string, object> args,
             long page,
             long itemsPerPage,
-            int domainRootStructureID,
+            int storeId,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Ascending)
         {
-            return this.PerformGetPagedEntityKeysNotInCollection(args, page, itemsPerPage, domainRootStructureID, sortBy, sortDirection);
+            return this.PerformGetPagedEntityKeysNotInCollection(args, page, itemsPerPage, storeId, sortBy, sortDirection);
         }
 
         /// <summary>
@@ -171,7 +171,7 @@
         protected abstract Page<Guid> PerformGetPagedEntityKeysNotInCollection(
             long page,
             long itemsPerPage,
-            int domainRootStructureID,
+            int storeId,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Ascending);
 
@@ -200,7 +200,7 @@
             Dictionary<string, object> args,
             long page,
             long itemsPerPage,
-            int domainRootStructureID,
+            int storeId,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Ascending);
     }

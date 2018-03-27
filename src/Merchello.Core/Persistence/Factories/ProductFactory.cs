@@ -86,7 +86,7 @@
             var product = new Product(variant)
             {
                 Key = dto.Key,
-                DomainRootStructureID = dto.DomainRootStructureID,
+                StoreId = dto.StoreId,
                 ProductOptions = this._getProductOptionCollection.Invoke(dto.Key),
                 ProductVariants = this._getProductVariantCollection.Invoke(dto.Key),
                 UpdateDate = dto.UpdateDate,
@@ -112,7 +112,7 @@
             var dto = new ProductDto()
             {
                 Key = entity.Key,
-                DomainRootStructureID = entity.DomainRootStructureID,
+                StoreId = entity.StoreId,
                 UpdateDate = entity.UpdateDate,
                 CreateDate = entity.CreateDate,
                 ProductVariantDto = _productVariantFactory.BuildDto(((Product)entity).MasterVariant)

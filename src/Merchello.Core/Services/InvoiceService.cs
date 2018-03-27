@@ -2006,7 +2006,7 @@
         }
 
         //TODOMS
-        public Page<IInvoice> GetPage(long page, long itemsPerPage, int domainRootStructureID, string sortBy = "", SortDirection sortDirection = SortDirection.Descending)
+        public Page<IInvoice> GetPage(long page, long itemsPerPage, int storeId, string sortBy = "", SortDirection sortDirection = SortDirection.Descending)
         {
             return this.GetPage(page, itemsPerPage, sortBy, sortDirection);
         }

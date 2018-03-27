@@ -39,7 +39,7 @@
         /// <returns>
         /// The <see cref="QueryResultDisplay"/>.
         /// </returns>
-        QueryResultDisplay Search(long page, long itemsPerPage, int domainRootStructureID, string sortBy = "loginName", SortDirection sortDirection = SortDirection.Ascending);
+        QueryResultDisplay Search(long page, long itemsPerPage, int storeId, string sortBy = "loginName", SortDirection sortDirection = SortDirection.Ascending);
 
         /// <summary>
         /// Searches all customers by a term
@@ -62,7 +62,7 @@
         /// <returns>
         /// The <see cref="QueryResultDisplay"/>.
         /// </returns>
-        QueryResultDisplay Search(string term, long page, long itemsPerPage, int domainRootStructureID, string sortBy = "loginName", SortDirection sortDirection = SortDirection.Ascending);
+        QueryResultDisplay Search(string term, long page, long itemsPerPage, int storeId, string sortBy = "loginName", SortDirection sortDirection = SortDirection.Ascending);
 
         /// <summary>
         /// Searches customers that have customer dates within a specified date range
@@ -88,7 +88,7 @@
         /// <returns>
         /// The <see cref="QueryResultDisplay"/>.
         /// </returns>
-        QueryResultDisplay Search(DateTime lastActivityDateStart, DateTime lastActivityDateEnd, long page, long itemsPerPage, int domainRootStructureID, string sortBy = "loginName", SortDirection sortDirection = SortDirection.Ascending);
+        QueryResultDisplay Search(DateTime lastActivityDateStart, DateTime lastActivityDateEnd, long page, long itemsPerPage, int storeId, string sortBy = "loginName", SortDirection sortDirection = SortDirection.Ascending);
 
     }
 }

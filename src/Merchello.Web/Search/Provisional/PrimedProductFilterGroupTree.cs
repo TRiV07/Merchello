@@ -71,16 +71,16 @@ namespace Merchello.Web.Search.Provisional
         }
 
         /// <inheritdoc/>
-        public TreeNode<ProductFilterGroupNode> GetTree(int domainRootStructureID, params Guid[] collectionKeys)
+        public TreeNode<ProductFilterGroupNode> GetTree(int storeId, params Guid[] collectionKeys)
         {
-            var cacheKey = GetCacheKey(collectionKeys, domainRootStructureID);
+            var cacheKey = GetCacheKey(collectionKeys, storeId);
 
             var tree = (TreeNode<ProductFilterGroupNode>)_cache.GetCacheItem(cacheKey);
             if (tree != null) return tree;
 
 
             // get all of the filter groups
-            var filterGroups = _getter.Invoke(domainRootStructureID).ToArray();
+            var filterGroups = _getter.Invoke(storeId).ToArray();
 
             // create a specific context for each filter group and filter (within the group)
             var contextKeys = GetContextKeys(filterGroups, collectionKeys);
@@ -253,10 +253,11 @@ namespace Merchello.Web.Search.Provisional
             var suffix = keys.Select(x => x.ToString()).OrderBy(x => x);
             return string.Format("{0}.{1}", CacheKeyBase, string.Join(string.Empty, suffix));
         }
-        private static string GetCacheKey(IEnumerable<Guid> keys, int domainRootStructureID)
+
+        private static string GetCacheKey(IEnumerable<Guid> keys, int storeId)
         {
             var suffix = keys.Select(x => x.ToString()).OrderBy(x => x);
-            return string.Format("{0}.{1}.{2}", CacheKeyBase, domainRootStructureID, string.Join(string.Empty, suffix));
+            return string.Format("{0}.{1}.{2}", CacheKeyBase, storeId, string.Join(string.Empty, suffix));
         }
 
     }

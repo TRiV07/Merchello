@@ -136,10 +136,10 @@
         /// The <see cref="ProductDisplay"/>.
         /// </returns>
         [HttpGet]
-        public ProductDisplay GetProductBySku(string sku, int domainRootStructureID)
+        public ProductDisplay GetProductBySku(string sku, int storeId)
         {
             //var product = _merchello.Query.Product.GetBySku(sku);
-            return _productService.GetBySku(sku, domainRootStructureID).ToProductDisplay(DetachedValuesConversionType.Editor);
+            return _productService.GetBySku(sku, storeId).ToProductDisplay(DetachedValuesConversionType.Editor);
         }
 
         /// <summary>
@@ -173,9 +173,9 @@
         /// The <see cref="ProductVariantDisplay"/>.
         /// </returns>
         [HttpGet]
-        public ProductVariantDisplay GetProductVariantBySku(string sku, int domainRootStructureID)
+        public ProductVariantDisplay GetProductVariantBySku(string sku, int storeId)
         {
-            var variant = _productVariantService.GetBySku(sku, domainRootStructureID);
+            var variant = _productVariantService.GetBySku(sku, storeId);
 
             // See if we have a variant
             // TODO - should document this properly (edge case)            
@@ -193,7 +193,7 @@
                     sku = sku.Substring(0, sku.LastIndexOf("|"));
 
                     // try and get it with new sku
-                    variant = _productVariantService.GetBySku(sku, domainRootStructureID);
+                    variant = _productVariantService.GetBySku(sku, storeId);
                 }
             }
 
@@ -229,9 +229,9 @@
         /// The value indicating whether the SKU exists.
         /// </returns>
         [HttpGet]
-        public bool GetSkuExists(string sku, int domainRootStructureID)
+        public bool GetSkuExists(string sku, int storeId)
         {
-            return _productService.SkuExists(sku, domainRootStructureID);
+            return _productService.SkuExists(sku, storeId);
         }
 
         /// <summary>
@@ -273,14 +273,14 @@
                   term.Value,
                   query.CurrentPage + 1,
                   query.ItemsPerPage,
-                  query.DomainRootStructureID,
+                  query.StoreId,
                   query.SortBy,
                   query.SortDirection)
               :
               _merchello.Query.Product.Search(
                   query.CurrentPage + 1,
                   query.ItemsPerPage,
-                  query.DomainRootStructureID,
+                  query.StoreId,
                   query.SortBy,
                   query.SortDirection);
         }
@@ -310,7 +310,7 @@
         {
             var itemsPerPage = query.ItemsPerPage;
             var currentPage = query.CurrentPage + 1;
-            var domainRootStructureID = query.DomainRootStructureID;
+            var storeId = query.StoreId;
             var collectionKey = query.Parameters.FirstOrDefault(x => x.FieldName == "collectionKey");
             var includedFields = query.Parameters.FirstOrDefault(x => x.FieldName == "includedFields");
             var searchTerm = query.Parameters.FirstOrDefault(x => x.FieldName == "term");
@@ -328,7 +328,7 @@
                 manufacturer,
                 currentPage,
                 itemsPerPage,
-                domainRootStructureID,
+                storeId,
                 query.SortBy,
                 query.SortDirection);
 
@@ -346,9 +346,9 @@
         /// </returns>
         [HttpPost]
         [Obsolete("AddProduct is being superceded by CreateProduct so we can attach content at time of creation")]
-        public ProductDisplay AddProduct(ProductDisplay product, int domainRootStructureID)
+        public ProductDisplay AddProduct(ProductDisplay product, int storeId)
         {
-            var merchProduct = _productService.CreateProduct(product.Name, product.Sku, product.Price, domainRootStructureID);
+            var merchProduct = _productService.CreateProduct(product.Name, product.Sku, product.Price, storeId);
 
             merchProduct = product.ToProduct(merchProduct);
             _productService.Save(merchProduct);
@@ -365,14 +365,14 @@
         /// The <see cref="ProductDisplay"/>.
         /// </returns>
         [HttpPost]
-        public ProductDisplay CreateProduct(ProductDisplay product, int domainRootStructureID)
+        public ProductDisplay CreateProduct(ProductDisplay product, int storeId)
         {
             // we need to remove the detached content to generate the product to begin with due to db foreign keys
             var detachedContents = product.DetachedContents.ToArray();
             product.DetachedContents = Enumerable.Empty<ProductVariantDetachedContentDisplay>();
 
             // First create the product record and save it
-            var merchProduct = _productService.CreateProduct(product.Name, product.Sku, product.Price, domainRootStructureID);
+            var merchProduct = _productService.CreateProduct(product.Name, product.Sku, product.Price, storeId);
             merchProduct = product.ToProduct(merchProduct);
 
             // we don't want to raise events here since we will be saving again and there is no sense
@@ -637,9 +637,9 @@
         /// The <see cref="IEnumerable{String}"/> (Manufacturer names).
         /// </returns>
         [HttpGet]
-        public IEnumerable<string> GetAllManufacturers(int domainRootStructureID)
+        public IEnumerable<string> GetAllManufacturers(int storeId)
         {
-            return _productService.GetAllManufacturers(domainRootStructureID);
+            return _productService.GetAllManufacturers(storeId);
         }
 
         /// <summary>

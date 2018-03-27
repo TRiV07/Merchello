@@ -200,10 +200,10 @@ namespace Merchello.Core.Services
         /// <returns>
         /// The <see cref="IProduct"/>.
         /// </returns>
-        public IProduct CreateProduct(string name, string sku, decimal price, int domainRootStructureID, bool raiseEvents = true)
+        public IProduct CreateProduct(string name, string sku, decimal price, int storeId, bool raiseEvents = true)
         {
             var templateVariant = new ProductVariant(name, sku, price);
-            var product = new Product(templateVariant, domainRootStructureID);
+            var product = new Product(templateVariant, storeId);
             if (Creating.IsRaisedEventCancelled(new Events.NewEventArgs<IProduct>(product), this))
             {
                 product.WasCancelled = true;
@@ -234,10 +234,10 @@ namespace Merchello.Core.Services
         /// <returns>
         /// The <see cref="IProduct"/>.
         /// </returns>
-        public IProduct CreateProductWithKey(string name, string sku, decimal price, int domainRootStructureID, bool raiseEvents = true)
+        public IProduct CreateProductWithKey(string name, string sku, decimal price, int storeId, bool raiseEvents = true)
         {
             var templateVariant = new ProductVariant(name, sku, price);
-            var product = new Product(templateVariant, domainRootStructureID);
+            var product = new Product(templateVariant, storeId);
 
             if (raiseEvents)
             if (Creating.IsRaisedEventCancelled(new Events.NewEventArgs<IProduct>(product), this))
@@ -249,7 +249,7 @@ namespace Merchello.Core.Services
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreateProductRepository(uow, domainRootStructureID))
+                using (var repository = RepositoryFactory.CreateProductRepository(uow, storeId))
                 {
                     repository.AddOrUpdate(product);
                     uow.Commit();
@@ -281,7 +281,7 @@ namespace Merchello.Core.Services
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreateProductRepository(uow, product.DomainRootStructureID))
+                using (var repository = RepositoryFactory.CreateProductRepository(uow, product.StoreId))
                 {
                     repository.AddOrUpdate(product);
                     uow.Commit();
@@ -358,7 +358,7 @@ namespace Merchello.Core.Services
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreateProductRepository(uow, product.DomainRootStructureID))
+                using (var repository = RepositoryFactory.CreateProductRepository(uow, product.StoreId))
                 {
                     repository.Delete(product);
                     uow.Commit();
@@ -406,9 +406,9 @@ namespace Merchello.Core.Services
         /// <returns>
         /// The <see cref="IProduct"/>.
         /// </returns>
-        public IProduct GetBySku(string sku, int domainRootStructureID)
+        public IProduct GetBySku(string sku, int storeId)
         {
-            var variant = GetProductVariantBySku(sku, domainRootStructureID);
+            var variant = GetProductVariantBySku(sku, storeId);
             return variant == null ? null : GetByKey(variant.ProductKey);
         }
 
@@ -443,9 +443,9 @@ namespace Merchello.Core.Services
         /// <returns>
         /// The <see cref="Page{IProduct}"/>.
         /// </returns>
-        public override Page<IProduct> GetPage(long page, long itemsPerPage, int domainRootStructureID, string sortBy = "", SortDirection sortDirection = SortDirection.Descending)
+        public override Page<IProduct> GetPage(long page, long itemsPerPage, int storeId, string sortBy = "", SortDirection sortDirection = SortDirection.Descending)
         {
-            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork(), domainRootStructureID))
+            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 return repository.GetPage(page, itemsPerPage, null, ValidateSortByField(sortBy), sortDirection);
             }
@@ -491,9 +491,9 @@ namespace Merchello.Core.Services
         /// <returns>
         /// The <see cref="IProductVariant"/>.
         /// </returns>
-        public IProductVariant GetProductVariantBySku(string sku, int domainRootStructureID)
+        public IProductVariant GetProductVariantBySku(string sku, int storeId)
         {
-            return _productVariantService.GetBySku(sku, domainRootStructureID);
+            return _productVariantService.GetBySku(sku, storeId);
         }
 
         /// <summary>
@@ -517,11 +517,11 @@ namespace Merchello.Core.Services
         /// The total product count.
         /// </returns>
         [Obsolete("Only used in ProductQuery")]
-        public int ProductsCount(int domainRootStructureID)
+        public int ProductsCount(int storeId)
         {
-            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork(), domainRootStructureID))
+            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork(), storeId))
             {
-                var query = Persistence.Querying.Query<IProduct>.Builder.Where(x => x.Key != Guid.Empty && x.DomainRootStructureID == domainRootStructureID);
+                var query = Persistence.Querying.Query<IProduct>.Builder.Where(x => x.Key != Guid.Empty && x.StoreId == storeId);
 
                 return repository.Count(query);
             }
@@ -536,9 +536,9 @@ namespace Merchello.Core.Services
         /// <returns>
         /// A value indicating whether or not  a SKU exists
         /// </returns>
-        public bool SkuExists(string sku, int domainRootStructureID)
+        public bool SkuExists(string sku, int storeId)
         {
-            return _productVariantService.SkuExists(sku, domainRootStructureID);
+            return _productVariantService.SkuExists(sku, storeId);
         }
 
         /// <summary>
@@ -916,9 +916,9 @@ namespace Merchello.Core.Services
         /// <returns>
         /// A collection of all <see cref="IProduct"/>.
         /// </returns>
-        public IEnumerable<IProduct> GetAll(int domainRootStructureID)
+        public IEnumerable<IProduct> GetAll(int storeId)
         {
-            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork(), domainRootStructureID))
+            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 return repository.GetAll();
             }
@@ -1109,11 +1109,11 @@ namespace Merchello.Core.Services
             Guid collectionKey,
             long page,
             long itemsPerPage,
-            int domainRootStructureID,
+            int storeId,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Descending)
         {
-            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork(), domainRootStructureID))
+            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 return repository.GetKeysNotInCollection(collectionKey, page, itemsPerPage, this.ValidateSortByField(sortBy), sortDirection);
             } 
@@ -1144,11 +1144,11 @@ namespace Merchello.Core.Services
             IEnumerable<Guid> collectionKeys,
             long page,
             long itemsPerPage,
-            int domainRootStructureID,
+            int storeId,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Descending)
         {
-            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork(), domainRootStructureID))
+            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 return repository.GetKeysNotInAnyCollections(collectionKeys.ToArray(), page, itemsPerPage, this.ValidateSortByField(sortBy), sortDirection);
             }
@@ -1183,11 +1183,11 @@ namespace Merchello.Core.Services
             string searchTerm,
             long page,
             long itemsPerPage,
-            int domainRootStructureID,
+            int storeId,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Descending)
         {
-            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork(), domainRootStructureID))
+            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 return repository.GetKeysNotInCollection(collectionKey, searchTerm, page, itemsPerPage, this.ValidateSortByField(sortBy), sortDirection);
             }
@@ -1222,11 +1222,11 @@ namespace Merchello.Core.Services
            string searchTerm,
            long page,
            long itemsPerPage,
-           int domainRootStructureID,
+           int storeId,
            string sortBy = "",
            SortDirection sortDirection = SortDirection.Descending)
         {
-            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork(), domainRootStructureID))
+            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 return repository.GetKeysNotInAnyCollections(collectionKeys.ToArray(), searchTerm, page, itemsPerPage, this.ValidateSortByField(sortBy), sortDirection);
             }
@@ -1275,11 +1275,11 @@ namespace Merchello.Core.Services
             Guid optionKey,
             long page,
             long itemsPerPage,
-            int domainRootStructureID,
+            int storeId,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Descending)
         {
-            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork(), domainRootStructureID))
+            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 return repository.GetProductsKeysWithOption(
                     optionKey,
@@ -1319,11 +1319,11 @@ namespace Merchello.Core.Services
             IEnumerable<string> choiceNames,
             long page,
             long itemsPerPage,
-            int domainRootStructureID,
+            int storeId,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Descending)
         {
-            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork(), domainRootStructureID))
+            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 return repository.GetProductsKeysWithOption(
                     optionName,
@@ -1360,11 +1360,11 @@ namespace Merchello.Core.Services
             string optionName,
             long page,
             long itemsPerPage,
-            int domainRootStructureID,
+            int storeId,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Descending)
         {
-            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork(), domainRootStructureID))
+            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 return repository.GetProductsKeysWithOption(
                     optionName,
@@ -1404,11 +1404,11 @@ namespace Merchello.Core.Services
             string choiceName,
             long page,
             long itemsPerPage,
-            int domainRootStructureID,
+            int storeId,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Descending)
         {
-            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork(), domainRootStructureID))
+            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 return repository.GetProductsKeysWithOption(
                     optionName,
@@ -1445,11 +1445,11 @@ namespace Merchello.Core.Services
             IEnumerable<string> optionNames,
             long page,
             long itemsPerPage,
-            int domainRootStructureID,
+            int storeId,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Descending)
         {
-            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork(), domainRootStructureID))
+            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 return repository.GetProductsKeysWithOption(
                     optionNames,
@@ -1489,11 +1489,11 @@ namespace Merchello.Core.Services
             decimal max,
             long page,
             long itemsPerPage,
-            int domainRootStructureID,
+            int storeId,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Descending)
         {
-            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork(), domainRootStructureID))
+            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 return repository.GetProductsKeysInPriceRange(
                     min,
@@ -1538,11 +1538,11 @@ namespace Merchello.Core.Services
             decimal taxModifier,
             long page,
             long itemsPerPage,
-            int domainRootStructureID,
+            int storeId,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Descending)
         {
-            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork(), domainRootStructureID))
+            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 return repository.GetProductsKeysInPriceRange(
                     min,
@@ -1580,11 +1580,11 @@ namespace Merchello.Core.Services
             string barcode,
             long page,
             long itemsPerPage,
-            int domainRootStructureID,
+            int storeId,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Descending)
         {
-            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork(), domainRootStructureID))
+            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 return repository.GetProductsKeysByBarcode(
                     barcode,
@@ -1620,11 +1620,11 @@ namespace Merchello.Core.Services
             IEnumerable<string> barcodes,
             long page,
             long itemsPerPage,
-            int domainRootStructureID,
+            int storeId,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Descending)
         {
-            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork(), domainRootStructureID))
+            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 return repository.GetProductsKeysByBarcode(
                     barcodes,
@@ -1661,11 +1661,11 @@ namespace Merchello.Core.Services
             string manufacturer,
             long page,
             long itemsPerPage,
-            int domainRootStructureID,
+            int storeId,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Descending)
         {
-            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork(), domainRootStructureID))
+            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 return repository.GetProductsKeysByManufacturer(
                     manufacturer,
@@ -1701,11 +1701,11 @@ namespace Merchello.Core.Services
             IEnumerable<string> manufacturer,
             long page,
             long itemsPerPage,
-            int domainRootStructureID,
+            int storeId,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Descending)
         {
-            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork(), domainRootStructureID))
+            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 return repository.GetProductsKeysByManufacturer(
                     manufacturer,
@@ -1740,12 +1740,12 @@ namespace Merchello.Core.Services
         internal Page<Guid> GetProductsKeysInStock(
             long page,
             long itemsPerPage,
-            int domainRootStructureID,
+            int storeId,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Descending,
             bool includeAllowOutOfStockPurchase = false)
         {
-            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork(), domainRootStructureID))
+            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 return repository.GetProductsKeysInStock(
                     page,
@@ -1773,9 +1773,9 @@ namespace Merchello.Core.Services
         /// <returns>
         /// The <see cref="Page{Guid}"/>.
         /// </returns>
-        internal Page<Guid> GetProductsKeysOnSale(long page, long itemsPerPage, int domainRootStructureID,  string sortBy = "", SortDirection sortDirection = SortDirection.Descending)
+        internal Page<Guid> GetProductsKeysOnSale(long page, long itemsPerPage, int storeId,  string sortBy = "", SortDirection sortDirection = SortDirection.Descending)
         {
-            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork(), domainRootStructureID))
+            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 return repository.GetProductsKeysOnSale(
                     page,
@@ -1796,9 +1796,9 @@ namespace Merchello.Core.Services
         /// <returns>
         /// The <see cref="int"/>.
         /// </returns>
-        internal override int Count(IQuery<IProduct> query, int domainRootStructureID)
+        internal override int Count(IQuery<IProduct> query, int storeId)
         {
-            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork(), domainRootStructureID))
+            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 return repository.Count(query);
             }
@@ -1813,9 +1813,9 @@ namespace Merchello.Core.Services
         /// <returns>
         /// The <see cref="int"/>.
         /// </returns>
-        internal int Count(IQuery<IProductVariant> query, int domainRootStructureID)
+        internal int Count(IQuery<IProductVariant> query, int storeId)
         {
-            using (var repository = RepositoryFactory.CreateProductVariantRepository(UowProvider.GetUnitOfWork(), domainRootStructureID))
+            using (var repository = RepositoryFactory.CreateProductVariantRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 return repository.Count(query);
             }
@@ -1847,9 +1847,9 @@ namespace Merchello.Core.Services
         /// <returns>
         /// The <see cref="Page{Guid}"/>.
         /// </returns>
-        public override Page<Guid> GetPagedKeys(long page, long itemsPerPage, int domainRootStructureID, string sortBy = "", SortDirection sortDirection = SortDirection.Descending)
+        public override Page<Guid> GetPagedKeys(long page, long itemsPerPage, int storeId, string sortBy = "", SortDirection sortDirection = SortDirection.Descending)
         {
-            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork(), domainRootStructureID))
+            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 return repository.GetPagedKeys(page, itemsPerPage, null, ValidateSortByField(sortBy), sortDirection);
             }
@@ -1876,9 +1876,9 @@ namespace Merchello.Core.Services
         /// <returns>
         /// The <see cref="Page{Guid}"/>.
         /// </returns>
-        public Page<Guid> GetPagedKeys(string searchTerm, long page, long itemsPerPage, int domainRootStructureID, string sortBy = "", SortDirection sortDirection = SortDirection.Descending)
+        public Page<Guid> GetPagedKeys(string searchTerm, long page, long itemsPerPage, int storeId, string sortBy = "", SortDirection sortDirection = SortDirection.Descending)
         {
-            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork(), domainRootStructureID))
+            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 return repository.SearchKeys(searchTerm, page, itemsPerPage, ValidateSortByField(sortBy), sortDirection);
             }
@@ -1894,9 +1894,9 @@ namespace Merchello.Core.Services
         /// <returns>
         /// The product key.
         /// </returns>
-        internal Guid GetKeyForSlug(string slug, int domainRootStructureID)
+        internal Guid GetKeyForSlug(string slug, int storeId)
         {
-            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork(), domainRootStructureID))
+            using (var repository = RepositoryFactory.CreateProductRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 return repository.GetKeyForSlug(slug);
             }

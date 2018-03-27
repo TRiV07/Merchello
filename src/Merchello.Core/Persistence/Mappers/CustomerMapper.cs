@@ -30,7 +30,7 @@
             if (!PropertyInfoCache.IsEmpty) return;
 
             CacheMap<Customer, CustomerDto>(src => src.Key, dto => dto.Key);
-            CacheMap<Customer, CustomerDto>(src => src.DomainRootStructureID, dto => dto.DomainRootStructureID);
+            CacheMap<Customer, CustomerDto>(src => src.StoreId, dto => dto.StoreId);
             CacheMap<Customer, CustomerDto>(src => src.FirstName, dto => dto.FirstName);
             CacheMap<Customer, CustomerDto>(src => src.LastName, dto => dto.LastName);
             CacheMap<Customer, CustomerDto>(src => src.Email, dto => dto.Email);

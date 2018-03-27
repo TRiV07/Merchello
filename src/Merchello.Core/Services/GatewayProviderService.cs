@@ -935,9 +935,9 @@
 
         #region Warehouse
 
-        public IWarehouse GetDefaultWarehouse(int domainRootStructureID)
+        public IWarehouse GetDefaultWarehouse(int storeId)
         {
-            return _warehouseService.GetDefaultWarehouse(domainRootStructureID);
+            return _warehouseService.GetDefaultWarehouse(storeId);
         }
 
 

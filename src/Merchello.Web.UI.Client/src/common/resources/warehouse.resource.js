@@ -99,8 +99,8 @@
                  *
                  * @description Gets the default warehouse from the API.
                  **/
-                getDefaultWarehouse: function (domainRootStructureID) {
-                    var url = Umbraco.Sys.ServerVariables['merchelloUrls']['merchelloWarehouseApiBaseUrl'] + 'GetDefaultWarehouse?domainRootStructureID=' + domainRootStructureID;
+                getDefaultWarehouse: function (storeId) {
+                    var url = Umbraco.Sys.ServerVariables['merchelloUrls']['merchelloWarehouseApiBaseUrl'] + 'GetDefaultWarehouse?storeId=' + storeId;
                     return umbRequestHelper.resourcePromise(
                         $http({
                             url: url,

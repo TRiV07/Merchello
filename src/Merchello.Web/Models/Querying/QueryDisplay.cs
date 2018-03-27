@@ -29,7 +29,10 @@ namespace Merchello.Web.Models.Querying
         /// </summary>
         public int ItemsPerPage { get; set; }
 
-        public int DomainRootStructureID { get; set; }
+        /// <summary>
+        /// Gets or sets the Store Id.
+        /// </summary>
+        public int StoreId { get; set; }
 
         /// <summary>
         /// Gets or sets the sort by.

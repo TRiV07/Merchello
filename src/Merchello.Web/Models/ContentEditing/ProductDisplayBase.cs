@@ -4,6 +4,7 @@
     using System.Collections.Generic;
 
     using Merchello.Core.Models;
+    using Merchello.Core.Models.EntityBase;
     using Merchello.Web.Models.ContentEditing.Content;
 
     using Newtonsoft.Json;
@@ -11,12 +12,12 @@
     /// <summary>
     /// The product display abstract.
     /// </summary>
-    public abstract class ProductDisplayBase : ProductVariantDataModifierData
+    public abstract class ProductDisplayBase : ProductVariantDataModifierData, IHasDomainRoot
     {
         /// <summary>
-        /// DomainRootStructureID
+        /// Gets or sets the Store Id
         /// </summary>
-        public int DomainRootStructureID { get; set; }
+        public int StoreId { get; set; }
 
         /// <summary>
         /// Gets or sets the version key.

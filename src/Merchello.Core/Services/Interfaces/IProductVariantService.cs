@@ -72,7 +72,7 @@
         /// </summary>
         /// <param name="productVariant"></param>
         /// <returns></returns>
-        int GetDomainRootStructureId(IProductVariant productVariant);
+        int GetStoreId(IProductVariant productVariant);
 
         /// <summary>
         /// Gets an <see cref="IProductVariant"/> object by it's unique SKU.
@@ -83,7 +83,7 @@
         /// <returns>
         /// The <see cref="IProductVariant"/>.
         /// </returns>
-        IProductVariant GetBySku(string sku, int domainRootStructureID); 
+        IProductVariant GetBySku(string sku, int storeId); 
 
         /// <summary>
         /// Gets list of <see cref="IProductVariant"/> objects given a list of Unique keys
@@ -115,6 +115,6 @@
         /// <returns>
         /// The <see cref="bool"/> indicating whether or not the SKU exists.
         /// </returns>
-        bool SkuExists(string sku, int domainRootStructureID);
+        bool SkuExists(string sku, int storeId);
     }
 }

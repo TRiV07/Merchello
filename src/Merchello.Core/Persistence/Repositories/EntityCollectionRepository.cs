@@ -26,7 +26,7 @@
         /// <summary>
         /// The domain root structure ID.
         /// </summary>
-        private readonly int _domainRootStructureID;
+        private readonly int _storeId;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EntityCollectionRepository"/> class.
@@ -40,10 +40,10 @@
         /// <param name="sqlSyntax">
         /// The SQL Syntax.
         /// </param>
-        public EntityCollectionRepository(IDatabaseUnitOfWork work, ILogger logger, ISqlSyntaxProvider sqlSyntax, int domainRootStructureID)
+        public EntityCollectionRepository(IDatabaseUnitOfWork work, ILogger logger, ISqlSyntaxProvider sqlSyntax, int storeId)
             : base(work, logger, sqlSyntax)
         {
-            _domainRootStructureID = domainRootStructureID;
+            _storeId = storeId;
         }
 
         /// <summary>
@@ -194,9 +194,9 @@
                 .Where<EntityCollectionDto>(x => x.ParentKey == null, SqlSyntax)
                 .Where("providerKey IN (@keys)", new { @keys = keys });
 
-            if (_domainRootStructureID != Constants.System.Root)
+            if (_storeId != Constants.System.Root)
             {
-                sql.Where<EntityCollectionDto>(x => x.DomainRootStructureID == _domainRootStructureID, SqlSyntax);
+                sql.Where<EntityCollectionDto>(x => x.StoreId == _storeId, SqlSyntax);
             }
 
             var matches = Database.Fetch<KeyDto>(sql);
@@ -413,9 +413,9 @@
             sql.Select(isCount ? "COUNT(*)" : "*")
                .From<EntityCollectionDto>(SqlSyntax);
 
-            if (_domainRootStructureID != Constants.System.Root)
+            if (_storeId != Constants.System.Root)
             {
-                sql.Where<EntityCollectionDto>(x => x.DomainRootStructureID == _domainRootStructureID, SqlSyntax);
+                sql.Where<EntityCollectionDto>(x => x.StoreId == _storeId, SqlSyntax);
             }
 
             return sql;

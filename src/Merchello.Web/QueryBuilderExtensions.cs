@@ -164,10 +164,10 @@
             return builder;
         }
 
-        public static IProductContentQueryBuilder DomainRootStructureID(this IProductContentQueryBuilder builder, int domainRootStructureID)
+        public static IProductContentQueryBuilder StoreId(this IProductContentQueryBuilder builder, int storeId)
         {
-            if (domainRootStructureID < 1) domainRootStructureID = -1;
-            builder.DomainRootStructureID = domainRootStructureID;
+            if (storeId < 1) storeId = -1;
+            builder.StoreId = storeId;
             return builder;
         }
 

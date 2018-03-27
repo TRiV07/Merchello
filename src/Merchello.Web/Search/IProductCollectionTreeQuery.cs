@@ -41,7 +41,7 @@
         /// <returns>
         /// The <see cref="TreeNode{IProductCollection}"/>.
         /// </returns>
-        TreeNode<IProductCollection> GetTreeWithRoot(IProductCollection collection, int domainRootStructureID);
+        TreeNode<IProductCollection> GetTreeWithRoot(IProductCollection collection, int storeId);
 
         /// <summary>
         /// Gets all of the root level trees.
@@ -49,6 +49,6 @@
         /// <returns>
         /// The <see cref="IEnumerable{IProductCollection}"/>.
         /// </returns>
-        IEnumerable<TreeNode<IProductCollection>> GetRootTrees(int domainRootStructureID);
+        IEnumerable<TreeNode<IProductCollection>> GetRootTrees(int storeId);
     }
 }

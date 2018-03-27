@@ -25,9 +25,9 @@
         /// <summary>
         /// Gets or sets domain root structure ID
         /// </summary>
-        [Column("domainRootStructureID")]
+        [Column("storeId")]
         [Constraint(Default = "-1")]
-        public int DomainRootStructureID { get; set; }
+        public int StoreId { get; set; }
 
         /// <summary>
         /// Gets or sets the login name.

@@ -93,12 +93,12 @@
                        .Select(x => x.ExtendedData.GetProductVariantKey())
                        .Where(x => !Guid.Empty.Equals(x))).ToArray();
 
-            //TODOMS Change way to get DomainRootStructureId
-            var domainRootStructureId = MerchelloContext.Services.ProductVariantService.GetDomainRootStructureId(variants.FirstOrDefault());
+            //TODOMS Change way to get storeId
+            var storeId = MerchelloContext.Services.ProductVariantService.GetStoreId(variants.FirstOrDefault());
 
             // the origin address will be the default warehouse
             // For the initial version we are only exposing a single warehouse
-            var warehouse = MerchelloContext.Services.WarehouseService.GetDefaultWarehouse(domainRootStructureId);
+            var warehouse = MerchelloContext.Services.WarehouseService.GetDefaultWarehouse(storeId);
             var origin = warehouse.AsAddress();
 
             ////For the initial version we are only exposing a single shipment

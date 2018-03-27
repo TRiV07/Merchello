@@ -122,7 +122,7 @@
             string methodName,
             long page,
             long itemsPerPage,
-            int domainRootStructureID,
+            int storeId,
             string sortBy,
             SortDirection sortDirection,
             IDictionary<string, string> args = null)
@@ -131,7 +131,7 @@
             sb.Append(methodName)
             .Append(page)
             .Append(itemsPerPage)
-            .Append(domainRootStructureID)
+            .Append(storeId)
             .Append(sortBy)
             .Append(sortDirection);
 

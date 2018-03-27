@@ -99,7 +99,7 @@
         /// </summary>
         public long ItemsPerPage { get; set; }
 
-        public int DomainRootStructureID { get; set; }
+        public int StoreId { get; set; }
 
         /// <summary>
         /// Gets or sets the sort by field.
@@ -135,15 +135,15 @@
             if (!hasCollections && !HasPriceRange)
             {
                 return HasSearchTerm
-                  ? _query.TypedProductContentSearchPaged(SearchTerm, Page, ItemsPerPage, DomainRootStructureID, SortBy, SortDirection)
-                  : _query.TypedProductContentSearchPaged(Page, ItemsPerPage, DomainRootStructureID, SortBy, SortDirection);
+                  ? _query.TypedProductContentSearchPaged(SearchTerm, Page, ItemsPerPage, StoreId, SortBy, SortDirection)
+                  : _query.TypedProductContentSearchPaged(Page, ItemsPerPage, StoreId, SortBy, SortDirection);
             }
 
             if (!hasCollections && HasPriceRange)
             {
                 if (!HasSearchTerm)
                 {
-                    return _query.TypedProductContentByPriceRange(MinPrice, MaxPrice, Page, ItemsPerPage, DomainRootStructureID, SortBy, SortDirection);
+                    return _query.TypedProductContentByPriceRange(MinPrice, MaxPrice, Page, ItemsPerPage, StoreId, SortBy, SortDirection);
                 }
                 
                 // don't have a price range with a search term filter.
@@ -160,13 +160,13 @@
                     if (!HasPriceRange)
                     {
                         return HasSearchTerm ?
-                        _query.TypedProductContentPageThatNotInAnyCollections(CollectionKeys, SearchTerm, Page, ItemsPerPage, DomainRootStructureID, SortBy, SortDirection) :
-                        _query.TypedProductContentPageThatNotInAnyCollections(CollectionKeys, Page, ItemsPerPage, DomainRootStructureID, SortBy, SortDirection);
+                        _query.TypedProductContentPageThatNotInAnyCollections(CollectionKeys, SearchTerm, Page, ItemsPerPage, StoreId, SortBy, SortDirection) :
+                        _query.TypedProductContentPageThatNotInAnyCollections(CollectionKeys, Page, ItemsPerPage, StoreId, SortBy, SortDirection);
                     }
 
                     return HasSearchTerm ?
-                    _query.TypedProductContentPageThatNotInAnyCollections(CollectionKeys, SearchTerm, MinPrice, MaxPrice, Page, ItemsPerPage, DomainRootStructureID, SortBy, SortDirection) :
-                    _query.TypedProductContentPageThatNotInAnyCollections(CollectionKeys, MinPrice, MaxPrice, Page, ItemsPerPage, DomainRootStructureID, SortBy, SortDirection);
+                    _query.TypedProductContentPageThatNotInAnyCollections(CollectionKeys, SearchTerm, MinPrice, MaxPrice, Page, ItemsPerPage, StoreId, SortBy, SortDirection) :
+                    _query.TypedProductContentPageThatNotInAnyCollections(CollectionKeys, MinPrice, MaxPrice, Page, ItemsPerPage, StoreId, SortBy, SortDirection);
 
                 case CollectionClusivity.ExistsInAnyCollectionOrFilter:
 

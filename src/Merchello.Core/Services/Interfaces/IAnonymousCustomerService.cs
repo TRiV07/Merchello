@@ -14,7 +14,7 @@
         /// Crates an <see cref="IAnonymousCustomer"/> and saves it to the database
         /// </summary>
         /// <returns><see cref="IAnonymousCustomer"/></returns>
-        IAnonymousCustomer CreateAnonymousCustomerWithKey(int domainRootStructureID);
+        IAnonymousCustomer CreateAnonymousCustomerWithKey(int storeId);
 
         /// <summary>
         /// Saves a single <see cref="IAnonymousCustomer"/>
@@ -49,6 +49,6 @@
         /// <returns>
         /// The collection of <see cref="IAnonymousCustomer"/> older than a certain number of days.
         /// </returns>
-        IEnumerable<IAnonymousCustomer> GetAnonymousCustomersCreatedBefore(DateTime createdDate, int domainRootStructureID);
+        IEnumerable<IAnonymousCustomer> GetAnonymousCustomersCreatedBefore(DateTime createdDate, int storeId);
     }
 }

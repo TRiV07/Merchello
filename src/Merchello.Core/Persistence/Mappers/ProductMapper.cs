@@ -19,7 +19,7 @@ namespace Merchello.Core.Persistence.Mappers
             if (!PropertyInfoCache.IsEmpty) return;
 
             CacheMap<Product, ProductDto>(src => src.Key, dto => dto.Key);
-            CacheMap<Product, ProductDto>(src => src.DomainRootStructureID, dto => dto.DomainRootStructureID);
+            CacheMap<Product, ProductDto>(src => src.StoreId, dto => dto.StoreId);
             CacheMap<Product, ProductDto>(src => src.UpdateDate, dto => dto.UpdateDate);
             CacheMap<Product, ProductDto>(src => src.CreateDate, dto => dto.CreateDate);
         }

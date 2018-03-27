@@ -95,7 +95,7 @@
         internal static readonly List<StaticField> IndexFieldPolicies = new List<StaticField>()
             {
                 new StaticField("productKey", FieldIndexTypes.ANALYZED, false, string.Empty),
-                new StaticField("domainRootStructureID", FieldIndexTypes.ANALYZED, false, "INT"),
+                new StaticField("storeId", FieldIndexTypes.ANALYZED, false, "INT"),
                 new StaticField("productVariantKey", FieldIndexTypes.ANALYZED, false, string.Empty),
                 new StaticField("name", FieldIndexTypes.ANALYZED, true, string.Empty),
                 new StaticField("sku", FieldIndexTypes.ANALYZED, true, string.Empty),

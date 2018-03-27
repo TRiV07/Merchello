@@ -14,8 +14,8 @@ angular.module('merchello.resources').factory('customerResource',
                  * @name AddCustomer
                  * @description Posts to the API a new customer.
                  **/
-                AddCustomer: function (customer, domainRootStructureID) {
-                    var url = Umbraco.Sys.ServerVariables['merchelloUrls']['merchelloCustomerApiBaseUrl'] + 'AddCustomer?domainRootStructureID=' + domainRootStructureID;
+                AddCustomer: function (customer, storeId) {
+                    var url = Umbraco.Sys.ServerVariables['merchelloUrls']['merchelloCustomerApiBaseUrl'] + 'AddCustomer?storeId=' + storeId;
                     return umbRequestHelper.resourcePromise($http.post(url, customer), 'Failed to create customer');
                 },
 
@@ -24,8 +24,8 @@ angular.module('merchello.resources').factory('customerResource',
                  * @name AddAnonymousCustomer
                  * @description Posts to the API a new anonymous customer.
                  **/
-                AddAnonymousCustomer: function (customer, domainRootStructureID) {
-                    var url = Umbraco.Sys.ServerVariables['merchelloUrls']['merchelloCustomerApiBaseUrl'] + 'AddAnonymousCustomer?domainRootStructureID=' + domainRootStructureID;
+                AddAnonymousCustomer: function (customer, storeId) {
+                    var url = Umbraco.Sys.ServerVariables['merchelloUrls']['merchelloCustomerApiBaseUrl'] + 'AddAnonymousCustomer?storeId=' + storeId;
                     return umbRequestHelper.resourcePromise($http.post(url, customer), 'Failed to create customer');
                 },
 

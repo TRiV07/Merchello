@@ -240,7 +240,7 @@
                 .InnerJoin<ProductVariantIndexDto>(SqlSyntax)
                 .On<ProductVariantDto, ProductVariantIndexDto>(SqlSyntax, left => left.Key, right => right.ProductVariantKey)
                 .Where<ProductVariantDto>(x => x.Manufacturer != string.Empty, SqlSyntax)
-                .Where<ProductDto>(x => x.DomainRootStructureID == _domainRootStructureID, SqlSyntax)
+                .Where<ProductDto>(x => x.StoreId == _storeId, SqlSyntax)
                 .OrderBy<ProductVariantDto>(x => x.Manufacturer, SqlSyntax);
 
             var results = Database.Fetch<string>(sql);
@@ -321,9 +321,9 @@
                 .InnerJoin<ProductVariantIndexDto>(SqlSyntax)
                 .On<ProductVariantDto, ProductVariantIndexDto>(SqlSyntax, left => left.Key, right => right.ProductVariantKey);
 
-            if (_domainRootStructureID != UConstants.System.Root)
+            if (_storeId != UConstants.System.Root)
             {
-                sql.Where<ProductDto>(x => x.DomainRootStructureID == _domainRootStructureID, SqlSyntax);
+                sql.Where<ProductDto>(x => x.StoreId == _storeId, SqlSyntax);
             }
 
             if (terms.Any())

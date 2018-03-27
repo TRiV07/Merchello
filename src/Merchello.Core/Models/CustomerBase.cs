@@ -22,7 +22,7 @@
         /// <summary>
         /// The domain root structure ID.
         /// </summary>
-        private int _domainRootStructureID;
+        private int _storeId;
 
         /// <summary>
         /// The last activity date.
@@ -40,8 +40,8 @@
         /// <param name="isAnonymous">
         /// The is anonymous.
         /// </param>
-        protected CustomerBase(bool isAnonymous, int domainRootStructureID)
-            : this(isAnonymous, domainRootStructureID, new ExtendedDataCollection())
+        protected CustomerBase(bool isAnonymous, int storeId)
+            : this(isAnonymous, storeId, new ExtendedDataCollection())
         {
         }
 
@@ -54,25 +54,25 @@
         /// <param name="extendedData">
         /// The extended data.
         /// </param>
-        protected CustomerBase(bool isAnonymous, int domainRootStructureID, ExtendedDataCollection extendedData)
+        protected CustomerBase(bool isAnonymous, int storeId, ExtendedDataCollection extendedData)
         {
             IsAnonymous = isAnonymous;
-            _domainRootStructureID = domainRootStructureID;
+            _storeId = storeId;
             _extendedData = extendedData;
         }
 
         /// <inheritdoc/>
         [DataMember]
-        public int DomainRootStructureID
+        public int StoreId
         {
             get
             {
-                return _domainRootStructureID;
+                return _storeId;
             }
 
             set
             {
-                SetPropertyValueAndDetectChanges(value, ref _domainRootStructureID, _ps.Value.DomainRootStructureIDSelector);
+                SetPropertyValueAndDetectChanges(value, ref _storeId, _ps.Value.StoreIdSelector);
             }
         }
 
@@ -168,7 +168,7 @@
             /// <summary>
             /// The domain root structure ID selector.
             /// </summary>
-            public readonly PropertyInfo DomainRootStructureIDSelector = ExpressionHelper.GetPropertyInfo<CustomerBase, int>(x => x.DomainRootStructureID);
+            public readonly PropertyInfo StoreIdSelector = ExpressionHelper.GetPropertyInfo<CustomerBase, int>(x => x.StoreId);
         }
     }
 }

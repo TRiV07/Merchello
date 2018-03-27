@@ -24,7 +24,7 @@
             if (!PropertyInfoCache.IsEmpty) return;
 
             CacheMap<EntityCollection, EntityCollectionDto>(src => src.Key, dto => dto.Key);
-            CacheMap<EntityCollection, EntityCollectionDto>(src => src.DomainRootStructureID, dto => dto.DomainRootStructureID);
+            CacheMap<EntityCollection, EntityCollectionDto>(src => src.StoreId, dto => dto.StoreId);
             CacheMap<EntityCollection, EntityCollectionDto>(src => src.EntityTfKey, dto => dto.EntityTfKey);
             CacheMap<EntityCollection, EntityCollectionDto>(src => src.ParentKey, dto => dto.ParentKey);
             CacheMap<EntityCollection, EntityCollectionDto>(src => src.ProviderKey, dto => dto.ProviderKey);

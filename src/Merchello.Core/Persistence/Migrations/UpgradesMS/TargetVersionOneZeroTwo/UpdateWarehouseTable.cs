@@ -31,7 +31,7 @@ namespace Merchello.Core.Persistence.Migrations.UpgradesMS.TargetVersionOneZeroT
         {
             if (_databaseSchemaHelper.TableExist("merchWarehouse"))
             {
-                Alter.Table("merchWarehouse").AddColumn("domainRootStructureID").AsInt32().NotNullable().WithDefaultValue(-1);
+                Alter.Table("merchWarehouse").AddColumn("storeId").AsInt32().NotNullable().WithDefaultValue(-1);
 
                 this.Execute.Code(database =>
                 {
@@ -42,7 +42,7 @@ namespace Merchello.Core.Persistence.Migrations.UpgradesMS.TargetVersionOneZeroT
                         try
                         {
                             Guid warehouseKey = Guid.NewGuid();
-                            database.Insert("merchWarehouse", "Key", new WarehouseDto() { Key = warehouseKey, DomainRootStructureID = id, Name = "Default Warehouse", CountryCode = string.Empty, IsDefault = true, CreateDate = DateTime.Now, UpdateDate = DateTime.Now });
+                            database.Insert("merchWarehouse", "Key", new WarehouseDto() { Key = warehouseKey, StoreId = id, Name = "Default Warehouse", CountryCode = string.Empty, IsDefault = true, CreateDate = DateTime.Now, UpdateDate = DateTime.Now });
 
                             database.Insert("merchWarehouseCatalog", "Key", new WarehouseCatalogDto() { Key = Guid.NewGuid(), WarehouseKey = warehouseKey, Name = "Default Catalog", Description = null, CreateDate = DateTime.Now, UpdateDate = DateTime.Now });
                         }
@@ -58,7 +58,7 @@ namespace Merchello.Core.Persistence.Migrations.UpgradesMS.TargetVersionOneZeroT
         {
             if (_databaseSchemaHelper.TableExist("merchWarehouse"))
             {
-                Delete.Column("domainRootStructureID").FromTable("merchWarehouse");
+                Delete.Column("storeId").FromTable("merchWarehouse");
             }
         }
     }

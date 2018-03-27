@@ -77,7 +77,7 @@
         /// <returns>
         /// The <see cref="Page{TEntity}"/>.
         /// </returns>
-        public abstract Page<TEntity> GetPage(long page, long itemsPerPage, int domainRootStructureID, string sortBy = "", SortDirection sortDirection = SortDirection.Descending);
+        public abstract Page<TEntity> GetPage(long page, long itemsPerPage, int storeId, string sortBy = "", SortDirection sortDirection = SortDirection.Descending);
     
         /// <summary>
         /// The count.
@@ -88,7 +88,7 @@
         /// <returns>
         /// The <see cref="int"/>.
         /// </returns>
-        internal abstract int Count(IQuery<TEntity> query, int domainRootStructureID);
+        internal abstract int Count(IQuery<TEntity> query, int storeId);
 
         /// <summary>
         /// Performs a paged query
@@ -111,7 +111,7 @@
         public abstract Page<Guid> GetPagedKeys(
             long page,
             long itemsPerPage,
-            int domainRootStructureID,
+            int storeId,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Descending);
 

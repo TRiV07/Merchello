@@ -64,7 +64,7 @@
             {
                 Key = FieldAsGuid(result, "productVariantKey"),
                 ProductKey = FieldAsGuid(result, "productKey"),
-                DomainRootStructureID = FieldAsInteger(result, "domainRootStructureID"),
+                StoreId = FieldAsInteger(result, "storeId"),
                 Name = FieldAsString(result, "name"),
                 Sku = FieldAsString(result, "sku"),
                 Price = FieldAsDecimal(result, "price"),

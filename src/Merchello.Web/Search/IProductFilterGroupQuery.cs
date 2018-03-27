@@ -42,6 +42,6 @@
         /// <returns>
         /// The <see cref="IEnumerable{IPrimedProductFilterGroup}"/>.
         /// </returns>
-        IEnumerable<IPrimedProductFilterGroup> GetFilterGroupsForCollectionContext(int domainRootStructureID, params Guid[] collectionKeys);
+        IEnumerable<IPrimedProductFilterGroup> GetFilterGroupsForCollectionContext(int storeId, params Guid[] collectionKeys);
     }
 }

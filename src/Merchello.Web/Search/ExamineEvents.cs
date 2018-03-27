@@ -473,7 +473,7 @@
         {
             if (e.Entity.HasIdentity)
             {
-                IndexProductVariant(e.Entity, sender.GetDomainRootStructureId(e.Entity));
+                IndexProductVariant(e.Entity, sender.GetStoreId(e.Entity));
             };
         }
 
@@ -484,7 +484,7 @@
         {
             foreach (var productVariant in e.SavedEntities)
             {
-                IndexProductVariant(productVariant, sender.GetDomainRootStructureId(productVariant));
+                IndexProductVariant(productVariant, sender.GetStoreId(productVariant));
             }
         }
 
@@ -506,11 +506,11 @@
         }
 
 
-        private static void IndexProductVariant(IProductVariant productVariant, int domainRootStructureID)
+        private static void IndexProductVariant(IProductVariant productVariant, int storeId)
         {
             var cache = new VirtualProductContentCache();
             cache.ClearVirtualCache(productVariant.ProductKey);
-            ProductIndexer.ReIndexNode(productVariant.SerializeToXml(domainRootStructureID).Root, IndexTypes.ProductVariant);
+            ProductIndexer.ReIndexNode(productVariant.SerializeToXml(storeId).Root, IndexTypes.ProductVariant);
         }
 
         private static void DeleteProductFromIndex(IProduct product)

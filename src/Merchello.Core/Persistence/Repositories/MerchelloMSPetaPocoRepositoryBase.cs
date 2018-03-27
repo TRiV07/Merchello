@@ -19,10 +19,10 @@ namespace Merchello.Core.Persistence.Repositories
         {
         }
 
-        public TEntity Get(Guid key, int domainRootStructureID)
+        public TEntity Get(Guid key, int storeId)
         {
             // TODO - This is hit a lot, we need to find out why and where
-            var entity = PerformGet(key, domainRootStructureID);
+            var entity = PerformGet(key, storeId);
             if (entity != null)
             {
                 entity.ResetDirtyProperties();
@@ -31,14 +31,14 @@ namespace Merchello.Core.Persistence.Repositories
             return entity;
         }
 
-        public IEnumerable<TEntity> GetAll(int domainRootStructureID, params Guid[] keys)
+        public IEnumerable<TEntity> GetAll(int storeId, params Guid[] keys)
         {
-            return PerformGetAll(domainRootStructureID, keys);
+            return PerformGetAll(storeId, keys);
         }
 
-        protected abstract TEntity PerformGet(Guid key, int domainRootStructureID);
+        protected abstract TEntity PerformGet(Guid key, int storeId);
        
-        protected abstract IEnumerable<TEntity> PerformGetAll(int domainRootStructureID, params Guid[] keys);
+        protected abstract IEnumerable<TEntity> PerformGetAll(int storeId, params Guid[] keys);
 
         protected abstract string GetBaseMSWhereClause();
     }

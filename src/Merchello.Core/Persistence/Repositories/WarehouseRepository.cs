@@ -32,7 +32,7 @@
         /// <summary>
         /// The domain root structure ID.
         /// </summary>
-        private readonly int _domainRootStructureID;
+        private readonly int _storeId;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="WarehouseRepository"/> class.
@@ -49,13 +49,13 @@
         /// <param name="sqlSyntax">
         /// The SQL Syntax.
         /// </param>
-        public WarehouseRepository(IDatabaseUnitOfWork work, IWarehouseCatalogRepository warehouseCatalogRepository, ILogger logger, ISqlSyntaxProvider sqlSyntax, int domainRootStructureID)
+        public WarehouseRepository(IDatabaseUnitOfWork work, IWarehouseCatalogRepository warehouseCatalogRepository, ILogger logger, ISqlSyntaxProvider sqlSyntax, int storeId)
             : base(work, logger, sqlSyntax)
         {
             Mandate.ParameterNotNull(warehouseCatalogRepository, "warehouseCatalogRepository");
 
             _warehouseCatalogRepository = warehouseCatalogRepository;
-            _domainRootStructureID = domainRootStructureID;
+            _storeId = storeId;
         }
 
         /// <summary>
@@ -138,9 +138,9 @@
             sql.Select(isCount ? "COUNT(*)" : "*")
                 .From<WarehouseDto>(SqlSyntax);
 
-            if (_domainRootStructureID != Constants.System.Root)
+            if (_storeId != Constants.System.Root)
             {
-                sql.Where<WarehouseDto>(x => x.DomainRootStructureID == _domainRootStructureID, SqlSyntax);
+                sql.Where<WarehouseDto>(x => x.StoreId == _storeId, SqlSyntax);
             }
 
             return sql;

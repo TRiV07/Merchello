@@ -177,7 +177,7 @@
             Guid collectionKey,
             long page,
             long itemsPerPage,
-            int domainRootStructureID,
+            int storeId,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Ascending)
         {
@@ -193,7 +193,7 @@
                 "GetNotInCollection",
                 page,
                 itemsPerPage,
-                domainRootStructureID,
+                storeId,
                 sortBy,
                 sortDirection,
                 new Dictionary<string, string>
@@ -208,7 +208,7 @@
             return this.GetQueryResultDisplay(
                     PagedKeyCache
                     .CachePage(
-                        cacheKey, ((CachedQueryableEntityCollectionProviderBase<TEntity>)provider).GetPagedEntityKeysNotInCollection(page, itemsPerPage, domainRootStructureID, sortBy, sortDirection)));
+                        cacheKey, ((CachedQueryableEntityCollectionProviderBase<TEntity>)provider).GetPagedEntityKeysNotInCollection(page, itemsPerPage, storeId, sortBy, sortDirection)));
         }
 
         /// <summary>
@@ -240,7 +240,7 @@
             string searchTerm,
             long page,
             long itemsPerPage,
-            int domainRootStructureID,
+            int storeId,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Ascending)
         {
@@ -258,7 +258,7 @@
                 "GetNotInCollection",
                 page,
                 itemsPerPage,
-                domainRootStructureID,
+                storeId,
                 sortBy,
                 sortDirection,
                 new Dictionary<string, string>
@@ -275,7 +275,7 @@
                     PagedKeyCache
                     .CachePage(
                         cacheKey, 
-                        ((CachedQueryableEntityCollectionProviderBase<TEntity>)provider).GetPagedEntityKeysNotInCollection(args, page, itemsPerPage, domainRootStructureID, sortBy, sortDirection)));
+                        ((CachedQueryableEntityCollectionProviderBase<TEntity>)provider).GetPagedEntityKeysNotInCollection(args, page, itemsPerPage, storeId, sortBy, sortDirection)));
         }
 
         /// <summary>
