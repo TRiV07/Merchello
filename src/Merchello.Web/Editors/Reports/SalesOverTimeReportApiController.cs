@@ -248,12 +248,12 @@
         {
             var monthName = _textService.GetLocalizedMonthName(_culture, startDate.Month);
 
-            var count = _invoiceService.CountInvoices(startDate, endDate);
+            var count = _invoiceService.CountInvoices(startDate, endDate, -1);//TODOMS
 
             var totals = this.ActiveCurrencies.Select(c => new ResultCurrencyValue()
             {
                 Currency = c.ToCurrencyDisplay(),
-                Value = startDate > DateTime.Today ? 0M : this._invoiceService.SumInvoiceTotals(startDate, endDate, c.CurrencyCode)
+                Value = startDate > DateTime.Today ? 0M : this._invoiceService.SumInvoiceTotals(startDate, endDate, c.CurrencyCode, -1)//TODOMS
             }).ToList();
 
             return new SalesOverTimeResult()

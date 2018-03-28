@@ -29,6 +29,6 @@
         /// <returns>
         /// The <see cref="Page{T}"/>.
         /// </returns>
-        Page<Guid> GetPagedEntityKeys(long page, long itemsPerPage, string sortBy = "", SortDirection sortDirection = SortDirection.Ascending);
+        Page<Guid> GetPagedEntityKeys(long page, long itemsPerPage, int storeId, string sortBy = "", SortDirection sortDirection = SortDirection.Ascending);
     }
 }

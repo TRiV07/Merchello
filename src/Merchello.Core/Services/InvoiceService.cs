@@ -22,10 +22,12 @@
     using Umbraco.Core.Persistence.SqlSyntax;
     using Constants = Core.Constants;
 
+    using MS = Merchello.Core.Constants.MultiStore;
+
     /// <summary>
     /// Represents the InvoiceService
     /// </summary>
-    public class InvoiceService : PageCachedServiceBase<IInvoice>, IInvoiceService
+    public class InvoiceService : PageCachedMSServiceBase<IInvoice>, IInvoiceService
     {
         #region Fields
 
@@ -53,7 +55,7 @@
         /// The store setting service.
         /// </summary>
         private readonly IStoreSettingService _storeSettingService;
-        
+
         #endregion
 
         #region Constructors
@@ -63,7 +65,7 @@
         /// </summary>
         public InvoiceService()
             : this(LoggerResolver.Current.Logger)
-        {            
+        {
         }
 
         /// <summary>
@@ -111,10 +113,10 @@
         /// The store setting service.
         /// </param>
         internal InvoiceService(
-            Persistence.RepositoryFactory repositoryFactory, 
+            Persistence.RepositoryFactory repositoryFactory,
             ILogger logger,
-            IAppliedPaymentService appliedPaymentService, 
-            IOrderService orderService, 
+            IAppliedPaymentService appliedPaymentService,
+            IOrderService orderService,
             IStoreSettingService storeSettingService)
             : this(new PetaPocoUnitOfWorkProvider(logger), repositoryFactory, logger, appliedPaymentService, orderService, storeSettingService)
         {
@@ -177,11 +179,11 @@
         /// The store setting service.
         /// </param>
         internal InvoiceService(
-            IDatabaseUnitOfWorkProvider provider, 
-            Persistence.RepositoryFactory repositoryFactory, 
-            ILogger logger, 
-            IEventMessagesFactory eventMessagesFactory, 
-            IAppliedPaymentService appliedPaymentService, 
+            IDatabaseUnitOfWorkProvider provider,
+            Persistence.RepositoryFactory repositoryFactory,
+            ILogger logger,
+            IEventMessagesFactory eventMessagesFactory,
+            IAppliedPaymentService appliedPaymentService,
             IOrderService orderService,
             IStoreSettingService storeSettingService)
             : base(provider, repositoryFactory, logger, eventMessagesFactory)
@@ -247,9 +249,9 @@
         /// <param name="invoiceStatusKey">The <see cref="IInvoiceStatus"/> key</param>
         /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events</param>
         /// <returns><see cref="IInvoice"/></returns>
-        public IInvoice CreateInvoice(Guid invoiceStatusKey, bool raiseEvents = true)
+        public IInvoice CreateInvoice(int storeId, Guid invoiceStatusKey, bool raiseEvents = true)
         {
-            return CreateInvoice(invoiceStatusKey, 0, raiseEvents);
+            return CreateInvoice(storeId, invoiceStatusKey, 0, raiseEvents);
         }
 
         /// <summary>
@@ -270,16 +272,16 @@
         /// <remarks>
         /// Invoice number must be a positive integer value or zero
         /// </remarks>
-        public IInvoice CreateInvoice(Guid invoiceStatusKey, int invoiceNumber, bool raiseEvents = true)
+        public IInvoice CreateInvoice(int storeId, Guid invoiceStatusKey, int invoiceNumber, bool raiseEvents = true)
         {
             Mandate.ParameterCondition(Guid.Empty != invoiceStatusKey, "invoiceStatusKey");
             Mandate.ParameterCondition(invoiceNumber >= 0, "invoiceNumber must be greater than or equal to 0");
 
             var status = GetInvoiceStatusByKey(invoiceStatusKey);
 
-            var defaultCurrencyCode = this.GetDefaultCurrencyCode();
+            var defaultCurrencyCode = this.GetDefaultCurrencyCode(storeId);
 
-            var invoice = new Invoice(status)
+            var invoice = new Invoice(status, storeId)
             {
                 VersionKey = Guid.NewGuid(),
                 InvoiceNumber = invoiceNumber,
@@ -306,10 +308,10 @@
         /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events</param>
         public void Save(IInvoice invoice, bool raiseEvents = true)
         {
-            if (!((Invoice) invoice).HasIdentity && invoice.InvoiceNumber <= 0)
+            if (!((Invoice)invoice).HasIdentity && invoice.InvoiceNumber <= 0)
             {
                 // We have to generate a new 'unique' invoice number off the configurable value
-                ((Invoice) invoice).InvoiceNumber = _storeSettingService.GetNextInvoiceNumber();
+                ((Invoice)invoice).InvoiceNumber = _storeSettingService.GetNextInvoiceNumber(invoice.StoreId);
             }
 
             var includesStatusChange = ((Invoice)invoice).IsPropertyDirty("InvoiceStatus") &&
@@ -329,7 +331,7 @@
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreateInvoiceRepository(uow))
+                using (var repository = RepositoryFactory.CreateInvoiceRepository(uow, invoice.StoreId))
                 {
                     repository.AddOrUpdate(invoice);
                     uow.Commit();
@@ -356,9 +358,9 @@
             {
                 var lastInvoiceNumber =
                     _storeSettingService.GetNextInvoiceNumber(newInvoiceCount);
-                foreach (var newInvoice in invoicesArray.Where(x => x.InvoiceNumber <= 0 && !((Invoice) x).HasIdentity))
+                foreach (var newInvoice in invoicesArray.Where(x => x.InvoiceNumber <= 0 && !((Invoice)x).HasIdentity))
                 {
-                    ((Invoice) newInvoice).InvoiceNumber = lastInvoiceNumber;
+                    ((Invoice)newInvoice).InvoiceNumber = lastInvoiceNumber;
                     lastInvoiceNumber = lastInvoiceNumber - 1;
                 }
             }
@@ -380,7 +382,7 @@
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreateInvoiceRepository(uow))
+                using (var repository = RepositoryFactory.CreateInvoiceRepository(uow, MS.DefaultId))
                 {
                     foreach (var invoice in invoicesArray)
                     {
@@ -419,7 +421,7 @@
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreateInvoiceRepository(uow))
+                using (var repository = RepositoryFactory.CreateInvoiceRepository(uow, invoice.StoreId))
                 {
                     repository.Delete(invoice);
                     uow.Commit();
@@ -442,7 +444,7 @@
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreateInvoiceRepository(uow))
+                using (var repository = RepositoryFactory.CreateInvoiceRepository(uow, MS.DefaultId))
                 {
                     foreach (var invoice in invoicesArray)
                     {
@@ -467,7 +469,7 @@
         /// <returns><see cref="IInvoice"/></returns>
         public override IInvoice GetByKey(Guid key)
         {
-            using (var repository = RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork(), MS.DefaultId))
             {
                 return repository.Get(key);
             }
@@ -491,9 +493,9 @@
         /// <returns>
         /// The <see cref="Page{IInvoice}"/>.
         /// </returns>
-        public override Page<IInvoice> GetPage(long page, long itemsPerPage, string sortBy = "", SortDirection sortDirection = SortDirection.Descending)
+        public override Page<IInvoice> GetPage(long page, long itemsPerPage, int storeId, string sortBy = "", SortDirection sortDirection = SortDirection.Descending)
         {
-            using (var repository = RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 var query = Persistence.Querying.Query<IInvoice>.Builder.Where(x => x.Key != Guid.Empty);
 
@@ -507,9 +509,9 @@
         /// </summary>
         /// <param name="invoiceNumber">The invoice number of the <see cref="IInvoice"/> to be retrieved</param>
         /// <returns><see cref="IInvoice"/></returns>
-        public IInvoice GetByInvoiceNumber(int invoiceNumber)
+        public IInvoice GetByInvoiceNumber(int invoiceNumber, int storeId)
         {
-            using (var repository = RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 var query = Persistence.Querying.Query<IInvoice>.Builder.Where(x => x.InvoiceNumber == invoiceNumber);
 
@@ -524,7 +526,7 @@
         /// <returns>List of <see cref="IInvoice"/></returns>
         public IEnumerable<IInvoice> GetByKeys(IEnumerable<Guid> keys)
         {
-            using (var repository = RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork(), MS.DefaultId))
             {
                 return repository.GetAll(keys.ToArray());
             }
@@ -553,7 +555,7 @@
         /// </returns>
         public IEnumerable<IInvoice> GetInvoicesByCustomerKey(Guid customeryKey)
         {
-            using (var repository = RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork(), MS.DefaultId))
             {
                 var query = Persistence.Querying.Query<IInvoice>.Builder.Where(x => x.CustomerKey == customeryKey);
 
@@ -573,12 +575,12 @@
         /// <returns>
         /// The count the invoices.
         /// </returns>
-        public IEnumerable<IInvoice> GetInvoicesByDateRange(DateTime startDate, DateTime endDate)
+        public IEnumerable<IInvoice> GetInvoicesByDateRange(DateTime startDate, DateTime endDate, int storeId)
         {
             // We need to make sure we get entire day
             var correctStart = startDate.GetStartOfDay();
             var correctEnd = endDate.GetEndOfDay();
-            using (var repository = RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 var query = Persistence.Querying.Query<IInvoice>.Builder.Where(x => x.InvoiceDate >= correctStart && x.InvoiceDate <= correctEnd);
                 return repository.GetByQuery(query);
@@ -589,9 +591,9 @@
         /// Gets the total count of all <see cref="IInvoice"/>
         /// </summary>
         /// <returns>The count of <see cref="IInvoice"/></returns>
-        public int CountInvoices()
+        public int CountInvoices(int storeId)
         {
-            return this.Count(Persistence.Querying.Query<IInvoice>.Builder.Where(x => x.Key != Guid.Empty));
+            return this.Count(Persistence.Querying.Query<IInvoice>.Builder.Where(x => x.Key != Guid.Empty), storeId);
         }
 
         /// <summary>
@@ -606,13 +608,13 @@
         /// <returns>
         /// The <see cref="int"/> representing the count of invoices.
         /// </returns>
-        public int CountInvoices(DateTime startDate, DateTime endDate)
+        public int CountInvoices(DateTime startDate, DateTime endDate, int storeId)
         {
             var query =
                 Persistence.Querying.Query<IInvoice>.Builder.Where(
                     x => x.InvoiceDate >= startDate && x.InvoiceDate <= endDate);
 
-            return Count(query);
+            return Count(query, storeId);
         }
 
 
@@ -631,7 +633,7 @@
         /// <returns>
         /// The <see cref="int"/> representing the count of invoices.
         /// </returns>
-        public int CountInvoices(DateTime startDate, DateTime endDate, CustomerType customerType)
+        public int CountInvoices(DateTime startDate, DateTime endDate, CustomerType customerType, int storeId)
         {
             var query = customerType == CustomerType.Anonymous ?
                 Persistence.Querying.Query<IInvoice>.Builder.Where(
@@ -639,7 +641,7 @@
                 Persistence.Querying.Query<IInvoice>.Builder.Where(
                     x => x.InvoiceDate >= startDate && x.InvoiceDate <= endDate && x.CustomerKey != null);
 
-            return Count(query);
+            return Count(query, storeId);
         }
 
         /// <summary>
@@ -657,9 +659,9 @@
         /// <returns>
         /// The sum of the invoice totals.
         /// </returns>
-        public decimal SumInvoiceTotals(DateTime startDate, DateTime endDate, string currencyCode)
+        public decimal SumInvoiceTotals(DateTime startDate, DateTime endDate, string currencyCode, int storeId)
         {
-            using (var repository = RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 return repository.SumInvoiceTotals(startDate, endDate, currencyCode);
             }
@@ -683,9 +685,9 @@
         /// <returns>
         /// The total of line items for a give SKU invoiced in a specific currency across the date range.
         /// </returns>
-        public decimal SumLineItemTotalsBySku(DateTime startDate, DateTime endDate, string currencyCode, string sku)
+        public decimal SumLineItemTotalsBySku(DateTime startDate, DateTime endDate, string currencyCode, string sku, int storeId)
         {
-            using (var repository = RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 return repository.SumLineItemTotalsBySku(startDate, endDate, currencyCode, sku);
             }
@@ -699,7 +701,7 @@
         /// </returns>
         public IEnumerable<string> GetDistinctCurrencyCodes()
         {
-            using (var repository = RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork(), MS.DefaultId))
             {
                 return repository.GetDistinctCurrencyCodes();
             }
@@ -777,7 +779,7 @@
         /// </param>
         public void AddToCollection(Guid invoiceKey, Guid collectionKey)
         {
-            using (var repository = RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork(), MS.DefaultId))
             {
                 repository.AddToCollection(invoiceKey, collectionKey);
             }
@@ -822,7 +824,7 @@
         /// </param>
         public void RemoveFromCollection(Guid invoiceKey, Guid collectionKey)
         {
-            using (var repository = RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork(), MS.DefaultId))
             {
                 repository.RemoveFromCollection(invoiceKey, collectionKey);
             }
@@ -842,7 +844,7 @@
         /// </returns>
         public bool ExistsInCollection(Guid invoiceKey, Guid collectionKey)
         {
-            using (var repository = RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork(), MS.DefaultId))
             {
                 return repository.ExistsInCollection(invoiceKey, collectionKey);
             }
@@ -862,7 +864,7 @@
         /// </returns>
         public bool ExistsInCollection(Guid entityKey, IEnumerable<Guid> collectionKeys)
         {
-            using (var repository = RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork(), MS.DefaultId))
             {
                 return repository.ExistsInCollection(entityKey, collectionKeys.ToArray());
             }
@@ -896,7 +898,7 @@
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Descending)
         {
-            using (var repository = RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork(), MS.DefaultId))
             {
                 return repository.GetFromCollection(
                     collectionKey,
@@ -935,7 +937,7 @@
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Descending)
         {
-            using (var repository = RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork(), MS.DefaultId))
             {
                 return repository.GetEntitiesThatExistInAllCollections(
                     collectionKeys.ToArray(),
@@ -978,7 +980,7 @@
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Descending)
         {
-            using (var repository = RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork(), MS.DefaultId))
             {
                 return repository.GetFromCollection(
                     collectionKey,
@@ -1022,7 +1024,7 @@
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Descending)
         {
-            using (var repository = RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork(), MS.DefaultId))
             {
                 return repository.GetEntitiesThatExistInAllCollections(
                     collectionKeys.ToArray(),
@@ -1062,7 +1064,7 @@
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Descending)
         {
-            using (var repository = RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork(), MS.DefaultId))
             {
                 return repository.GetKeysFromCollection(
                     collectionKey,
@@ -1105,7 +1107,7 @@
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Descending)
         {
-            using (var repository = RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork(), MS.DefaultId))
             {
                 return repository.GetKeysFromCollection(
                     collectionKey,
@@ -1115,7 +1117,7 @@
                     this.ValidateSortByField(sortBy),
                     sortDirection);
             }
-        }       
+        }
 
         /// <summary>
         /// The get invoice keys from static collection.
@@ -1142,10 +1144,11 @@
             Guid collectionKey,
             long page,
             long itemsPerPage,
+            int storeId,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Descending)
         {
-            using (var repository = RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 return repository.GetKeysNotInCollection(
                     collectionKey,
@@ -1185,10 +1188,11 @@
             string searchTerm,
             long page,
             long itemsPerPage,
+            int storeId,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Descending)
         {
-            using (var repository = RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 return repository.GetKeysNotInCollection(
                     collectionKey,
@@ -1234,10 +1238,11 @@
             Guid invoiceStatusKey,
             long page,
             long itemsPerPage,
+            int storeId,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Descending)
         {
-            using (var repository = RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 return repository.GetInvoicesMatchingInvoiceStatus(
                     searchTerm,
@@ -1278,10 +1283,11 @@
             Guid invoiceStatusKey,
             long page,
             long itemsPerPage,
+            int storeId,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Descending)
         {
-            using (var repository = RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 return repository.GetInvoiceKeysMatchingInvoiceStatus(
                     searchTerm,
@@ -1322,10 +1328,11 @@
             Guid invoiceStatusKey,
             long page,
             long itemsPerPage,
+            int storeId,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Descending)
         {
-            using (var repository = RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 return repository.GetInvoicesMatchingTermNotInvoiceStatus(
                     searchTerm,
@@ -1366,10 +1373,11 @@
             Guid invoiceStatusKey,
             long page,
             long itemsPerPage,
+            int storeId,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Descending)
         {
-            using (var repository = RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 return repository.GetInvoiceKeysMatchingTermNotInvoiceStatus(
                     searchTerm,
@@ -1410,10 +1418,11 @@
             Guid orderStatusKey,
             long page,
             long itemsPerPage,
+            int storeId,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Descending)
         {
-            using (var repository = RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 return repository.GetInvoicesMatchingOrderStatus(
                     searchTerm,
@@ -1450,10 +1459,11 @@
             Guid orderStatusKey,
             long page,
             long itemsPerPage,
+            int storeId,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Descending)
         {
-            using (var repository = RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 return repository.GetInvoiceKeysMatchingOrderStatus(
                     orderStatusKey,
@@ -1493,10 +1503,11 @@
             Guid orderStatusKey,
             long page,
             long itemsPerPage,
+            int storeId,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Descending)
         {
-            using (var repository = RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 return repository.GetInvoiceKeysMatchingOrderStatus(
                     searchTerm,
@@ -1537,10 +1548,11 @@
             Guid orderStatusKey,
             long page,
             long itemsPerPage,
+            int storeId,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Descending)
         {
-            using (var repository = RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 return repository.GetInvoicesMatchingTermNotOrderStatus(
                     searchTerm,
@@ -1577,10 +1589,11 @@
             Guid orderStatusKey,
             long page,
             long itemsPerPage,
+            int storeId,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Descending)
         {
-            using (var repository = RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 return repository.GetInvoiceKeysMatchingTermNotOrderStatus(
                     orderStatusKey,
@@ -1620,10 +1633,11 @@
             Guid orderStatusKey,
             long page,
             long itemsPerPage,
+            int storeId,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Descending)
         {
-            using (var repository = RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 return repository.GetInvoiceKeysMatchingTermNotOrderStatus(
                     searchTerm,
@@ -1720,7 +1734,7 @@
 
                 var taxLineItem = taxes.AsLineItemOf<InvoiceLineItem>();
 
-                var currencyCode = _storeSettingService.GetByKey(Core.Constants.StoreSetting.CurrencyCodeKey).Value;
+                var currencyCode = _storeSettingService.GetByKey(Core.Constants.StoreSetting.CurrencyCodeKey, invoice.StoreId).Value;
 
                 taxLineItem.ExtendedData.SetValue(Core.Constants.ExtendedDataKeys.CurrencyCode, currencyCode);
 
@@ -1734,7 +1748,7 @@
             var discounts = invoice.Items.Where(x => x.LineItemType == LineItemType.Discount).Sum(x => x.TotalPrice);
 
             // Calculate a new total
-            decimal converted;            
+            decimal converted;
             invoice.Total = Math.Round(decimal.TryParse((charges - discounts).ToString(CultureInfo.InvariantCulture), NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture.NumberFormat, out converted) ? converted : 0, 2);
 
             // Save the invoice
@@ -1760,7 +1774,7 @@
         /// </remarks>
         private void SetTaxableSetting(IInvoice invoice, bool taxable = false)
         {
-            if (!MerchelloContext.Current.Gateways.Taxation.ProductPricingEnabled) return;
+            if (!MerchelloContext.Current.Gateways.Taxation.ProductPricingEnabled(invoice.StoreId)) return;
 
             foreach (var item in invoice.Items.Where(x => x.ExtendedData.TaxIncludedInProductPrice()))
             {
@@ -1776,10 +1790,10 @@
         /// </returns>
         internal IEnumerable<IInvoice> GetAll()
         {
-            using (var repository = RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork(), MS.DefaultId))
             {
                 return repository.GetAll();
-            } 
+            }
         }
 
         /// <summary>
@@ -1791,9 +1805,9 @@
         /// <returns>
         /// The <see cref="int"/>.
         /// </returns>
-        internal override int Count(IQuery<IInvoice> query)
+        internal override int Count(IQuery<IInvoice> query, int storeId)
         {
-            using (var repository = RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 return repository.Count(query);
             }
@@ -1805,9 +1819,9 @@
         /// <returns>
         /// The currency code saved in the store settings.
         /// </returns>
-        internal string GetDefaultCurrencyCode()
+        internal string GetDefaultCurrencyCode(int storeId)
         {
-            return this._storeSettingService.GetByKey(Core.Constants.StoreSetting.CurrencyCodeKey).Value;
+            return this._storeSettingService.GetByKey(Core.Constants.StoreSetting.CurrencyCodeKey, storeId).Value;
         }
 
         #region Key Queries
@@ -1833,10 +1847,10 @@
         /// <remarks>
         /// This is used by large back office collections usually backed by Examine (Lucene) backed cache
         /// </remarks>
-        public override Page<Guid> GetPagedKeys(long page, long itemsPerPage, string sortBy = "", SortDirection sortDirection = SortDirection.Descending)
+        public override Page<Guid> GetPagedKeys(long page, long itemsPerPage, int storeId, string sortBy = "", SortDirection sortDirection = SortDirection.Descending)
         {
             return GetPagedKeys(
-                RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork()),
+                RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork(), storeId),
                 Persistence.Querying.Query<IInvoice>.Builder.Where(x => x.Key != Guid.Empty),
                 page,
                 itemsPerPage,
@@ -1872,10 +1886,11 @@
             string searchTerm,
             long page,
             long itemsPerPage,
+            int storeId,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Descending)
         {
-            using (var repository = (InvoiceRepository)RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = (InvoiceRepository)RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 return repository.SearchKeys(searchTerm, page, itemsPerPage, ValidateSortByField(sortBy));
             }
@@ -1917,10 +1932,11 @@
             DateTime endDate,
             long page,
             long itemsPerPage,
+            int storeId,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Descending)
         {
-            using (var repository = (InvoiceRepository)RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = (InvoiceRepository)RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 return repository.SearchKeys(searchTerm, startDate, endDate, page, itemsPerPage, ValidateSortByField(sortBy));
             }
@@ -1951,11 +1967,12 @@
             IQuery<IInvoice> query,
             long page,
             long itemsPerPage,
+            int storeId,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Descending)
         {
             return GetPagedKeys(
-                RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork()),
+                RepositoryFactory.CreateInvoiceRepository(UowProvider.GetUnitOfWork(), storeId),
                 query,
                 page,
                 itemsPerPage,
@@ -2003,12 +2020,6 @@
             var appliedPayments = _appliedPaymentService.GetAppliedPaymentsByInvoiceKey(invoice.Key).ToArray();
 
             if (appliedPayments.Any()) _appliedPaymentService.Delete(appliedPayments);
-        }
-
-        //TODOMS
-        public Page<IInvoice> GetPage(long page, long itemsPerPage, int storeId, string sortBy = "", SortDirection sortDirection = SortDirection.Descending)
-        {
-            return this.GetPage(page, itemsPerPage, sortBy, sortDirection);
         }
     }
 }

@@ -77,7 +77,7 @@
 
             //// Invoice needs to be created via the service so that the Creating / Created events get fired.
             //// see http://issues.merchello.com/youtrack/issue/M-1290
-            var invoice = _checkoutManager.Context.Services.InvoiceService.CreateInvoice(unpaid.Key);
+            var invoice = _checkoutManager.Context.Services.InvoiceService.CreateInvoice(_checkoutManager.Context.Customer.StoreId, unpaid.Key);//TOCHECKMS
             invoice.VersionKey = _checkoutManager.Context.VersionKey;
 
             //// var invoice = new Invoice(unpaid) { VersionKey = _checkoutManager.Context.VersionKey };

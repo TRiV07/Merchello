@@ -19,7 +19,7 @@
         /// <returns>
         /// The <see cref="IEnumerable{Object}"/>.
         /// </returns>
-        IEnumerable<object> GetEntities();
+        IEnumerable<object> GetEntities(int storeId);
             
             /// <summary>
         /// The get entities.
@@ -30,6 +30,6 @@
         /// <returns>
         /// The <see cref="IEnumerable"/>.
         /// </returns>
-        IEnumerable<T> GetEntities<T>() where T : class, IEntity;
+        IEnumerable<T> GetEntities<T>(int storeId) where T : class, IEntity;
     }
 }

@@ -4,6 +4,7 @@
     using System.Web.Mvc;
 
     using Merchello.Core;
+    using Merchello.Core.MultiStore;
     using Merchello.Web.Controllers;
     using Merchello.Web.Store.Factories;
     using Merchello.Web.Store.Models;
@@ -55,7 +56,7 @@
                 try
                 {
                     resp.AddUpdatedItems(this.WishList.Items);
-                    resp.FormattedTotal = this.WishList.TotalWishListPrice.AsFormattedCurrency();
+                    resp.FormattedTotal = this.WishList.TotalWishListPrice.AsFormattedCurrency(Services.DomainService.CurrentDomain().RootContentId.Value);
                     resp.ItemCount = this.GetWishListItemCountForDisplay();
                     return this.Json(resp);
                 }

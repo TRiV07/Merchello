@@ -1,9 +1,11 @@
+using Merchello.Core.Models.EntityBase;
+
 namespace Merchello.Web.Models.VirtualContent
 {
     /// <summary>
     /// The ProductContentBase interface.
     /// </summary>
-    public interface IProductContentBase
+    public interface IProductContentBase : IHasDomainRoot
     {
         /// <summary>
         /// Gets the culture name.

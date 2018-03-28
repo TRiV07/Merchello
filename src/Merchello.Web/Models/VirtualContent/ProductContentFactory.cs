@@ -154,7 +154,20 @@
                 parent = _parentGetter(display);
             }
 
-            return new ProductContent(publishedContentType, optionContentTypes, clone, parent, _defaultStoreLanguage);
+            var parentCulture = parent != null ? parent.GetCulture().Name : string.Empty;
+
+            var defaultStoreLanguage = StringExtensions.IsNullOrWhiteSpace(parentCulture) ?
+                _storeSettingService.GetByKey(Constants.StoreSetting.DefaultExtendedContentCulture, display.StoreId).Value :
+                parentCulture;
+
+            if (_allLanguages.Any())
+            {
+                defaultStoreLanguage = _allLanguages.Any(x => x.CultureInfo.Name == defaultStoreLanguage)
+                                            ? defaultStoreLanguage
+                                            : _allLanguages.First().CultureInfo.Name;
+            }
+
+            return new ProductContent(publishedContentType, optionContentTypes, clone, parent, defaultStoreLanguage);
         }
 
         /// <summary>
@@ -206,19 +219,19 @@
             //// http://issues.merchello.com/youtrack/issue/M-878
             _allLanguages = ApplicationContext.Current.Services.LocalizationService.GetAllLanguages().ToArray();
 
-            _parentCulture = _parent != null ? _parent.GetCulture().Name : string.Empty;
+            //_parentCulture = _parent != null ? _parent.GetCulture().Name : string.Empty;
 
-            _defaultStoreLanguage = StringExtensions.IsNullOrWhiteSpace(this._parentCulture) ?
-                _storeSettingService.GetByKey(Constants.StoreSetting.DefaultExtendedContentCulture).Value :
-                _parentCulture;
+            //_defaultStoreLanguage = StringExtensions.IsNullOrWhiteSpace(this._parentCulture) ?
+            //    _storeSettingService.GetByKey(Constants.StoreSetting.DefaultExtendedContentCulture).Value :
+            //    _parentCulture;
 
-            if (_allLanguages.Any())
-            {
+            //if (_allLanguages.Any())
+            //{
 
-                _defaultStoreLanguage = _allLanguages.Any(x => x.CultureInfo.Name == _defaultStoreLanguage)
-                                            ? _defaultStoreLanguage
-                                            : _allLanguages.First().CultureInfo.Name;
-            }
+            //    _defaultStoreLanguage = _allLanguages.Any(x => x.CultureInfo.Name == _defaultStoreLanguage)
+            //                                ? _defaultStoreLanguage
+            //                                : _allLanguages.First().CultureInfo.Name;
+            //}
 
         }
     }

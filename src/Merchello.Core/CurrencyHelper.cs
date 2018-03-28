@@ -16,10 +16,10 @@
         /// <returns>
         /// The <see cref="string"/>.
         /// </returns>
-        public static string FormatCurrency(decimal amount)
+        public static string FormatCurrency(decimal amount, int storeId)
         {
             if (!CurrencyContext.HasCurrent) return amount.ToString(CultureInfo.InvariantCulture);
-            return CurrencyContext.Current.FormatCurrency(amount);
+            return CurrencyContext.Current.FormatCurrency(amount, storeId);
         }
     }
 
@@ -37,9 +37,9 @@
         /// <returns>
         /// The <see cref="string"/>.
         /// </returns>
-        public static string AsFormattedCurrency(this decimal amount)
+        public static string AsFormattedCurrency(this decimal amount, int storeId)
         {
-            return CurrencyHelper.FormatCurrency(amount);
+            return CurrencyHelper.FormatCurrency(amount, storeId);
         }
     }
 }

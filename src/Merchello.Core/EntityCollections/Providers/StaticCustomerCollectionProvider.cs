@@ -62,7 +62,7 @@
         /// <returns>
         /// The <see cref="Page{ICustomer}"/>.
         /// </returns>
-        protected override Page<ICustomer> PerformGetPagedEntities(long page, long itemsPerPage, string sortBy = "", SortDirection sortDirection = SortDirection.Ascending)
+        protected override Page<ICustomer> PerformGetPagedEntities(long page, long itemsPerPage, int storeId, string sortBy = "", SortDirection sortDirection = SortDirection.Ascending)
         {
             return this.MerchelloContext.Services.CustomerService.GetFromCollection(
                 this.CollectionKey,
@@ -93,6 +93,7 @@
         protected override Page<Guid> PerformGetPagedEntityKeys(
             long page,
             long itemsPerPage,
+            int storeId,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Ascending)
         {
@@ -163,10 +164,11 @@
             Dictionary<string, object> args,
             long page,
             long itemsPerPage,
+            int storeId,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Ascending)
         {
-            if (!args.ContainsKey("searchTerm")) return PerformGetPagedEntityKeys(page, itemsPerPage, sortBy, sortDirection);
+            if (!args.ContainsKey("searchTerm")) return PerformGetPagedEntityKeys(page, itemsPerPage, storeId, sortBy, sortDirection);
 
             return ((CustomerService)this.MerchelloContext.Services.CustomerService).GetKeysFromCollection(
             this.CollectionKey,

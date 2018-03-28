@@ -52,9 +52,9 @@
         /// All we're doing here is keeping a bit of control in case we need to do some processing before or after
         /// later on.
         /// </remarks>
-        public Page<Guid> GetPagedEntityKeys(long page, long itemsPerPage, string sortBy = "", SortDirection sortDirection = SortDirection.Ascending)
+        public Page<Guid> GetPagedEntityKeys(long page, long itemsPerPage, int storeId, string sortBy = "", SortDirection sortDirection = SortDirection.Ascending)
         {
-            return this.PerformGetPagedEntityKeys(page, itemsPerPage, sortBy, sortDirection);
+            return this.PerformGetPagedEntityKeys(page, itemsPerPage, storeId, sortBy, sortDirection);
         }
 
         /// <summary>
@@ -78,6 +78,7 @@
         protected abstract Page<Guid> PerformGetPagedEntityKeys(
             long page,
             long itemsPerPage,
+            int storeId,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Ascending);
     }

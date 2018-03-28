@@ -179,7 +179,7 @@ namespace Merchello.Core
             {
                 ReplaceablePattern.GetConfigurationReplaceablePattern("InvoiceKey", invoice.Key.ToString()),
                 ReplaceablePattern.GetConfigurationReplaceablePattern("InvoiceNumber", invoice.PrefixedInvoiceNumber()),
-                ReplaceablePattern.GetConfigurationReplaceablePattern("InvoiceDate", invoice.InvoiceDate.FormatAsStoreDate()),
+                ReplaceablePattern.GetConfigurationReplaceablePattern("InvoiceDate", invoice.InvoiceDate.FormatAsStoreDate(invoice.StoreId)),
                 ReplaceablePattern.GetConfigurationReplaceablePattern("BillToName", invoice.BillToName),
                 ReplaceablePattern.GetConfigurationReplaceablePattern("BillToAddress1", invoice.BillToAddress1),
                 ReplaceablePattern.GetConfigurationReplaceablePattern("BillToAddress2", invoice.BillToAddress2),
@@ -1006,6 +1006,7 @@ namespace Merchello.Core
                     writer.WriteStartElement("invoice");
                     writer.WriteAttributeString("id", ((Invoice)invoice).ExamineId.ToString(CultureInfo.InvariantCulture));
                     writer.WriteAttributeString("invoiceKey", invoice.Key.ToString());
+                    writer.WriteAttributeString("storeId", invoice.StoreId.ToString());
                     writer.WriteAttributeString("customerKey", invoice.CustomerKey.ToString());
                     writer.WriteAttributeString("invoiceNumberPrefix", invoice.InvoiceNumberPrefix);
                     writer.WriteAttributeString("invoiceNumber", invoice.InvoiceNumber.ToString(CultureInfo.InvariantCulture));

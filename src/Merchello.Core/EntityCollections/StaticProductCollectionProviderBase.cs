@@ -60,7 +60,7 @@
         /// <remarks>
         /// 
         /// </remarks>
-        protected override Page<IProduct> PerformGetPagedEntities(long page, long itemsPerPage, string sortBy = "", SortDirection sortDirection = SortDirection.Ascending)
+        protected override Page<IProduct> PerformGetPagedEntities(long page, long itemsPerPage, int storeId, string sortBy = "", SortDirection sortDirection = SortDirection.Ascending)
         {
             return this.MerchelloContext.Services.ProductService.GetFromCollection(
                 this.CollectionKey,
@@ -88,7 +88,7 @@
         /// <returns>
         /// The <see cref="Page{Guid}"/>.
         /// </returns>
-        protected override Page<Guid> PerformGetPagedEntityKeys(long page, long itemsPerPage, string sortBy = "", SortDirection sortDirection = SortDirection.Ascending)
+        protected override Page<Guid> PerformGetPagedEntityKeys(long page, long itemsPerPage, int storeId, string sortBy = "", SortDirection sortDirection = SortDirection.Ascending)
         {
             return ((ProductService)this.MerchelloContext.Services.ProductService).GetKeysFromCollection(
                 this.CollectionKey,
@@ -123,10 +123,11 @@
             Dictionary<string, object> args,
             long page,
             long itemsPerPage,
+            int storeId,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Ascending)
         {
-            if (!args.ContainsKey("searchTerm")) return PerformGetPagedEntityKeys(page, itemsPerPage, sortBy, sortDirection);
+            if (!args.ContainsKey("searchTerm")) return PerformGetPagedEntityKeys(page, itemsPerPage, storeId, sortBy, sortDirection);
 
             return ((ProductService)this.MerchelloContext.Services.ProductService).GetKeysFromCollection(
                 this.CollectionKey,

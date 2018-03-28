@@ -149,7 +149,7 @@
                     PagedKeyCache
                     .CachePage(
                         cacheKey,
-                        ((CachedQueryableEntityCollectionProviderBase<TEntity>)provider).GetPagedEntityKeys(args, page, itemsPerPage, sortBy, sortDirection)));
+                        ((CachedQueryableEntityCollectionProviderBase<TEntity>)provider).GetPagedEntityKeys(args, page, itemsPerPage, Core.Constants.MultiStore.DefaultId, sortBy, sortDirection)));//TOCHECKMS
         }
 
         /// <summary>
@@ -350,7 +350,7 @@
             var provider = this.GetEntityCollectionProvider(collectionKey);
             return PagedKeyCache.CachePage(
                        cacheKey,
-                       provider.GetPagedEntityKeys(page, itemsPerPage, sortBy, sortDirection));
+                       provider.GetPagedEntityKeys(page, itemsPerPage, Core.Constants.MultiStore.DefaultId, sortBy, sortDirection));//TOCHECKMS
         } 
 
         /// <summary>

@@ -1,5 +1,6 @@
 ﻿namespace Merchello.Core.Models.Rdbms
 {
+    using Merchello.Core.Models.EntityBase;
     using System;
 
     using Umbraco.Core.Persistence;
@@ -11,7 +12,7 @@
     [TableName("merchShipment")]
     [PrimaryKey("pk", autoIncrement = false)]
     [ExplicitColumns]
-    internal class ShipmentDto
+    internal class ShipmentDto : IHasDomainRoot
     {
         /// <summary>
         /// Gets or sets the key.
@@ -20,6 +21,13 @@
         [PrimaryKeyColumn(AutoIncrement = false)]
         [Constraint(Default = "newid()")]
         public Guid Key { get; set; }
+
+        /// <summary>
+        /// Gets or sets domain root structure ID
+        /// </summary>
+        [Column("storeId")]
+        [Constraint(Default = Constants.MultiStore.DefaultId)]
+        public int StoreId { get; set; }
 
         /// <summary>
         /// Gets or sets the shipment number prefix.
@@ -32,7 +40,7 @@
         /// Gets or sets the invoice number.
         /// </summary>
         [Column("shipmentNumber")]
-        [IndexAttribute(IndexTypes.UniqueNonClustered, Name = "IX_merchShipmentNumber")]
+        [IndexAttribute(IndexTypes.UniqueNonClustered, Name = "IX_merchShipmentNumber", ForColumns = "shipmentNumber, storeId")]
         public int ShipmentNumber { get; set; }
 
         /// <summary>

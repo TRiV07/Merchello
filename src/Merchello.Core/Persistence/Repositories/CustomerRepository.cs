@@ -55,13 +55,13 @@
         /// The domain root structure ID.
         /// </param>
         public CustomerRepository(
-            IDatabaseUnitOfWork work, 
-            ICustomerAddressRepository customerAddressRepository, 
+            IDatabaseUnitOfWork work,
+            int storeId,
+            ICustomerAddressRepository customerAddressRepository,
             INoteRepository noteRepository,
-            ILogger logger, 
-            ISqlSyntaxProvider sqlSyntax,
-            int storeId) 
-            : base(work, logger, sqlSyntax, storeId)
+            ILogger logger,
+            ISqlSyntaxProvider sqlSyntax)
+            : base(work, storeId, logger, sqlSyntax)
         {
             Mandate.ParameterNotNull(customerAddressRepository, "customerAddressRepository");
             Mandate.ParameterNotNull(noteRepository, "noteRepository");
@@ -885,7 +885,7 @@
 
             var factory = new CustomerFactory();
             var dto = factory.BuildDto(entity);
-            
+
             Database.Insert(dto);
             entity.Key = dto.Key;
 

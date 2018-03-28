@@ -56,10 +56,11 @@
             Dictionary<string, object> args,
             long page,
             long itemsPerPage,
+            int storeId,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Ascending)
         {
-            return this.PerformGetPagedEntityKeys(args, page, itemsPerPage, sortBy, sortDirection);
+            return this.PerformGetPagedEntityKeys(args, page, itemsPerPage, storeId, sortBy, sortDirection);
         }
 
         /// <summary>
@@ -147,6 +148,7 @@
             Dictionary<string, object> args,
             long page,
             long itemsPerPage,
+            int storeId,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Ascending);
 

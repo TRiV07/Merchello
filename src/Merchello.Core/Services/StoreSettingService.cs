@@ -23,6 +23,8 @@
     using Umbraco.Core.Persistence.SqlSyntax;
     using Umbraco.Core.Services;
 
+    using MS = Merchello.Core.Constants.MultiStore;
+
     /// <summary>
     /// Represents the Store Settings Service
     /// </summary>
@@ -248,7 +250,7 @@
         /// <param name="typeName">The type name</param>
         /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events</param>
         /// <returns><see cref="IStoreSetting"/></returns>
-        public IStoreSetting CreateStoreSettingWithKey(string name, string value, string typeName, bool raiseEvents)
+        public IStoreSetting CreateStoreSettingWithKey(string name, string value, string typeName, int storeId, bool raiseEvents)
         {
             Mandate.ParameterNotNullOrEmpty(name, "name");
             Mandate.ParameterNotNullOrEmpty(value, "value");
@@ -272,7 +274,7 @@
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreateStoreSettingRepository(uow))
+                using (var repository = RepositoryFactory.CreateStoreSettingRepository(uow, storeId))
                 {
                     repository.AddOrUpdate(storeSetting);
                     uow.Commit();
@@ -302,7 +304,7 @@
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreateStoreSettingRepository(uow))
+                using (var repository = RepositoryFactory.CreateStoreSettingRepository(uow, storeSetting.StoreId))
                 {
                     repository.AddOrUpdate(storeSetting);
                     uow.Commit();
@@ -336,7 +338,7 @@
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreateStoreSettingRepository(uow))
+                using (var repository = RepositoryFactory.CreateStoreSettingRepository(uow, storeSetting.StoreId))
                 {
                     repository.Delete(storeSetting);
                     uow.Commit();
@@ -354,11 +356,11 @@
         /// <returns>
         /// The <see cref="IStoreSetting"/>.
         /// </returns>
-        public IStoreSetting GetByKey(Guid key)
+        public IStoreSetting GetByKey(Guid key, int storeId)
         {
-            using (var repository = RepositoryFactory.CreateStoreSettingRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateStoreSettingRepository(UowProvider.GetUnitOfWork(), storeId))
             {
-                return repository.Get(key, _domainService.CurrentDomain()?.RootContentId ?? 0);
+                return repository.Get(key);
             }
         }
 
@@ -368,19 +370,11 @@
         /// <returns>
         /// The collection of all <see cref="IStoreSetting"/>.
         /// </returns>
-        public IEnumerable<IStoreSetting> GetAll()
+        public IEnumerable<IStoreSetting> GetAll(int storeId)
         {
-            using (var repository = RepositoryFactory.CreateStoreSettingRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateStoreSettingRepository(UowProvider.GetUnitOfWork(), storeId))
             {
-                return repository.GetAll(_domainService.CurrentDomain()?.RootContentId ?? 0);
-            }
-        }
-
-        public IEnumerable<IStoreSetting> GetAll(int id)
-        {
-            using (var repository = RepositoryFactory.CreateStoreSettingRepository(UowProvider.GetUnitOfWork()))
-            {
-                return repository.GetAll(id);
+                return repository.GetAll();
             }
         }
 
@@ -393,17 +387,17 @@
         /// <returns>
         /// The next invoice number.
         /// </returns>
-        public virtual int GetNextInvoiceNumber(int invoicesCount = 1)
+        public virtual int GetNextInvoiceNumber(int storeId, int invoicesCount = 1)
         {
             var invoiceNumber = 0;
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreateStoreSettingRepository(uow))
+                using (var repository = RepositoryFactory.CreateStoreSettingRepository(uow, storeId))
                 {
-                    using (var validationRepository = RepositoryFactory.CreateInvoiceRepository(uow))
+                    using (var validationRepository = RepositoryFactory.CreateInvoiceRepository(uow, storeId))
                     { 
-                        invoiceNumber = repository.GetNextInvoiceNumber(Core.Constants.StoreSetting.NextInvoiceNumberKey, _domainService.CurrentDomain()?.RootContentId ?? 0, validationRepository.GetMaxDocumentNumber, invoicesCount);
+                        invoiceNumber = repository.GetNextInvoiceNumber(Core.Constants.StoreSetting.NextInvoiceNumberKey, validationRepository.GetMaxDocumentNumber, invoicesCount);
                     }
 
                     uow.Commit();
@@ -422,17 +416,17 @@
         /// <returns>
         /// The next order number.
         /// </returns>
-        public virtual int GetNextOrderNumber(int ordersCount = 1)
+        public virtual int GetNextOrderNumber(int storeId, int ordersCount = 1)
         {
             var orderNumber = 0;
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreateStoreSettingRepository(uow))
+                using (var repository = RepositoryFactory.CreateStoreSettingRepository(uow, storeId))
                 {
-                    using (var validationRepository = RepositoryFactory.CreateOrderRepository(uow))
+                    using (var validationRepository = RepositoryFactory.CreateOrderRepository(uow, storeId))
                     {
-                        orderNumber = repository.GetNextOrderNumber(Core.Constants.StoreSetting.NextOrderNumberKey, _domainService.CurrentDomain()?.RootContentId ?? 0, validationRepository.GetMaxDocumentNumber, ordersCount);
+                        orderNumber = repository.GetNextOrderNumber(Core.Constants.StoreSetting.NextOrderNumberKey, validationRepository.GetMaxDocumentNumber, ordersCount);
                     }
 
                     uow.Commit();
@@ -451,17 +445,17 @@
         /// <returns>
         /// The next shipment number.
         /// </returns>
-        public int GetNextShipmentNumber(int shipmentsCount = 1)
+        public int GetNextShipmentNumber(int storeId, int shipmentsCount = 1)
         {
             var shipmentNumber = 0;
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreateStoreSettingRepository(uow))
+                using (var repository = RepositoryFactory.CreateStoreSettingRepository(uow, storeId))
                 {
-                    using (var validationRepository = RepositoryFactory.CreateShipmentRepository(uow))
+                    using (var validationRepository = RepositoryFactory.CreateShipmentRepository(uow, storeId))
                     {
-                        shipmentNumber = repository.GetNextShipmentNumber(Core.Constants.StoreSetting.NextShipmentNumberKey, _domainService.CurrentDomain()?.RootContentId ?? 0, validationRepository.GetMaxDocumentNumber, shipmentsCount);
+                        shipmentNumber = repository.GetNextShipmentNumber(Core.Constants.StoreSetting.NextShipmentNumberKey, validationRepository.GetMaxDocumentNumber, shipmentsCount);
                     }
 
                     uow.Commit();
@@ -479,7 +473,7 @@
         /// </returns>
         public IEnumerable<ITypeField> GetTypeFields()
         {
-            using (var repository = RepositoryFactory.CreateStoreSettingRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateStoreSettingRepository(UowProvider.GetUnitOfWork(), MS.DefaultId))
             {
                 return repository.GetTypeFields();
             }

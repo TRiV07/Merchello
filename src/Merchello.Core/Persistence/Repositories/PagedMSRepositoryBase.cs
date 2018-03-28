@@ -13,7 +13,7 @@
 
     using UnitOfWork;
 
-    using UConstants = Umbraco.Core.Constants;
+    using MS = Merchello.Core.Constants.MultiStore;
 
     /// <summary>
     /// Defines a repository that provides paged ID queries
@@ -26,7 +26,7 @@
     /// </typeparam>
     internal abstract class PagedMSRepositoryBase<TEntity, TDto> : MerchelloPetaPocoRepositoryBase<TEntity>, IPagedRepository<TEntity, TDto> 
         where TEntity : class, IEntity
-        where TDto : class, IPageableDto, IHasDomainRoot
+        where TDto : class, IPageableDto
     {
         /// <summary>
         /// The domain root structure ID.
@@ -45,7 +45,7 @@
         /// <param name="sqlSyntax">
         /// The SQL Syntax.
         /// </param>
-        protected PagedMSRepositoryBase(IDatabaseUnitOfWork work, ILogger logger, ISqlSyntaxProvider sqlSyntax, int storeId) 
+        protected PagedMSRepositoryBase(IDatabaseUnitOfWork work, int storeId, ILogger logger, ISqlSyntaxProvider sqlSyntax) 
             : base(work, logger, sqlSyntax)
         {
             _storeId = storeId;
@@ -74,13 +74,14 @@
         /// </returns>
         public virtual Page<TEntity> GetPage(long page, long itemsPerPage, IQuery<TEntity> query, string orderExpression, SortDirection sortDirection = SortDirection.Descending)
         {
-            var sqlClause = new Sql();
-            sqlClause.Select("*").From<TDto>(SqlSyntax);
+            var sqlClause = GetBaseQuery(false);
+            //var sqlClause = new Sql();
+            //sqlClause.Select("*").From<TDto>(SqlSyntax);
 
-            if (_storeId != UConstants.System.Root)
-            {
-                sqlClause.Where<TDto>(x => x.StoreId == _storeId, SqlSyntax);
-            }
+            //if (_storeId != MS.DefaultId)
+            //{
+            //    sqlClause.Where<TDto>(x => x.StoreId == _storeId, SqlSyntax);
+            //}
 
             var translator = new SqlTranslator<TEntity>(sqlClause, query);
             var sql = translator.Translate();
@@ -113,13 +114,14 @@
         /// </returns>
         public virtual Page<Guid> GetPagedKeys(long page, long itemsPerPage, IQuery<TEntity> query, string orderExpression, SortDirection sortDirection = SortDirection.Descending)
         {
-            var sqlClause = new Sql();
-            sqlClause.Select("*").From<TDto>(SqlSyntax);
+            var sqlClause = GetBaseQuery(false);
+            //var sqlClause = new Sql();
+            //sqlClause.Select("*").From<TDto>(SqlSyntax);
 
-            if (_storeId != UConstants.System.Root)
-            {
-                sqlClause.Where<TDto>(x => x.StoreId == _storeId, SqlSyntax);
-            }
+            //if (_storeId != MS.DefaultId)
+            //{
+            //    sqlClause.Where<TDto>(x => x.StoreId == _storeId, SqlSyntax);
+            //}
 
             var translator = new SqlTranslator<TEntity>(sqlClause, query);
             var sql = translator.Translate();

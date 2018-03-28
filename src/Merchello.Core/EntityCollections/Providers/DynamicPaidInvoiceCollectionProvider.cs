@@ -69,9 +69,9 @@
         /// <returns>
         /// The <see cref="Page{IInvoice}"/>.
         /// </returns>
-        protected override Page<IInvoice> PerformGetPagedEntities(long page, long itemsPerPage, string sortBy = "", SortDirection sortDirection = SortDirection.Ascending)
+        protected override Page<IInvoice> PerformGetPagedEntities(long page, long itemsPerPage, int storeId, string sortBy = "", SortDirection sortDirection = SortDirection.Ascending)
         {
-            var keyPage = this.PerformGetPagedEntityKeys(page, itemsPerPage, sortBy, sortDirection);
+            var keyPage = this.PerformGetPagedEntityKeys(page, itemsPerPage, storeId, sortBy, sortDirection);
             return _invoiceService.GetPageFromKeyPage(keyPage, () => _invoiceService.GetByKeys(keyPage.Items));
         }
 
@@ -96,13 +96,14 @@
         protected override Page<Guid> PerformGetPagedEntityKeys(
             long page,
             long itemsPerPage,
+            int storeId,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Ascending)
         {
             var query =
                 Query<IInvoice>.Builder.Where(x => x.InvoiceStatusKey == Constants.InvoiceStatus.Paid);
 
-            return _invoiceService.GetPagedKeys(query, page, itemsPerPage, sortBy, sortDirection);
+            return _invoiceService.GetPagedKeys(query, page, itemsPerPage, storeId, sortBy, sortDirection);
         }
 
         /// <summary>
@@ -130,10 +131,11 @@
             Dictionary<string, object> args,
             long page,
             long itemsPerPage,
+            int storeId,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Ascending)
         {
-            if (!args.ContainsKey("searchTerm")) return PerformGetPagedEntityKeys(page, itemsPerPage, sortBy, sortDirection);
+            if (!args.ContainsKey("searchTerm")) return PerformGetPagedEntityKeys(page, itemsPerPage, storeId, sortBy, sortDirection);
 
             return
                     this._invoiceService.GetInvoiceKeysMatchingInvoiceStatus(
@@ -141,6 +143,7 @@
                         Constants.InvoiceStatus.Paid,
                         page,
                         itemsPerPage,
+                        storeId,
                         sortBy,
                         sortDirection);
         }
@@ -173,7 +176,7 @@
             var query =
                 Query<IInvoice>.Builder.Where(x => x.InvoiceStatusKey != Constants.InvoiceStatus.Paid);
 
-            return _invoiceService.GetPagedKeys(query, page, itemsPerPage, sortBy, sortDirection);
+            return _invoiceService.GetPagedKeys(query, page, itemsPerPage, storeId, sortBy, sortDirection);
         }
 
         /// <summary>
@@ -214,6 +217,7 @@
                     Constants.InvoiceStatus.Paid,
                     page,
                     itemsPerPage,
+                    storeId,
                     sortBy,
                     sortDirection);
         }

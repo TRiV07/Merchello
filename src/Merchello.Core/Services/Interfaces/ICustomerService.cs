@@ -123,7 +123,7 @@
         /// <returns>
         /// The collection of all <see cref="ICustomer"/>.
         /// </returns>
-        IEnumerable<ICustomer> GetAll(int storeId);
+        //IEnumerable<ICustomer> GetAll();
 
         /// <summary>
         /// Gets the total customer count.

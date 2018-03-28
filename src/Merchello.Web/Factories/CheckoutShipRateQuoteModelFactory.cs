@@ -75,7 +75,7 @@
             var selectItems = quotes.Select(x => new SelectListItem
                 {
                     Value = x.ShipMethod.Key.ToString(),
-                    Text = string.Format("{0} ({1})", x.ShipMethod.Name, x.Rate.AsFormattedCurrency())
+                    Text = string.Format("{0} ({1})", x.ShipMethod.Name, x.Rate.AsFormattedCurrency(shipment.StoreId))
                 });
 
             var model = new TShipRateQuoteModel

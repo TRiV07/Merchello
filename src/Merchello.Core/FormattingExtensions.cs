@@ -16,9 +16,9 @@
         /// <returns>
         /// The store formatted date string.
         /// </returns>
-        internal static string FormatAsStoreDate(this DateTime value)
+        internal static string FormatAsStoreDate(this DateTime value, int storeId)
         {
-            return value.FormatAsStoreDate(MerchelloContext.Current);
+            return value.FormatAsStoreDate(storeId, MerchelloContext.Current);
         }
 
         /// <summary>
@@ -33,10 +33,10 @@
         /// <returns>
         /// The store formatted date string.
         /// </returns>
-        internal static string FormatAsStoreDate(this DateTime value, IMerchelloContext merchelloContext)
+        internal static string FormatAsStoreDate(this DateTime value, int storeId, IMerchelloContext merchelloContext)
         {
             var dateFormat =
-                merchelloContext.Services.StoreSettingService.GetByKey(Constants.StoreSetting.DateFormatKey);
+                merchelloContext.Services.StoreSettingService.GetByKey(Constants.StoreSetting.DateFormatKey, storeId);
             return dateFormat == null ? value.ToShortDateString() : value.ToString(dateFormat.Value);
         }
 

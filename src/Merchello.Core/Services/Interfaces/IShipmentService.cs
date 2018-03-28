@@ -24,7 +24,7 @@
         /// <returns>
         /// The <see cref="IShipment"/>.
         /// </returns>
-        IShipment CreateShipment(IShipmentStatus shipmentStatus, bool raiseEvents = true);
+        IShipment CreateShipment(IShipmentStatus shipmentStatus, int storeId, bool raiseEvents = true);
 
         /// <summary>
         /// Creates a <see cref="IShipment"/> without persisting it to the database.
@@ -44,7 +44,7 @@
         /// <returns>
         /// The <see cref="IShipment"/>.
         /// </returns>
-        IShipment CreateShipment(IShipmentStatus shipmentStatus, IAddress origin, IAddress destination, bool raiseEvents = true);
+        IShipment CreateShipment(IShipmentStatus shipmentStatus, int storeId, IAddress origin, IAddress destination, bool raiseEvents = true);
 
         /// <summary>
         /// Creates a <see cref="IShipment"/> without persisting it to the database.
@@ -67,7 +67,7 @@
         /// <returns>
         /// The <see cref="IShipment"/>.
         /// </returns>
-        IShipment CreateShipment(IShipmentStatus shipmentStatus, IAddress origin, IAddress destination, LineItemCollection items, bool raiseEvents = true);
+        IShipment CreateShipment(IShipmentStatus shipmentStatus, int storeId, IAddress origin, IAddress destination, LineItemCollection items, bool raiseEvents = true);
 
         /// <summary>
         /// Saves a single <see cref="IShipment"/> object
@@ -109,7 +109,7 @@
         /// </summary>
         /// <param name="shipMethodKey">The pk of the shipMethod</param>
         /// <returns>A collection of <see cref="IShipment"/></returns>
-        IEnumerable<IShipment> GetShipmentsByShipMethodKey(Guid shipMethodKey);
+        IEnumerable<IShipment> GetShipmentsByShipMethodKey(Guid shipMethodKey, int storeId);
 
 
         /// <summary>

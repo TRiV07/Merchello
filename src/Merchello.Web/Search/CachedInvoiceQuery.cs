@@ -14,6 +14,8 @@
     using Models.ContentEditing;
     using Models.Querying;
 
+    using MS = Merchello.Core.Constants.MultiStore;
+
     /// <summary>
     /// Responsible for invoice related queries - caches via lucene
     /// </summary>
@@ -143,9 +145,9 @@
         /// <returns>
         /// The <see cref="QueryResultDisplay"/>.
         /// </returns>
-        public QueryResultDisplay Search(long page, long itemsPerPage, string sortBy = "invoiceNumber", SortDirection sortDirection = SortDirection.Descending)
+        public QueryResultDisplay Search(long page, long itemsPerPage, int storeId, string sortBy = "invoiceNumber", SortDirection sortDirection = SortDirection.Descending)
         {
-            return GetQueryResultDisplay(_invoiceService.GetPagedKeys(page, itemsPerPage, sortBy, sortDirection));
+            return GetQueryResultDisplay(_invoiceService.GetPagedKeys(page, itemsPerPage, storeId, sortBy, sortDirection));
         }
 
         /// <summary>
@@ -169,9 +171,9 @@
         /// <returns>
         /// The <see cref="QueryResultDisplay"/>.
         /// </returns>
-        public QueryResultDisplay Search(string term, long page, long itemsPerPage, string sortBy = "invoiceNumber", SortDirection sortDirection = SortDirection.Descending)
+        public QueryResultDisplay Search(string term, long page, long itemsPerPage, int storeId, string sortBy = "invoiceNumber", SortDirection sortDirection = SortDirection.Descending)
         {
-            return GetQueryResultDisplay(_invoiceService.GetPagedKeys(term, page, itemsPerPage, sortBy, sortDirection));
+            return GetQueryResultDisplay(_invoiceService.GetPagedKeys(term, page, itemsPerPage, storeId, sortBy, sortDirection));
         }
 
         /// <summary>
@@ -201,13 +203,13 @@
         /// <returns>
         /// The <see cref="QueryResultDisplay"/>.
         /// </returns>
-        public QueryResultDisplay Search(DateTime invoiceDateStart, DateTime invoiceDateEnd, long page, long itemsPerPage, string sortBy = "invoiceDate", SortDirection sortDirection = SortDirection.Descending, bool customerOnly = false)
+        public QueryResultDisplay Search(DateTime invoiceDateStart, DateTime invoiceDateEnd, long page, long itemsPerPage, int storeId, string sortBy = "invoiceDate", SortDirection sortDirection = SortDirection.Descending, bool customerOnly = false)
         {            
             var query = customerOnly ? 
                 Query<IInvoice>.Builder.Where(x => x.InvoiceDate >= invoiceDateStart && x.InvoiceDate <= invoiceDateEnd && x.CustomerKey != null ):
                 Query<IInvoice>.Builder.Where(x => x.InvoiceDate >= invoiceDateStart && x.InvoiceDate <= invoiceDateEnd);
 
-            return GetQueryResultDisplay(_invoiceService.GetPagedKeys(query, page, itemsPerPage, sortBy, sortDirection));
+            return GetQueryResultDisplay(_invoiceService.GetPagedKeys(query, page, itemsPerPage, storeId, sortBy, sortDirection));
         }
 
         /// <summary>
@@ -240,9 +242,9 @@
         /// <returns>
         /// The <see cref="QueryResultDisplay"/>.
         /// </returns>
-        public QueryResultDisplay Search(string term, DateTime invoiceDateStart, DateTime invoiceDateEnd, long page, long itemsPerPage, string sortBy = "invoiceDate", SortDirection sortDirection = SortDirection.Descending, bool customerOnly = false)
+        public QueryResultDisplay Search(string term, DateTime invoiceDateStart, DateTime invoiceDateEnd, long page, long itemsPerPage, int storeId, string sortBy = "invoiceDate", SortDirection sortDirection = SortDirection.Descending, bool customerOnly = false)
         {
-            return GetQueryResultDisplay(_invoiceService.GetPagedKeys(term, invoiceDateStart, invoiceDateEnd, page, itemsPerPage, sortBy, sortDirection));
+            return GetQueryResultDisplay(_invoiceService.GetPagedKeys(term, invoiceDateStart, invoiceDateEnd, page, itemsPerPage, storeId, sortBy, sortDirection));
         }
 
         /// <summary>
@@ -275,13 +277,13 @@
         /// <returns>
         /// The <see cref="QueryResultDisplay"/>.
         /// </returns>
-        public QueryResultDisplay Search(DateTime invoiceDateStart, DateTime invoiceDateEnd, Guid invoiceStatusKey, long page, long itemsPerPage, string sortBy = "invoiceDate", SortDirection sortDirection = SortDirection.Descending, bool customerOnly = false)
+        public QueryResultDisplay Search(DateTime invoiceDateStart, DateTime invoiceDateEnd, Guid invoiceStatusKey, long page, long itemsPerPage, int storeId, string sortBy = "invoiceDate", SortDirection sortDirection = SortDirection.Descending, bool customerOnly = false)
         {
             var query = customerOnly ?
                 Query<IInvoice>.Builder.Where(x => x.InvoiceDate >= invoiceDateStart && x.InvoiceDate <= invoiceDateEnd && x.InvoiceStatusKey == invoiceStatusKey  && x.CustomerKey != null ):
                 Query<IInvoice>.Builder.Where(x => x.InvoiceDate >= invoiceDateStart && x.InvoiceDate <= invoiceDateEnd && x.InvoiceStatusKey == invoiceStatusKey);
 
-            return GetQueryResultDisplay(_invoiceService.GetPagedKeys(query, page, itemsPerPage, sortBy, sortDirection));
+            return GetQueryResultDisplay(_invoiceService.GetPagedKeys(query, page, itemsPerPage, storeId, sortBy, sortDirection));
         }
 
         /// <summary>
@@ -314,13 +316,13 @@
         /// <returns>
         /// The <see cref="QueryResultDisplay"/>.
         /// </returns>
-        public QueryResultDisplay Search(DateTime invoiceDateStart, DateTime invoiceDateEnd, bool exported, long page, long itemsPerPage, string sortBy = "invoiceDate", SortDirection sortDirection = SortDirection.Descending, bool customerOnly = false)
+        public QueryResultDisplay Search(DateTime invoiceDateStart, DateTime invoiceDateEnd, bool exported, long page, long itemsPerPage, int storeId, string sortBy = "invoiceDate", SortDirection sortDirection = SortDirection.Descending, bool customerOnly = false)
         {
             var query = customerOnly ? 
                 Query<IInvoice>.Builder.Where(x => x.InvoiceDate >= invoiceDateStart && x.InvoiceDate <= invoiceDateEnd && x.Exported == exported   && x.CustomerKey != null ):
                 Query<IInvoice>.Builder.Where(x => x.InvoiceDate >= invoiceDateStart && x.InvoiceDate <= invoiceDateEnd && x.Exported == exported);
 
-            return GetQueryResultDisplay(_invoiceService.GetPagedKeys(query, page, itemsPerPage, sortBy, sortDirection));
+            return GetQueryResultDisplay(_invoiceService.GetPagedKeys(query, page, itemsPerPage, storeId, sortBy, sortDirection));
         }
 
         /// <summary>
@@ -356,13 +358,13 @@
         /// <returns>
         /// The <see cref="QueryResultDisplay"/>.
         /// </returns>
-        public QueryResultDisplay Search(DateTime invoiceDateStart, DateTime invoiceDateEnd, Guid invoiceStatusKey, bool exported, long page, long itemsPerPage, string sortBy = "invoiceDate", SortDirection sortDirection = SortDirection.Descending, bool customerOnly = false)
+        public QueryResultDisplay Search(DateTime invoiceDateStart, DateTime invoiceDateEnd, Guid invoiceStatusKey, bool exported, long page, long itemsPerPage, int storeId, string sortBy = "invoiceDate", SortDirection sortDirection = SortDirection.Descending, bool customerOnly = false)
         {
             var query = customerOnly ? 
                 Query<IInvoice>.Builder.Where(x => x.InvoiceDate >= invoiceDateStart && x.InvoiceDate <= invoiceDateEnd && x.Exported == exported && x.InvoiceStatusKey == invoiceStatusKey  && x.CustomerKey != null):
                 Query<IInvoice>.Builder.Where(x => x.InvoiceDate >= invoiceDateStart && x.InvoiceDate <= invoiceDateEnd && x.Exported == exported && x.InvoiceStatusKey == invoiceStatusKey  );
 
-            return GetQueryResultDisplay(_invoiceService.GetPagedKeys(query, page, itemsPerPage, sortBy, sortDirection));
+            return GetQueryResultDisplay(_invoiceService.GetPagedKeys(query, page, itemsPerPage, storeId, sortBy, sortDirection));
         }
 
         /// <summary>
@@ -386,11 +388,11 @@
         /// <returns>
         /// The <see cref="QueryResultDisplay"/>.
         /// </returns>
-        public QueryResultDisplay SearchByInvoiceStatus(Guid invoiceStatusKey, long page, long itemsPerPage, string sortBy = "invoiceNumber", SortDirection sortDirection = SortDirection.Descending)
+        public QueryResultDisplay SearchByInvoiceStatus(Guid invoiceStatusKey, long page, long itemsPerPage, int storeId, string sortBy = "invoiceNumber", SortDirection sortDirection = SortDirection.Descending)
         {
             var query = Query<IInvoice>.Builder.Where(x => x.InvoiceStatusKey == invoiceStatusKey);
 
-            return GetQueryResultDisplay(_invoiceService.GetPagedKeys(query, page, itemsPerPage, sortBy, sortDirection));
+            return GetQueryResultDisplay(_invoiceService.GetPagedKeys(query, page, itemsPerPage, storeId, sortBy, sortDirection));
         }
 
         /// <summary>
@@ -417,11 +419,11 @@
         /// <returns>
         /// The <see cref="QueryResultDisplay"/>.
         /// </returns>
-        public QueryResultDisplay SearchByInvoiceStatus(Guid invoiceStatusKey, bool exported, long page, long itemsPerPage, string sortBy = "invoiceNumber", SortDirection sortDirection = SortDirection.Descending)
+        public QueryResultDisplay SearchByInvoiceStatus(Guid invoiceStatusKey, bool exported, long page, long itemsPerPage, int storeId, string sortBy = "invoiceNumber", SortDirection sortDirection = SortDirection.Descending)
         {
             var query = Query<IInvoice>.Builder.Where(x => x.InvoiceStatusKey == invoiceStatusKey && x.Exported == exported);
 
-            return GetQueryResultDisplay(_invoiceService.GetPagedKeys(query, page, itemsPerPage, sortBy, sortDirection));
+            return GetQueryResultDisplay(_invoiceService.GetPagedKeys(query, page, itemsPerPage, storeId, sortBy, sortDirection));
         }
 
         /// <summary>
@@ -449,7 +451,7 @@
         {
             var query = Query<IInvoice>.Builder.Where(x => x.CustomerKey == customerKey);
 
-            return GetQueryResultDisplay(_invoiceService.GetPagedKeys(query, page, itemsPerPage, sortBy, sortDirection));
+            return GetQueryResultDisplay(_invoiceService.GetPagedKeys(query, page, itemsPerPage, MS.DefaultId, sortBy, sortDirection));
         }
 
         /// <summary>
@@ -480,7 +482,7 @@
         {
             var query = Query<IInvoice>.Builder.Where(x => x.CustomerKey == customerKey && x.InvoiceStatusKey == invoiceStatusKey);
 
-            return GetQueryResultDisplay(_invoiceService.GetPagedKeys(query, page, itemsPerPage, sortBy, sortDirection));
+            return GetQueryResultDisplay(_invoiceService.GetPagedKeys(query, page, itemsPerPage, MS.DefaultId, sortBy, sortDirection));
         }       
 
         /// <summary>
@@ -496,7 +498,7 @@
         {
             var query = Query<IInvoice>.Builder.Where(x => x.CustomerKey == customerKey);
 
-            return GetQueryResultDisplay(_invoiceService.GetPagedKeys(query, 1, int.MaxValue, "invoiceNumber")).Items.Select(x => (InvoiceDisplay)x);
+            return GetQueryResultDisplay(_invoiceService.GetPagedKeys(query, 1, int.MaxValue, MS.DefaultId, "invoiceNumber")).Items.Select(x => (InvoiceDisplay)x);
         }
 
         /// <summary>

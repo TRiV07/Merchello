@@ -52,8 +52,8 @@
         public IEnumerable<ICustomer> GetAll()
         {
             return MerchelloContext.HasCurrent
-                       ? MerchelloContext.Current.Services.CustomerService.GetAll(UConstants.System.Root)
-                       : new CustomerService(Logger.CreateWithDefaultLog4NetConfiguration()).GetAll(UConstants.System.Root);
+                       ? ((CustomerService)MerchelloContext.Current.Services.CustomerService).GetAll()
+                       : new CustomerService(Logger.CreateWithDefaultLog4NetConfiguration()).GetAll();
         }
 
         /// <summary>

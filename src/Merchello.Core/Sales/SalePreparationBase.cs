@@ -809,6 +809,7 @@
         private void AddShipmentRateQuoteLineItem(IShipmentRateQuote shipmentRateQuote)
         {
             var lineItem = shipmentRateQuote.AsLineItemOf<ItemCacheLineItem>();
+            //TODOMS
             if (_shippingTaxable.Value) lineItem.ExtendedData.SetValue(Core.Constants.ExtendedDataKeys.Taxable, true.ToString());
             _itemCache.AddItem(lineItem);
         }
@@ -819,7 +820,8 @@
         private void Initialize()
         {
             var storeSettingsService = _merchelloContext.Services.StoreSettingService;
-            var shippingTaxSetting = storeSettingsService.GetByKey(Core.Constants.StoreSetting.GlobalShippingIsTaxableKey);
+            //TODOMS
+            var shippingTaxSetting = storeSettingsService.GetByKey(Core.Constants.StoreSetting.GlobalShippingIsTaxableKey, -1);
             _shippingTaxable = new Lazy<bool>(() => Convert.ToBoolean(shippingTaxSetting.Value));
             this._offerCodeTempData = new Lazy<List<string>>(this.BuildOfferCodeList);
         }

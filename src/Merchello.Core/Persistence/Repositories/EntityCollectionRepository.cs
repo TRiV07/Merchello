@@ -40,7 +40,7 @@
         /// <param name="sqlSyntax">
         /// The SQL Syntax.
         /// </param>
-        public EntityCollectionRepository(IDatabaseUnitOfWork work, ILogger logger, ISqlSyntaxProvider sqlSyntax, int storeId)
+        public EntityCollectionRepository(IDatabaseUnitOfWork work, int storeId, ILogger logger, ISqlSyntaxProvider sqlSyntax)
             : base(work, logger, sqlSyntax)
         {
             _storeId = storeId;

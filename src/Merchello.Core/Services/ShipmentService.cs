@@ -20,6 +20,8 @@
     using Umbraco.Core.Logging;
     using Umbraco.Core.Persistence.SqlSyntax;
 
+    using MS = Merchello.Core.Constants.MultiStore;
+
     /// <summary>
     /// Represents the ShipmentService
     /// </summary>
@@ -43,7 +45,7 @@
         /// </summary>
         public ShipmentService()
             : this(LoggerResolver.Current.Logger)
-        {            
+        {
         }
 
         /// <summary>
@@ -170,7 +172,7 @@
         /// <summary>
         /// Special event that fires when an order record is updated
         /// </summary>
-        internal static event TypedEventHandler<IShipmentService, SaveEventArgs<IOrder>> UpdatedOrder; 
+        internal static event TypedEventHandler<IShipmentService, SaveEventArgs<IOrder>> UpdatedOrder;
 
         #endregion
 
@@ -188,9 +190,9 @@
         /// <returns>
         /// The <see cref="IShipment"/>.
         /// </returns>
-        public IShipment CreateShipment(IShipmentStatus shipmentStatus, bool raiseEvents = true)
+        public IShipment CreateShipment(IShipmentStatus shipmentStatus, int storeId, bool raiseEvents = true)
         {
-            return CreateShipment(shipmentStatus, new Address(), new Address(), new LineItemCollection());
+            return CreateShipment(shipmentStatus, storeId, new Address(), new Address(), new LineItemCollection());
         }
 
         /// <summary>
@@ -211,9 +213,9 @@
         /// <returns>
         /// The <see cref="IShipment"/>.
         /// </returns>
-        public IShipment CreateShipment(IShipmentStatus shipmentStatus, IAddress origin, IAddress destination, bool raiseEvents = true)
+        public IShipment CreateShipment(IShipmentStatus shipmentStatus, int storeId, IAddress origin, IAddress destination, bool raiseEvents = true)
         {
-            return CreateShipment(shipmentStatus, origin, destination, new LineItemCollection());
+            return CreateShipment(shipmentStatus, storeId, origin, destination, new LineItemCollection());
         }
 
         /// <summary>
@@ -237,7 +239,7 @@
         /// <returns>
         /// The <see cref="IShipment"/>.
         /// </returns>
-        public IShipment CreateShipment(IShipmentStatus shipmentStatus, IAddress origin, IAddress destination, LineItemCollection items, bool raiseEvents = true)
+        public IShipment CreateShipment(IShipmentStatus shipmentStatus, int storeId, IAddress origin, IAddress destination, LineItemCollection items, bool raiseEvents = true)
         {
             Mandate.ParameterNotNull(shipmentStatus, "shipmentStatus");
             Mandate.ParameterNotNull(origin, "origin");
@@ -255,10 +257,10 @@
                 lineItemCollection.Add(item);
             }
 
-            var shipment = new Shipment(shipmentStatus, origin, destination, lineItemCollection)
-                               {
-                                   VersionKey = Guid.NewGuid()
-                               };
+            var shipment = new Shipment(shipmentStatus, storeId, origin, destination, lineItemCollection)
+            {
+                VersionKey = Guid.NewGuid()
+            };
 
             if (!raiseEvents)
             {
@@ -279,7 +281,7 @@
             if (!((Shipment)shipment).HasIdentity && shipment.ShipmentNumber <= 0)
             {
                 // We have to generate a new 'unique' invoice number off the configurable value
-                ((Shipment)shipment).ShipmentNumber = _storeSettingService.GetNextShipmentNumber();
+                ((Shipment)shipment).ShipmentNumber = _storeSettingService.GetNextShipmentNumber(shipment.StoreId);
             }
 
             var includesStatusChange = ((Shipment)shipment).IsPropertyDirty("ShipmentStatus")
@@ -307,7 +309,7 @@
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreateShipmentRepository(uow))
+                using (var repository = RepositoryFactory.CreateShipmentRepository(uow, shipment.StoreId))
                 {
                     repository.AddOrUpdate(shipment);
                     uow.Commit();
@@ -315,7 +317,7 @@
             }
 
             if (!raiseEvents) return;
-            
+
             Saved.RaiseEvent(new SaveEventArgs<IShipment>(shipment), this);
             if (includesStatusChange) StatusChanged.RaiseEvent(new StatusChangeEventArgs<IShipment>(shipment), this);
         }
@@ -362,7 +364,7 @@
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreateShipmentRepository(uow))
+                using (var repository = RepositoryFactory.CreateShipmentRepository(uow, MS.DefaultId))
                 {
                     foreach (var shipment in shipmentsArray)
                     {
@@ -395,7 +397,7 @@
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreateShipmentRepository(uow))
+                using (var repository = RepositoryFactory.CreateShipmentRepository(uow, shipment.StoreId))
                 {
                     UpdateOrderLineItemShipmentKeys(shipment);
                     repository.Delete(shipment);
@@ -416,25 +418,25 @@
             var shipmentsArray = shipmentList as IShipment[] ?? shipmentList.ToArray();
 
             if (raiseEvents)
-            Deleting.RaiseEvent(new DeleteEventArgs<IShipment>(shipmentsArray), this);
+                Deleting.RaiseEvent(new DeleteEventArgs<IShipment>(shipmentsArray), this);
 
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreateShipmentRepository(uow))
+                using (var repository = RepositoryFactory.CreateShipmentRepository(uow, MS.DefaultId))
                 {
                     foreach (var shipment in shipmentsArray)
                     {
                         UpdateOrderLineItemShipmentKeys(shipment);
-                        repository.Delete(shipment);    
-                    }                    
+                        repository.Delete(shipment);
+                    }
                 }
                 uow.Commit();
             }
 
             if (raiseEvents) Deleted.RaiseEvent(new DeleteEventArgs<IShipment>(shipmentsArray), this);
         }
-       
+
 
         /// <summary>
         /// Gets an <see cref="IShipment"/> object by its 'UniqueId'
@@ -443,7 +445,7 @@
         /// <returns><see cref="IShipment"/></returns>
         public IShipment GetByKey(Guid key)
         {
-            using (var repository = RepositoryFactory.CreateShipmentRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateShipmentRepository(UowProvider.GetUnitOfWork(), MS.DefaultId))
             {
                 return repository.Get(key);
             }
@@ -454,17 +456,15 @@
         /// </summary>
         /// <param name="shipMethodKey">The pk of the shipMethod</param>
         /// <returns>A collection of <see cref="IShipment"/></returns>
-        public IEnumerable<IShipment> GetShipmentsByShipMethodKey(Guid shipMethodKey)
+        public IEnumerable<IShipment> GetShipmentsByShipMethodKey(Guid shipMethodKey, int storeId)
         {
-            using (var repository = RepositoryFactory.CreateShipmentRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateShipmentRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 var query = Query<IShipment>.Builder.Where(x => x.ShipMethodKey == shipMethodKey);
 
                 return repository.GetByQuery(query);
             }
         }
-
-
 
         /// <summary>
         /// Gets list of <see cref="IShipment"/> objects given a list of Unique keys
@@ -473,7 +473,7 @@
         /// <returns>List of <see cref="IShipment"/></returns>
         public IEnumerable<IShipment> GetByKeys(IEnumerable<Guid> keys)
         {
-            using (var repository = RepositoryFactory.CreateShipmentRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateShipmentRepository(UowProvider.GetUnitOfWork(), MS.DefaultId))
             {
                 return repository.GetAll(keys.ToArray());
             }
@@ -503,7 +503,7 @@
             if (orderLineItems.Any())
             {
                 var keys = orderLineItems.Where(x => x.ShipmentKey != null).Select(x => x.ShipmentKey.Value).ToArray();
-                using (var repository = RepositoryFactory.CreateShipmentRepository(UowProvider.GetUnitOfWork()))
+                using (var repository = RepositoryFactory.CreateShipmentRepository(UowProvider.GetUnitOfWork(), MS.DefaultId))
                 {
                     return repository.GetAll(keys);
                 }
@@ -544,9 +544,9 @@
         /// Gets all <see cref="IShipment"/>
         /// </summary>
         /// <returns>A collection of <see cref="IShipment"/></returns>
-        internal IEnumerable<IShipment> GetAll()
+        internal IEnumerable<IShipment> GetAll(int storeId)
         {
-            using (var repository = RepositoryFactory.CreateShipmentRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateShipmentRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 return repository.GetAll();
             }
@@ -562,10 +562,10 @@
         /// </param>
         private void UpdateOrderLineItemShipmentKeys(IShipment shipment)
         {
-            using (var repository = RepositoryFactory.CreateOrderRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateOrderRepository(UowProvider.GetUnitOfWork(), shipment.StoreId))
             {
                 // there really should only ever be one of these
-                var orderKeys = shipment.Items.Select(x => ((OrderLineItem) x).ContainerKey).Distinct();
+                var orderKeys = shipment.Items.Select(x => ((OrderLineItem)x).ContainerKey).Distinct();
 
                 foreach (var orderKey in orderKeys)
                 {

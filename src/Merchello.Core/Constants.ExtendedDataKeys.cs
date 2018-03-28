@@ -176,6 +176,14 @@
             }
 
             /// <summary>
+            /// Gets the StoreId reserved extended data key.
+            /// </summary>
+            public static string StoreId
+            {
+                get { return "merchStoreId"; }
+            }
+
+            /// <summary>
             /// Gets the exported reserved extended data key.
             /// </summary>
             public static string Exported

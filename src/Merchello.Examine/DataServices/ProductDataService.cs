@@ -52,8 +52,8 @@
         public IEnumerable<IProduct> GetAll()
         {
             return MerchelloContext.HasCurrent
-                       ? MerchelloContext.Current.Services.ProductService.GetAll(UConstants.System.Root)
-                       : new ProductService().GetAll(UConstants.System.Root);
+                       ? MerchelloContext.Current.Services.ProductService.GetAll(Constants.MultiStore.DefaultId)
+                       : new ProductService().GetAll(Constants.MultiStore.DefaultId);
         }
 
         /// <summary>

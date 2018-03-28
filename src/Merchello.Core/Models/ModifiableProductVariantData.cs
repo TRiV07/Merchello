@@ -12,6 +12,11 @@
     public abstract class ProductVariantDataModifierData : IProductVariantDataModifierData
     {
         /// <summary>
+        /// Gets or sets the Store Id
+        /// </summary>
+        public int StoreId { get; set; }
+
+        /// <summary>
         /// The _modified data logs.
         /// </summary>
         private readonly List<IDataModifierLog> _modifiedDataLogs = new List<IDataModifierLog>();

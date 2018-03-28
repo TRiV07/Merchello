@@ -17,6 +17,8 @@
 
     using UnitOfWork;
 
+    using MS = Merchello.Core.Constants.MultiStore;
+
     /// <summary>
     /// The shipment repository.
     /// </summary>
@@ -26,6 +28,11 @@
         /// The order line item repository.
         /// </summary>
         private readonly IOrderLineItemRepository _orderLineItemRepository;
+
+        /// <summary>
+        /// The domain root structure ID.
+        /// </summary>
+        private readonly int _storeId;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ShipmentRepository"/> class.
@@ -42,11 +49,12 @@
         /// <param name="sqlSyntax">
         /// The SQL Syntax.
         /// </param>
-        public ShipmentRepository(IDatabaseUnitOfWork work, IOrderLineItemRepository orderLineItemRepository, ILogger logger, ISqlSyntaxProvider sqlSyntax)
+        public ShipmentRepository(IDatabaseUnitOfWork work, int storeId, IOrderLineItemRepository orderLineItemRepository, ILogger logger, ISqlSyntaxProvider sqlSyntax)
             : base(work, logger, sqlSyntax)
         {
             Mandate.ParameterNotNull(orderLineItemRepository, "orderLineItemRepository");
             _orderLineItemRepository = orderLineItemRepository;
+            _storeId = storeId;
         }
 
 
@@ -58,7 +66,12 @@
         /// </returns>
         public int GetMaxDocumentNumber()
         {
-            var value = Database.ExecuteScalar<object>("SELECT TOP 1 shipmentNumber FROM merchShipment ORDER BY shipmentNumber DESC");
+            var value = Database.ExecuteScalar<object>(@"
+                            SELECT TOP 1 shipmentNumber
+                            FROM merchShipment
+                            WHERE storeId = @StoreId
+                            ORDER BY shipmentNumber DESC",
+                            new { @StoreId = _storeId });
             return value == null ? 0 : int.Parse(value.ToString());
         }
 
@@ -113,6 +126,9 @@
                 {
                     dtos.AddRange(Database.Fetch<ShipmentDto, ShipmentStatusDto>(GetBaseQuery(false).WhereIn<ShipmentDto>(x => x.Key, keyList, SqlSyntax)));
                 }
+
+                // Saving keys order
+                dtos = keys.Select(k => dtos.FirstOrDefault(x => x.Key == k)).ToList();
             }
             else
             {
@@ -161,6 +177,11 @@
                 .From<ShipmentDto>(SqlSyntax)
                 .InnerJoin<ShipmentStatusDto>(SqlSyntax)
                 .On<ShipmentDto, ShipmentStatusDto>(SqlSyntax, left => left.ShipmentStatusKey, right => right.Key);
+
+            if (_storeId != MS.DefaultId)
+            {
+                sql.Where<ShipmentDto>(x => x.StoreId == _storeId, SqlSyntax);
+            }
 
             return sql;
         }

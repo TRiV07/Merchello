@@ -149,7 +149,7 @@
             // execute the change
             var attempt = TaskHandlers.Any()
                 ? TaskHandlers.First().Execute(
-                        new Shipment(status, quoted.GetOriginAddress(), quoted.GetDestinationAddress())
+                        new Shipment(status, invoice.StoreId, quoted.GetOriginAddress(), quoted.GetDestinationAddress())
                             {
                                 ShipMethodKey = _shipMethodKey,
                                 VersionKey = quoted.VersionKey,

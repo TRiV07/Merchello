@@ -24,6 +24,11 @@
         #region Fields
 
         /// <summary>
+        /// The domain root structure ID.
+        /// </summary>
+        private int _storeId;
+
+        /// <summary>
         /// The customer key.
         /// </summary>
         private Guid? _customerKey;
@@ -151,8 +156,8 @@
         /// <param name="invoiceStatus">
         /// The invoice status.
         /// </param>
-        internal Invoice(IInvoiceStatus invoiceStatus)
-            : this(invoiceStatus, new Address())
+        internal Invoice(IInvoiceStatus invoiceStatus, int storeId)
+            : this(invoiceStatus, storeId, new Address())
         {
         }
 
@@ -165,8 +170,8 @@
         /// <param name="billToAddress">
         /// The bill to address.
         /// </param>
-        internal Invoice(IInvoiceStatus invoiceStatus, IAddress billToAddress)
-            : this(invoiceStatus, billToAddress, new LineItemCollection(), new OrderCollection(), Enumerable.Empty<INote>().ToArray())
+        internal Invoice(IInvoiceStatus invoiceStatus, int storeId, IAddress billToAddress)
+            : this(invoiceStatus, storeId, billToAddress, new LineItemCollection(), new OrderCollection(), Enumerable.Empty<INote>().ToArray())
         {
         }
 
@@ -188,7 +193,7 @@
         /// <param name="notes">
         /// The notes collection
         /// </param>
-        internal Invoice(IInvoiceStatus invoiceStatus, IAddress billToAddress, LineItemCollection lineItemCollection, OrderCollection orders, INote[] notes)
+        internal Invoice(IInvoiceStatus invoiceStatus, int storeId, IAddress billToAddress, LineItemCollection lineItemCollection, OrderCollection orders, INote[] notes)
         {
             Ensure.ParameterNotNull(invoiceStatus, "invoiceStatus");
             Ensure.ParameterNotNull(billToAddress, "billToAddress");
@@ -197,6 +202,7 @@
             Ensure.ParameterNotNull(notes, "notes");
 
             _invoiceStatus = invoiceStatus;
+            _storeId = storeId;
 
             _billToName = billToAddress.Name;
             _billToAddress1 = billToAddress.Address1;
@@ -211,6 +217,21 @@
             _orders = orders;
             _invoiceDate = DateTime.Now;
 
+        }
+
+        /// <inheritdoc/>
+        [DataMember]
+        public int StoreId
+        {
+            get
+            {
+                return _storeId;
+            }
+
+            set
+            {
+                SetPropertyValueAndDetectChanges(value, ref _storeId, _ps.Value.StoreIdSelector);
+            }
         }
 
         /// <inheritdoc/>
@@ -708,6 +729,11 @@
             /// The orders changed selector.
             /// </summary>
             public readonly PropertyInfo OrdersChangedSelector = ExpressionHelper.GetPropertyInfo<Invoice, OrderCollection>(x => x.Orders);
+
+            /// <summary>
+            /// The domain root structure ID selector.
+            /// </summary>
+            public readonly PropertyInfo StoreIdSelector = ExpressionHelper.GetPropertyInfo<Invoice, int>(x => x.StoreId);
         }
     }
 }

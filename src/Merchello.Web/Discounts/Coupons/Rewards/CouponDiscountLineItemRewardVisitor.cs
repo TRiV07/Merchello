@@ -150,37 +150,43 @@
             // handle the special case for percent deduction based when tax is included in the product price
             var audit = new CouponRewardAdjustmentAudit() { RelatesToSku = lineItem.Sku };
 
-            if (lineItem.ExtendedData.TaxIncludedInProductPrice() && _productTaxationEnabled
+            if (lineItem.ExtendedData.TaxIncludedInProductPrice()
                 && lineItem.ExtendedData.DefinesProductVariant()
                 && _adjustmentType == CouponDiscountLineItemReward.Adjustment.Percent)
             {
                 var product = _merchello.Query.Product.GetByKey(lineItem.ExtendedData.GetProductKey());
-                var preTaxPrice = product.Price - (product.Price * DiscountPercent);
-                var preTaxAmount = lineItem.ExtendedData.ProductPriceTaxAmount() - (lineItem.ExtendedData.ProductPriceTaxAmount() * DiscountPercent);
-                //// this is sort of weird here, but the line item price may have been set outside the typical workflow
-                //// and we cannot rely on the OnSale flag being set so we set both prices to the value set in the line item 
-                //// and then apply the taxes to the new price.  Example of this would be using different currencies                                
-                product.Price = lineItem.Price;
-                
-                // this will be the amount of the discount with the taxation break out from the taxation results
-                product.SalePrice = preTaxPrice;
-                var result = _taxationContext.CalculateTaxesForProduct(product);
-                product.AlterProduct(result);
+                if (_taxationContext.ProductPricingEnabled(product.StoreId))
+                {
+                    var preTaxPrice = product.Price - (product.Price * DiscountPercent);
+                    var preTaxAmount = lineItem.ExtendedData.ProductPriceTaxAmount() - (lineItem.ExtendedData.ProductPriceTaxAmount() * DiscountPercent);
+                    //// this is sort of weird here, but the line item price may have been set outside the typical workflow
+                    //// and we cannot rely on the OnSale flag being set so we set both prices to the value set in the line item 
+                    //// and then apply the taxes to the new price.  Example of this would be using different currencies                                
+                    product.Price = lineItem.Price;
+
+                    // this will be the amount of the discount with the taxation break out from the taxation results
+                    product.SalePrice = preTaxPrice;
+                    var result = _taxationContext.CalculateTaxesForProduct(product);
+                    product.AlterProduct(result);
 
 
 
-                audit.Log = product.Price == lineItem.Price ? 
-                    product.ModifiedDataLogs :
-                    product.ModifiedDataLogs.Where(x => x.PropertyName == "SalePrice").ToArray();
-                _audits.Add(audit);
+                    audit.Log = product.Price == lineItem.Price ?
+                        product.ModifiedDataLogs :
+                        product.ModifiedDataLogs.Where(x => x.PropertyName == "SalePrice").ToArray();
+                    _audits.Add(audit);
 
 
-                // if taxes are to be excluded the constraint ExcludeTaxesIncludedInProductPrices should be added to remove them
-               _qualifyingTotal += lineItem.Price * lineItem.Quantity;
-                _adjustedProductPreTaxTotal += preTaxPrice * lineItem.Quantity;
-                _adjustedTaxTotal += preTaxAmount * lineItem.Quantity;
+                    // if taxes are to be excluded the constraint ExcludeTaxesIncludedInProductPrices should be added to remove them
+                    _qualifyingTotal += lineItem.Price * lineItem.Quantity;
+                    _adjustedProductPreTaxTotal += preTaxPrice * lineItem.Quantity;
+                    _adjustedTaxTotal += preTaxAmount * lineItem.Quantity;
+
+                    return;
+                }
             }
-            else if (_adjustmentType == CouponDiscountLineItemReward.Adjustment.Percent)
+
+            if (_adjustmentType == CouponDiscountLineItemReward.Adjustment.Percent)
             {
                 var modifiedPrice = lineItem.Price - (lineItem.Price * DiscountPercent);
                 audit.Log = new[]
@@ -207,7 +213,7 @@
         private void Initialize()
         {
             _taxationContext = MerchelloContext.Current.Gateways.Taxation;
-            _productTaxationEnabled = _taxationContext.ProductPricingEnabled;
+            //_productTaxationEnabled = _taxationContext.ProductPricingEnabled;
 
             // we do not want to modify data here
             _merchello = new MerchelloHelper(false);

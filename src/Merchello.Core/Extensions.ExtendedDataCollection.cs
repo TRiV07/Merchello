@@ -100,6 +100,19 @@ namespace Merchello.Core
             }
         }
 
+        public static void AddStoreId(this ExtendedDataCollection extendedData, int storeId)
+        {
+            extendedData.SetValue(Constants.ExtendedDataKeys.StoreId, storeId.ToString());
+        }
+
+        public static int GetStoreId(this ExtendedDataCollection extendedData)
+        {
+            if (extendedData.ContainsKey(Constants.ExtendedDataKeys.StoreId))
+                return extendedData.GetValue(Constants.ExtendedDataKeys.StoreId).AsInt();
+
+            return -1;
+        }
+
         #region ExtendedDataCollection
 
         /// <summary>
@@ -333,6 +346,7 @@ namespace Merchello.Core
         {
             extendedData.SetValue(Constants.ExtendedDataKeys.ProductKey, product.Key.ToString());
             extendedData.SetValue(Constants.ExtendedDataKeys.ProductVariantKey, product.ProductVariantKey.ToString());
+            AddStoreId(extendedData, product.StoreId);
             AddBaseProductValues(extendedData, product);
         }
 
@@ -847,6 +861,7 @@ namespace Merchello.Core
             extendedData.AddAddress(shipment.GetDestinationAddress(), Constants.ExtendedDataKeys.ShippingDestinationAddress);
             extendedData.SetValue(Constants.ExtendedDataKeys.ShipMethodKey, shipment.ShipMethodKey.ToString());
             extendedData.AddLineItemCollection(shipment.Items);
+            extendedData.AddStoreId(shipment.StoreId);
         }
 
         /// <summary>
@@ -866,6 +881,7 @@ namespace Merchello.Core
             var origin = extendedData.GetAddress(Constants.ExtendedDataKeys.ShippingOriginAddress);
             var destination = extendedData.GetAddress(Constants.ExtendedDataKeys.ShippingDestinationAddress);
             var lineItemCollection = extendedData.GetLineItemCollection<T>();
+            var storeId = extendedData.GetStoreId();
 
             if (origin == null) throw new NullReferenceException("ExtendedDataCollection does not contain an 'origin shipping address'");
             if (destination == null) throw new NullReferenceException("ExtendedDataCollection does not container a 'destination shipping address'");
@@ -883,7 +899,7 @@ namespace Merchello.Core
             };
 
 
-            return new Shipment(quoted, origin, destination, lineItemCollection)
+            return new Shipment(quoted, storeId, origin, destination, lineItemCollection)
             {
                 ShipMethodKey = extendedData.ContainsKey(Constants.ExtendedDataKeys.ShipMethodKey) ?
                         extendedData.GetShipMethodKey() :

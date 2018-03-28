@@ -548,12 +548,12 @@
         /// </param>
         private async void MigrationManagerOnUpgraded(object sender, MerchelloMigrationEventArgs e)
         {
-            var response = await ((WebMigrationManager)sender).PostAnalyticInfo(e.MigrationRecord);
-            if (response.StatusCode != System.Net.HttpStatusCode.OK)
-            {
-                var ex = new Exception(response.ReasonPhrase);
-                MultiLogHelper.Error(typeof(UmbracoApplicationEventHandler), "Failed to record Merchello Migration Record", ex);
-            }
+            //var response = await ((WebMigrationManager)sender).PostAnalyticInfo(e.MigrationRecord);
+            //if (response.StatusCode != System.Net.HttpStatusCode.OK)
+            //{
+            //    var ex = new Exception(response.ReasonPhrase);
+            //    MultiLogHelper.Error(typeof(UmbracoApplicationEventHandler), "Failed to record Merchello Migration Record", ex);
+            //}
         }
     }
 }

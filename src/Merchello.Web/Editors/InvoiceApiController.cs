@@ -200,7 +200,7 @@
             var endDate = DateTime.MaxValue;
             if (isDateSearch)
             {
-                var settings = _storeSettingService.GetAll().ToList();
+                var settings = _storeSettingService.GetAll(query.StoreId).ToList();
                 var dateFormat = settings.FirstOrDefault(s => s.Name == "dateFormat");
 
                 if (dateFormat == null)
@@ -234,6 +234,7 @@
                     endDate,
                     query.CurrentPage + 1,
                     query.ItemsPerPage,
+                    query.StoreId,
                     query.SortBy,
                     query.SortDirection);
             }
@@ -244,6 +245,7 @@
                     term.Value,
                     query.CurrentPage + 1,
                     query.ItemsPerPage,
+                    query.StoreId,
                     query.SortBy,
                     query.SortDirection);
             }
@@ -255,6 +257,7 @@
                     endDate,
                     query.CurrentPage + 1,
                     query.ItemsPerPage,
+                    query.StoreId,
                     query.SortBy,
                     query.SortDirection);
             }
@@ -262,6 +265,7 @@
             return this._merchello.Query.Invoice.Search(
                 query.CurrentPage + 1,
                 query.ItemsPerPage,
+                query.StoreId,
                 query.SortBy,
                 query.SortDirection);
         }
@@ -327,6 +331,7 @@
                     endDate,
                     query.CurrentPage + 1,
                     query.ItemsPerPage,
+                    query.StoreId,
                     query.SortBy,
                     query.SortDirection) :
 
@@ -336,6 +341,7 @@
                     invoiceStatusKey.Value.EncodeAsGuid(),
                     query.CurrentPage + 1,
                     query.ItemsPerPage,
+                    query.StoreId,
                     query.SortBy,
                     query.SortDirection);
         }
@@ -535,9 +541,8 @@
                             }
                             else
                             {
-                                //TODOMS
-                                invoiceAddItem.ProductVariant = productService.GetProductVariantBySku(invoiceAddItem.Sku, -1);
-                                invoiceAddItem.Product = productService.GetBySku(invoiceAddItem.Sku, -1);
+                                invoiceAddItem.ProductVariant = productService.GetProductVariantBySku(invoiceAddItem.Sku, merchInvoice.StoreId);
+                                invoiceAddItem.Product = productService.GetBySku(invoiceAddItem.Sku, merchInvoice.StoreId);
                                 invoiceAddItem.IsProductVariant = invoiceAddItem.Product == null;
                             }
                         }
@@ -770,7 +775,7 @@
                         : invoiceAddItem.Product.Sku;
 
                     // Product Pricing Enabled
-                    var productPricingEnabled = MerchelloContext.Gateways.Taxation.ProductPricingEnabled;
+                    var productPricingEnabled = MerchelloContext.Gateways.Taxation.ProductPricingEnabled(merchInvoice.StoreId);
 
                     // Create the lineitem
                     var invoiceLineItem = invoiceAddItem.Product == null

@@ -85,7 +85,7 @@
         /// <returns>
         /// The <see cref="IEnumerable{Object}"/>.
         /// </returns>
-        public abstract IEnumerable<object> GetEntities();
+        public abstract IEnumerable<object> GetEntities(int storeId);
         
 
         /// <summary>
@@ -97,11 +97,11 @@
         /// <returns>
         /// The <see cref="IEnumerable{T}"/>.
         /// </returns>
-        public IEnumerable<T> GetEntities<T>() where T : class, IEntity
+        public IEnumerable<T> GetEntities<T>(int storeId) where T : class, IEntity
         {
             this.ValidateType(typeof(T)); 
             
-            return this.GetEntities().Select(x => x as T);
+            return this.GetEntities(storeId).Select(x => x as T);
         }
 
         /// <summary>
@@ -122,7 +122,7 @@
         /// <returns>
         /// The <see cref="Page{Object}"/>.
         /// </returns>
-        public abstract Page<object> GetPagedEntities(long page, long itemsPerPage, string sortBy = "", SortDirection sortDirection = SortDirection.Ascending);
+        public abstract Page<object> GetPagedEntities(long page, long itemsPerPage, int storeId, string sortBy = "", SortDirection sortDirection = SortDirection.Ascending);
 
         /// <summary>
         /// Gets a page of typed entities
@@ -145,12 +145,12 @@
         /// <returns>
         /// The <see cref="Page{T}"/>.
         /// </returns>
-        public Page<T> GetPagedEntities<T>(long page, long itemsPerPage, string sortBy = "", SortDirection sortDirection = SortDirection.Ascending)
+        public Page<T> GetPagedEntities<T>(long page, long itemsPerPage, int storeId, string sortBy = "", SortDirection sortDirection = SortDirection.Ascending)
             where T : class, IEntity
         {
             this.ValidateType(typeof(T));
 
-            var p = GetPagedEntities(page, itemsPerPage, sortBy, sortDirection);
+            var p = GetPagedEntities(page, itemsPerPage, storeId, sortBy, sortDirection);
 
             return new Page<T>()
                 {

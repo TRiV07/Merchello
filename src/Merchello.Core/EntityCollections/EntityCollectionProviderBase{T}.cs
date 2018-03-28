@@ -38,9 +38,9 @@
         /// <returns>
         /// The <see cref="IEnumerable{Object}"/>.
         /// </returns>
-        public override IEnumerable<object> GetEntities()
+        public override IEnumerable<object> GetEntities(int storeId)
         {
-            return this.PerformGetPagedEntities(1, long.MaxValue).Items;
+            return this.PerformGetPagedEntities(1, long.MaxValue, storeId).Items;
         }
 
         /// <summary>
@@ -81,9 +81,9 @@
         /// <returns>
         /// The <see cref="Page{Object}"/>.
         /// </returns>
-        public override Page<object> GetPagedEntities(long page, long itemsPerPage, string sortBy = "", SortDirection sortDirection = SortDirection.Ascending)
+        public override Page<object> GetPagedEntities(long page, long itemsPerPage, int storeId, string sortBy = "", SortDirection sortDirection = SortDirection.Ascending)
         {
-            var p = this.PerformGetPagedEntities(page, itemsPerPage, sortBy, sortDirection);
+            var p = this.PerformGetPagedEntities(page, itemsPerPage, storeId, sortBy, sortDirection);
 
             return new Page<object>()
                 {
@@ -128,6 +128,7 @@
         protected abstract Page<T> PerformGetPagedEntities(
             long page,
             long itemsPerPage,
+            int storeId,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Ascending);
 

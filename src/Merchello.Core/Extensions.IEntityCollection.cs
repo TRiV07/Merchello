@@ -47,7 +47,7 @@ namespace Merchello.Core
         {
             var resolved = collection.ResolveProvider();
 
-            return resolved == null ? Enumerable.Empty<object>() : resolved.GetEntities();
+            return resolved == null ? Enumerable.Empty<object>() : resolved.GetEntities(collection.StoreId);
         }
 
         /// <summary>
@@ -67,7 +67,7 @@ namespace Merchello.Core
         {
             var resolved = collection.ResolveProvider();
 
-            return resolved == null ? Enumerable.Empty<T>() : resolved.GetEntities<T>();
+            return resolved == null ? Enumerable.Empty<T>() : resolved.GetEntities<T>(collection.StoreId);
         }
 
         /// <summary>
@@ -95,6 +95,7 @@ namespace Merchello.Core
             this IEntityCollection collection,
             long page,
             long itemsPerPage,
+            int storeId,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Ascending)
         {
@@ -102,7 +103,7 @@ namespace Merchello.Core
 
             return resolved == null
                        ? new Page<object>()
-                       : resolved.GetPagedEntities(page, itemsPerPage, sortBy, sortDirection);
+                       : resolved.GetPagedEntities(page, itemsPerPage, storeId, sortBy, sortDirection);
         }
 
         /// <summary>
@@ -133,6 +134,7 @@ namespace Merchello.Core
             this IEntityCollection collection,
             long page,
             long itemsPerPage,
+            int storeId,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Ascending) where T : class, IEntity
         {
@@ -140,7 +142,7 @@ namespace Merchello.Core
 
             return resolved == null
                        ? new Page<T>()
-                       : resolved.GetPagedEntities<T>(page, itemsPerPage, sortBy, sortDirection);
+                       : resolved.GetPagedEntities<T>(page, itemsPerPage, storeId, sortBy, sortDirection);
         }
 
         /// <summary>

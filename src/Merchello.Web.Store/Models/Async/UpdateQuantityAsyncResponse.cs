@@ -5,7 +5,9 @@
 
     using Merchello.Core;
     using Merchello.Core.Models;
+    using Merchello.Core.MultiStore;
     using Merchello.Web.Models.Ui.Async;
+    using Umbraco.Core;
 
     /// <summary>
     /// A response object to for an AJAX UpdateQuantity operation.
@@ -60,7 +62,7 @@
                         {
                             Key = item.Key,
                             Quantity = item.Quantity,
-                            FormattedTotal = item.TotalPrice.AsFormattedCurrency()
+                            FormattedTotal = item.TotalPrice.AsFormattedCurrency(ApplicationContext.Current.Services.DomainService.CurrentDomain().RootContentId.Value)
                         });
             }
         }

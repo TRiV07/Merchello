@@ -4,6 +4,7 @@
     using System.Web.Mvc;
 
     using Merchello.Core;
+    using Merchello.Core.MultiStore;
     using Merchello.Web.Controllers;
     using Merchello.Web.Factories;
     using Merchello.Web.Store.Factories;
@@ -122,7 +123,7 @@
                 try
                 {
                     resp.AddUpdatedItems(this.Basket.Items);
-                    resp.FormattedTotal = this.Basket.TotalBasketPrice.AsFormattedCurrency();
+                    resp.FormattedTotal = this.Basket.TotalBasketPrice.AsFormattedCurrency(Services.DomainService.CurrentDomain().RootContentId.Value);
                     resp.ItemCount = this.GetBasketItemCountForDisplay();
                     return this.Json(resp);
                 }

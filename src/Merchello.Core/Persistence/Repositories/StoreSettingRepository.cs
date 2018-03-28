@@ -20,11 +20,18 @@
     using UnitOfWork;
     using static Umbraco.Core.Persistence.Database;
 
+    using MS = Merchello.Core.Constants.MultiStore;
+
     /// <summary>
     /// Represents the Store Settings Repository
     /// </summary>
-    internal class StoreSettingRepository : MerchelloMSPetaPocoRepositoryBase<IStoreSetting>, IStoreSettingRepository
+    internal class StoreSettingRepository : MerchelloPetaPocoRepositoryBase<IStoreSetting>, IStoreSettingRepository
     {
+        /// <summary>
+        /// The domain root structure ID.
+        /// </summary>
+        private readonly int _storeId;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="StoreSettingRepository"/> class.
         /// </summary>
@@ -37,9 +44,10 @@
         /// <param name="sqlSyntax">
         /// The SQL Syntax.
         /// </param>
-        public StoreSettingRepository(IDatabaseUnitOfWork work, ILogger logger, ISqlSyntaxProvider sqlSyntax)
+        public StoreSettingRepository(IDatabaseUnitOfWork work, int storeId, ILogger logger, ISqlSyntaxProvider sqlSyntax)
             : base(work, logger, sqlSyntax)
         {
+            _storeId = storeId;
         }
 
         /// <summary>
@@ -49,11 +57,11 @@
         /// <param name="validate">Function to execute to validate the next number</param>
         /// <param name="invoicesCount">The number of invoices needing invoice numbers.  Useful when saving multiple new invoices.</param>
         /// <returns>The next invoice number</returns>
-        public int GetNextInvoiceNumber(Guid storeSettingKey, int storeId, Func<int> validate, int invoicesCount = 1)
+        public int GetNextInvoiceNumber(Guid storeSettingKey, Func<int> validate, int invoicesCount = 1)
         {
             Mandate.ParameterCondition(1 <= invoicesCount, "invoicesCount");
 
-            var setting = Get(storeSettingKey, storeId);
+            var setting = Get(storeSettingKey);
             if (string.IsNullOrEmpty(setting.Value)) setting.Value = "1";
             var nextInvoiceNumber = int.Parse(setting.Value);
             var max = validate();
@@ -75,11 +83,11 @@
         /// <param name="validate">Function to execute to validate the next number</param>
         /// <param name="ordersCount">The number of orders needing invoice orders.  Useful when saving multiple new orders.</param>
         /// <returns>The next order number</returns>
-        public int GetNextOrderNumber(Guid storeSettingKey, int storeId, Func<int> validate, int ordersCount = 1)
+        public int GetNextOrderNumber(Guid storeSettingKey, Func<int> validate, int ordersCount = 1)
         {
             Mandate.ParameterCondition(1 >= ordersCount, "ordersCount");
 
-            var setting = Get(storeSettingKey, storeId);
+            var setting = Get(storeSettingKey);
             if (string.IsNullOrEmpty(setting.Value)) setting.Value = "1";
             var max = validate();
             if (max == 0) max++;
@@ -101,11 +109,11 @@
         /// <param name="validate">Function to execute to validate the next number</param>
         /// <param name="shipmentsCount">The number of shipments needing invoice orders.  Useful when saving multiple new shipments.</param>
         /// <returns>The next shipment number</returns>
-        public int GetNextShipmentNumber(Guid storeSettingKey, int storeId, Func<int> validate, int shipmentsCount = 1)
+        public int GetNextShipmentNumber(Guid storeSettingKey, Func<int> validate, int shipmentsCount = 1)
         {
             Mandate.ParameterCondition(1 >= shipmentsCount, "shipmentsCount");
 
-            var setting = Get(storeSettingKey, storeId);
+            var setting = Get(storeSettingKey);
             if (string.IsNullOrEmpty(setting.Value)) setting.Value = "1";
             var max = validate();
             if (max == 0) max++;
@@ -132,62 +140,6 @@
             return dtos.Select(dto => new TypeField(dto.Alias, dto.Name, dto.Key));
         }
 
-        protected override IStoreSetting PerformGet(Guid key, int storeId)
-        {
-            var sql = GetBaseQuery(false)
-               .Where(GetBaseMSWhereClause(), new { Key = key, storeId });
-
-            var dto = Database.Fetch<StoreSettingDto>(sql).FirstOrDefault();
-
-            if (dto == null)
-                return null;
-
-            var factory = new StoreSettingFactory();
-
-            var setting = factory.BuildEntity(dto);
-
-            return setting;
-        }
-
-        protected override IEnumerable<IStoreSetting> PerformGetAll(int storeId, params Guid[] keys)
-        {
-            var dtos = new List<StoreSettingDto>();
-
-            if (keys.Any())
-            {
-                // This is to get around the WhereIn max limit of 2100 parameters and to help with performance of each WhereIn query
-                var keyLists = keys.Split(400).ToList();
-
-                // Loop the split keys and get them
-                foreach (var keyList in keyLists)
-                {
-                    dtos.AddRange(Database.Fetch<StoreSettingDto>(GetBaseQuery(false)
-                        .Where("storeId = @StoreId", new { StoreId = storeId })
-                        .WhereIn<StoreSettingDto>(x => x.Key, keyList, SqlSyntax)));
-                }
-            }
-            else
-            {
-                dtos = Database.Fetch<StoreSettingDto>(GetBaseQuery(false)
-                    .Where("storeId = @StoreId", new { StoreId = storeId }));
-            }
-
-            var factory = new StoreSettingFactory();
-            foreach (var dto in dtos)
-            {
-                yield return factory.BuildEntity(dto);
-            }
-        }
-
-        /// <summary>
-        /// Gets a <see cref="IStoreSetting"/> by it's key
-        /// </summary>
-        /// <param name="key">
-        /// The key.
-        /// </param>
-        /// <returns>
-        /// The <see cref="IStoreSetting"/>.
-        /// </returns>
         protected override IStoreSetting PerformGet(Guid key)
         {
             var sql = GetBaseQuery(false)
@@ -205,18 +157,8 @@
             return setting;
         }
 
-        /// <summary>
-        /// Gets a collection of all <see cref="IStoreSetting"/>
-        /// </summary>
-        /// <param name="keys">
-        /// The keys.
-        /// </param>
-        /// <returns>
-        /// The <see cref="IEnumerable{IStoreSetting}"/>.
-        /// </returns>
         protected override IEnumerable<IStoreSetting> PerformGetAll(params Guid[] keys)
         {
-
             var dtos = new List<StoreSettingDto>();
 
             if (keys.Any())
@@ -227,8 +169,11 @@
                 // Loop the split keys and get them
                 foreach (var keyList in keyLists)
                 {
-                    dtos.AddRange(Database.Fetch<StoreSettingDto>(GetBaseQuery(false).WhereIn<StoreSettingDto>(x => x.Key, keyList, SqlSyntax)));
+                    dtos.AddRange(Database.Fetch<StoreSettingDto>(GetBaseQuery(false)
+                        .WhereIn<StoreSettingDto>(x => x.Key, keyList, SqlSyntax)));
                 }
+
+                dtos = keys.Select(k => dtos.FirstOrDefault(x => x.Key == k)).ToList();
             }
             else
             {
@@ -277,6 +222,11 @@
             sql.Select(isCount ? "COUNT(*)" : "*")
                 .From<StoreSettingDto>(SqlSyntax);
 
+            if (_storeId != MS.DefaultId)
+            {
+                sql.Where<StoreSettingDto>(x => x.StoreId == _storeId, SqlSyntax);
+            }
+
             return sql;
         }
 
@@ -289,11 +239,6 @@
         protected override string GetBaseWhereClause()
         {
             return "merchStoreSetting.pk = @Key";
-        }
-
-        protected override string GetBaseMSWhereClause()
-        {
-            return "merchStoreSetting.pk = @Key AND storeId = @StoreId";
         }
 
         /// <summary>

@@ -17,10 +17,12 @@
 
     using UnitOfWork;
 
+    using MS = Merchello.Core.Constants.MultiStore;
+
     /// <summary>
     /// Represents the OrderRepository
     /// </summary>
-    internal class OrderRepository : PagedRepositoryBase<IOrder, OrderDto>, IOrderRepository
+    internal class OrderRepository : PagedMSRepositoryBase<IOrder, OrderDto>, IOrderRepository
     {
         /// <summary>
         /// The order line item repository.
@@ -42,11 +44,10 @@
         /// <param name="sqlSyntax">
         /// The SQL syntax.
         /// </param>
-        public OrderRepository(IDatabaseUnitOfWork work, ILineItemRepositoryBase<IOrderLineItem> orderLineItemRepository, ILogger logger, ISqlSyntaxProvider sqlSyntax)
-            : base(work, logger, sqlSyntax)
+        public OrderRepository(IDatabaseUnitOfWork work, int storeId, ILineItemRepositoryBase<IOrderLineItem> orderLineItemRepository, ILogger logger, ISqlSyntaxProvider sqlSyntax)
+            : base(work, storeId, logger, sqlSyntax)
         {
             Mandate.ParameterNotNull(orderLineItemRepository, "lineItemRepository");
-
             _orderLineItemRepository = orderLineItemRepository;
         }
 
@@ -108,6 +109,9 @@
                 {
                     dtos.AddRange(Database.Fetch<OrderDto, OrderIndexDto, OrderStatusDto>(GetBaseQuery(false).WhereIn<OrderDto>(x => x.Key, keyList, SqlSyntax)));
                 }
+
+                // Saving keys order
+                dtos = keys.Select(k => dtos.FirstOrDefault(x => x.Key == k)).ToList();
             }
             else
             {
@@ -174,10 +178,17 @@
             var sql = new Sql();
             sql.Select(isCount ? "COUNT(*)" : "*")
                .From<OrderDto>(SqlSyntax)
+               .InnerJoin<InvoiceDto>(SqlSyntax)
+               .On<OrderDto, InvoiceDto>(SqlSyntax, left => left.InvoiceKey, right => right.Key)
                .InnerJoin<OrderIndexDto>(SqlSyntax)
                .On<OrderDto, OrderIndexDto>(SqlSyntax, left => left.Key, right => right.OrderKey)
                .InnerJoin<OrderStatusDto>(SqlSyntax)
                .On<OrderDto, OrderStatusDto>(SqlSyntax, left => left.OrderStatusKey, right => right.Key);
+
+            if (_storeId != MS.DefaultId)
+            {
+                sql.Where<InvoiceDto>(x => x.StoreId == _storeId, SqlSyntax);
+            }
 
             return sql;
         }
@@ -265,8 +276,8 @@
         {
             var sql = new Sql();
             sql.Select("*")
-                .From<OrderItemDto>()
-                .Where<OrderItemDto>(x => x.ContainerKey == orderKey);
+                .From<OrderItemDto>(SqlSyntax)
+                .Where<OrderItemDto>(x => x.ContainerKey == orderKey, SqlSyntax);
 
             var dtos = Database.Fetch<OrderItemDto>(sql);
 
@@ -288,8 +299,12 @@
         /// </returns>
         public int GetMaxDocumentNumber()
         {
-
-            var value = Database.ExecuteScalar<object>("SELECT TOP 1 orderNumber FROM merchOrder ORDER BY orderNumber DESC");
+            var value = Database.ExecuteScalar<object>(@"
+                            SELECT TOP 1 orderNumber
+                            FROM merchOrder
+                            WHERE storeId = @StoreId
+                            ORDER BY orderNumber DESC",
+                            new { @StoreId = _storeId });
             return value == null ? 0 : int.Parse(value.ToString());
         }
     }

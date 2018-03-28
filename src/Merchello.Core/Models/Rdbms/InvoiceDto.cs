@@ -1,5 +1,6 @@
 ﻿namespace Merchello.Core.Models.Rdbms
 {
+    using Merchello.Core.Models.EntityBase;
     using System;
     using Umbraco.Core.Persistence;
     using Umbraco.Core.Persistence.DatabaseAnnotations;
@@ -10,7 +11,7 @@
     [TableName("merchInvoice")]
     [PrimaryKey("pk", autoIncrement = false)]
     [ExplicitColumns]
-    internal class InvoiceDto : IPageableDto
+    internal class InvoiceDto : IPageableDto, IHasDomainRoot
     {
         /// <summary>
         /// Gets or sets the key.
@@ -19,6 +20,13 @@
         [PrimaryKeyColumn(AutoIncrement = false)]
         [Constraint(Default = "newid()")]
         public Guid Key { get; set; }
+
+        /// <summary>
+        /// Gets or sets domain root structure ID
+        /// </summary>
+        [Column("storeId")]
+        [Constraint(Default = Constants.MultiStore.DefaultId)]
+        public int StoreId { get; set; }
 
         /// <summary>
         /// Gets or sets the customer key.
@@ -39,7 +47,7 @@
         /// Gets or sets the invoice number.
         /// </summary>
         [Column("invoiceNumber")]
-        [Index(IndexTypes.UniqueNonClustered, Name = "IX_merchInvoiceNumber")]
+        [Index(IndexTypes.UniqueNonClustered, Name = "IX_merchInvoiceNumber", ForColumns = "invoiceNumber, storeId")]
         public int InvoiceNumber { get; set; }
 
         /// <summary>

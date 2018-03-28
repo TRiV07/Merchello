@@ -348,6 +348,7 @@
     <Compile Include="Configuration\Sections\IMerchelloCountriesSection.cs" />
     <Compile Include="Configuration\Sections\MerchelloCountriesSection.cs" />
     <Compile Include="Configuration\Sections\MerchelloSection.cs" />
+    <Compile Include="Constants.MultiStore.cs" />
     <Compile Include="Constants.Cache.cs" />
     <Compile Include="Constants.CountryCodes.cs">
       <DependentUpon>Constants.cs</DependentUpon>
@@ -520,6 +521,8 @@
     <Compile Include="Models\Rdbms\DigitalMediaDto.cs" />
     <Compile Include="Models\Rdbms\UserGroup2AppDto.cs" />
     <Compile Include="PagedCollection.cs" />
+    <Compile Include="Persistence\Migrations\UpgradesMS\TargetVersionOneZeroFour\UpdateShipmentTable.cs" />
+    <Compile Include="Persistence\Migrations\UpgradesMS\TargetVersionOneZeroFour\UpdateInvoiceTable.cs" />
     <Compile Include="Persistence\Migrations\UpgradesMS\TargetVersionOneZeroThree\UpdateAnonymousCustomerTable.cs" />
     <Compile Include="Persistence\Migrations\UpgradesMS\TargetVersionOneZeroThree\UpdateCustomerTable.cs" />
     <Compile Include="Persistence\Migrations\UpgradesMS\TargetVersionOneZeroTwo\UpdateWarehouseTable.cs" />

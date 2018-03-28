@@ -64,6 +64,7 @@
         protected override Page<IInvoice> PerformGetPagedEntities(
             long page,
             long itemsPerPage,
+            int storeId,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Ascending)
         {
@@ -96,6 +97,7 @@
         protected override Page<Guid> PerformGetPagedEntityKeys(
             long page,
             long itemsPerPage,
+            int storeId,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Ascending)
         {
@@ -138,6 +140,7 @@
                     CollectionKey,
                     page,
                     itemsPerPage,
+                    storeId,
                     sortBy,
                     sortDirection);
         }
@@ -167,10 +170,11 @@
             Dictionary<string, object> args,
             long page,
             long itemsPerPage,
+            int storeId,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Ascending)
         {
-            if (!args.ContainsKey("searchTerm")) return PerformGetPagedEntityKeys(page, itemsPerPage, sortBy, sortDirection);
+            if (!args.ContainsKey("searchTerm")) return PerformGetPagedEntityKeys(page, itemsPerPage, storeId, sortBy, sortDirection);
 
             return
                 ((InvoiceService)MerchelloContext.Services.InvoiceService).GetKeysFromCollection(
@@ -219,6 +223,7 @@
                     args["searchTerm"].ToString(),
                     page,
                     itemsPerPage,
+                    storeId,
                     sortBy,
                     sortDirection);
         }

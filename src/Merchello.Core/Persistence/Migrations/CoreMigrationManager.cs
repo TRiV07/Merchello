@@ -458,6 +458,7 @@
         /// </returns>
         private string EnsureMigrationKey(MerchelloDatabaseSchemaResult schemaResult)
         {
+            return Guid.NewGuid().ToString();
             var migrationSetting =
                             schemaResult.StoreSettings.FirstOrDefault(
                                 x => x.Key == Constants.StoreSetting.MigrationKey);
@@ -477,9 +478,12 @@
             {
                 var setting =
                     MerchelloContext.Current.Services.StoreSettingService.GetByKey(
-                        Constants.StoreSetting.MigrationKey);
-                if (setting != null) setting.Value = migrationKey;
-                MerchelloContext.Current.Services.StoreSettingService.Save(setting);
+                        Constants.StoreSetting.MigrationKey, -1);
+                if (setting != null)
+                {
+                    setting.Value = migrationKey;
+                    MerchelloContext.Current.Services.StoreSettingService.Save(setting);
+                }
             }
 
             Guid validGuid;

@@ -182,9 +182,9 @@
         /// <returns>
         /// The formatted currency.
         /// </returns>
-        public string FormatCurrency(decimal amount)
+        public string FormatCurrency(decimal amount, int storeId)
         {
-            return CurrencyHelper.FormatCurrency(amount);
+            return CurrencyHelper.FormatCurrency(amount, storeId);
         }
 
         /// <summary>

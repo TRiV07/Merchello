@@ -9,6 +9,7 @@
 
     using Merchello.Core;
     using Merchello.Core.Models;
+    using Merchello.Core.MultiStore;
     using Merchello.Core.Services;
     using Merchello.Web.Models.ContentEditing;
     using Merchello.Web.Models.Querying;
@@ -110,9 +111,11 @@
                             var currencyCodes = MerchelloContext.Services.InvoiceService.GetDistinctCurrencyCodes().ToList();
                             if (!currencyCodes.Any())
                             {
-                                var code =
-                                    ((InvoiceService)MerchelloContext.Services.InvoiceService).GetDefaultCurrencyCode();
-                                currencyCodes.Add(code);
+                                //var code =
+                                //    ((InvoiceService)MerchelloContext.Services.InvoiceService).GetDefaultCurrencyCode();
+
+                                currencyCodes.AddRange(Services.DomainService.GetRootIds().Select(x =>
+                                    ((InvoiceService)MerchelloContext.Services.InvoiceService).GetDefaultCurrencyCode(x)));
                             }
                             return currencyCodes.Select(c => this.MerchelloContext.Services.StoreSettingService.GetCurrencyByCode(c)).ToList();
                         });

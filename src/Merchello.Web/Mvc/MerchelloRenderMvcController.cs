@@ -3,6 +3,7 @@
     using Merchello.Core;
     using Merchello.Core.Gateways;
     using Merchello.Core.Models;
+    using Merchello.Core.MultiStore;
     using Merchello.Core.Services;
     using Merchello.Web.Pluggable;
     using Merchello.Web.Workflow;
@@ -25,11 +26,6 @@
         /// The <see cref="ICustomerContext"/>.
         /// </summary>
         private ICustomerContext _customerContext;
-
-        /// <summary>
-        /// The <see cref="ICurrency"/>.
-        /// </summary>
-        private ICurrency _currency;
 
         /// <summary>
         /// The setting to save initialized state.
@@ -122,8 +118,10 @@
         {
             get
             {
-                if (!_isInitialized) this.Initialize();
-                return _currency;
+                var storeSettingsService = this._merchelloContext.Services.StoreSettingService;
+                return storeSettingsService.GetCurrencyByCode(
+                    storeSettingsService.GetByKey(Core.Constants.StoreSetting.CurrencyCodeKey, Services.DomainService.CurrentDomain().RootContentId.Value).Value
+                );
             }
         }
 
@@ -132,10 +130,7 @@
         /// </summary>
         private void Initialize()
         {
-            var storeSettingsService = this._merchelloContext.Services.StoreSettingService;
-            var storeSetting = storeSettingsService.GetByKey(Core.Constants.StoreSetting.CurrencyCodeKey);
             _customerContext = PluggableObjectHelper.GetInstance<CustomerContextBase>("CustomerContext", UmbracoContext);
-            _currency = storeSettingsService.GetCurrencyByCode(storeSetting.Value);
             _isInitialized = true;
         }
     }

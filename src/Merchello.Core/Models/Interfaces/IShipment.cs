@@ -1,12 +1,13 @@
 ﻿namespace Merchello.Core.Models
 {
+    using Merchello.Core.Models.EntityBase;
     using System;
     using System.Runtime.Serialization;
 
     /// <summary>
     /// Defines a Merchello Shipment object interface
     /// </summary>
-    public interface IShipment : ILineItemContainer
+    public interface IShipment : ILineItemContainer, IHasDomainRoot
     {
         /// <summary>
         /// Gets or sets the shipment number prefix.

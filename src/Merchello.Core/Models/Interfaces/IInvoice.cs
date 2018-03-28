@@ -1,5 +1,6 @@
 ﻿namespace Merchello.Core.Models
 {
+    using Merchello.Core.Models.EntityBase;
     using System;
     using System.Collections.Generic;
     using System.Runtime.Serialization;
@@ -9,7 +10,7 @@
     /// <summary>
     /// Defines an invoice.
     /// </summary>
-    public interface IInvoice : ILineItemContainer, IHasNotes
+    public interface IInvoice : ILineItemContainer, IHasNotes, IHasDomainRoot
     {
         /// <summary>
         /// Gets or sets the unique customer 'key' to associated with the invoice

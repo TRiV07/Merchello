@@ -10,12 +10,12 @@
         /// <summary>
         /// Gets a value indicating whether product pricing enabled.
         /// </summary>
-        bool ProductPricingEnabled { get; }
+        bool ProductPricingEnabled(int storeId);
 
-        /// <summary>
-        /// Gets the taxation application.
-        /// </summary>
-        TaxationApplication TaxationApplication { get; }
+        ///// <summary>
+        ///// Gets the taxation application.
+        ///// </summary>
+        //TaxationApplication TaxationApplication { get; }
 
         /// <summary>
         /// Gets the <see cref="ITaxationByProductMethod"/>.

@@ -16,7 +16,7 @@
         /// <param name="invoiceStatusKey">The <see cref="IInvoiceStatus"/> key</param>
         /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events</param>
         /// <returns><see cref="IInvoice"/></returns>
-        IInvoice CreateInvoice(Guid invoiceStatusKey, bool raiseEvents = true);
+        IInvoice CreateInvoice(int storeId, Guid invoiceStatusKey, bool raiseEvents = true);
 
         /// <summary>
         /// Creates a <see cref="IInvoice"/> with an assigned invoice number without saving it to the database
@@ -36,7 +36,7 @@
         /// <remarks>
         /// Invoice number must be a positive integer value or zero
         /// </remarks>
-        IInvoice CreateInvoice(Guid invoiceStatusKey, int invoiceNumber, bool raiseEvents = true);
+        IInvoice CreateInvoice(int storeId, Guid invoiceStatusKey, int invoiceNumber, bool raiseEvents = true);
 
         /// <summary>
         /// Saves a single <see cref="IInvoice"/>
@@ -78,7 +78,7 @@
         /// </summary>
         /// <param name="invoiceNumber">The invoice number of the <see cref="IInvoice"/> to be retrieved</param>
         /// <returns><see cref="IInvoice"/></returns>
-        IInvoice GetByInvoiceNumber(int invoiceNumber);
+        IInvoice GetByInvoiceNumber(int invoiceNumber, int storeId);
 
         /// <summary>
         /// Gets list of <see cref="IInvoice"/> objects given a list of Keys
@@ -117,7 +117,7 @@
         /// <returns>
         /// The collection of <see cref="IInvoice"/>.
         /// </returns>
-        IEnumerable<IInvoice> GetInvoicesByDateRange(DateTime startDate, DateTime endDate);
+        IEnumerable<IInvoice> GetInvoicesByDateRange(DateTime startDate, DateTime endDate, int storeId);
 
         /// <summary>
         /// Gets the total count of all invoices
@@ -125,7 +125,7 @@
         /// <returns>
         /// The <see cref="int"/> representing the count of invoices.
         /// </returns>
-        int CountInvoices();
+        int CountInvoices(int storeId);
 
         /// <summary>
         /// Gets the total count of all invoices within a date range.
@@ -139,7 +139,7 @@
         /// <returns>
         /// The <see cref="int"/> representing the count of invoices.
         /// </returns>
-        int CountInvoices(DateTime startDate, DateTime endDate);
+        int CountInvoices(DateTime startDate, DateTime endDate, int storeId);
 
         /// <summary>
         /// The count invoices by customer type
@@ -156,7 +156,7 @@
         /// <returns>
         /// The <see cref="int"/>.
         /// </returns>
-        int CountInvoices(DateTime startDate, DateTime endDate, CustomerType customerType);
+        int CountInvoices(DateTime startDate, DateTime endDate, CustomerType customerType, int storeId);
 
         /// <summary>
         /// Gets the totals of invoices in a date range for a specific currency code.
@@ -173,7 +173,7 @@
         /// <returns>
         /// The sum of the invoice totals.
         /// </returns>
-        decimal SumInvoiceTotals(DateTime startDate, DateTime endDate, string currencyCode);
+        decimal SumInvoiceTotals(DateTime startDate, DateTime endDate, string currencyCode, int storeId);
 
         /// <summary>
         /// Gets the total of line items for a give SKU invoiced in a specific currency across the date range.
@@ -193,7 +193,7 @@
         /// <returns>
         /// The total of line items for a give SKU invoiced in a specific currency across the date range.
         /// </returns>
-        decimal SumLineItemTotalsBySku(DateTime startDate, DateTime endDate, string currencyCode, string sku);
+        decimal SumLineItemTotalsBySku(DateTime startDate, DateTime endDate, string currencyCode, string sku, int storeId);
 
         /// <summary>
         /// Gets distinct currency codes used in invoices.

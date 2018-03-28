@@ -22,7 +22,7 @@
         /// <param name="typeName">The type name</param>
         /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events</param>
         /// <returns><see cref="IStoreSetting"/></returns>
-        IStoreSetting CreateStoreSettingWithKey(string name, string value, string typeName, bool raiseEvents = true);
+        IStoreSetting CreateStoreSettingWithKey(string name, string value, string typeName, int storeId, bool raiseEvents = true);
 
         /// <summary>
         /// Saves a single <see cref="IStoreSetting"/> object
@@ -43,13 +43,13 @@
         /// </summary>
         /// <param name="key">The store setting key</param>
         /// <returns>The <see cref="IStoreSetting"/></returns>
-        IStoreSetting GetByKey(Guid key);
+        IStoreSetting GetByKey(Guid key, int storeId);
 
         /// <summary>
         /// Gets a collection of all <see cref="IStoreSetting"/>
         /// </summary>
         /// <returns>The collection of all <see cref="IStoreSetting"/></returns>
-        IEnumerable<IStoreSetting> GetAll();
+        IEnumerable<IStoreSetting> GetAll(int storeId);
 
         /// <summary>
         /// Returns the <see cref="ICountry"/> for the country code passed.
@@ -108,14 +108,14 @@
         /// <returns>
         /// The next invoice number
         /// </returns>
-        int GetNextInvoiceNumber(int invoicesCount = 1);
+        int GetNextInvoiceNumber(int storeId, int invoicesCount = 1);
 
         /// <summary>
         /// Gets the next usable OrderNumber
         /// </summary>
         /// <param name="ordersCount">The number of orders</param>
         /// <returns>The next order number</returns>
-        int GetNextOrderNumber(int ordersCount = 1);
+        int GetNextOrderNumber(int storeId, int ordersCount = 1);
 
         /// <summary>
         /// Gets the next usable ShipmentNumber.
@@ -126,7 +126,7 @@
         /// <returns>
         /// The next shipment number.
         /// </returns>
-        int GetNextShipmentNumber(int shipmentsCount = 1);
+        int GetNextShipmentNumber(int storeId, int shipmentsCount = 1);
 
         /// <summary>
         /// Gets the complete collection of registered type fields

@@ -40,7 +40,7 @@
         /// <returns>
         /// The <see cref="QueryResultDisplay"/>.
         /// </returns>
-        QueryResultDisplay Search(long page, long itemsPerPage, string sortBy = "invoiceNumber", SortDirection sortDirection = SortDirection.Descending);
+        QueryResultDisplay Search(long page, long itemsPerPage, int storeId, string sortBy = "invoiceNumber", SortDirection sortDirection = SortDirection.Descending);
 
         /// <summary>
         /// Searches all invoices by a term
@@ -63,7 +63,7 @@
         /// <returns>
         /// The <see cref="QueryResultDisplay"/>.
         /// </returns>
-        QueryResultDisplay Search(string term, long page, long itemsPerPage, string sortBy = "invoiceNumber", SortDirection sortDirection = SortDirection.Descending);
+        QueryResultDisplay Search(string term, long page, long itemsPerPage, int storeId, string sortBy = "invoiceNumber", SortDirection sortDirection = SortDirection.Descending);
 
         /// <summary>
         /// Searches invoices that have invoice dates within a specified date range
@@ -92,7 +92,7 @@
         /// <returns>
         /// The <see cref="QueryResultDisplay"/>.
         /// </returns>
-        QueryResultDisplay Search(DateTime invoiceDateStart, DateTime invoiceDateEnd, long page, long itemsPerPage, string sortBy = "invoiceDate", SortDirection sortDirection = SortDirection.Descending, bool customerOnly = false);
+        QueryResultDisplay Search(DateTime invoiceDateStart, DateTime invoiceDateEnd, long page, long itemsPerPage, int storeId, string sortBy = "invoiceDate", SortDirection sortDirection = SortDirection.Descending, bool customerOnly = false);
 
         /// <summary>
         /// Searches invoices that have invoice dates within a specified date range and a specific term
@@ -124,7 +124,7 @@
         /// <returns>
         /// The <see cref="QueryResultDisplay"/>.
         /// </returns>
-        QueryResultDisplay Search(string term, DateTime invoiceDateStart, DateTime invoiceDateEnd, long page, long itemsPerPage, string sortBy = "invoiceDate", SortDirection sortDirection = SortDirection.Descending, bool customerOnly = false);
+        QueryResultDisplay Search(string term, DateTime invoiceDateStart, DateTime invoiceDateEnd, long page, long itemsPerPage, int storeId, string sortBy = "invoiceDate", SortDirection sortDirection = SortDirection.Descending, bool customerOnly = false);
 
         /// <summary>
         /// Searches invoices that have invoice dates within a specified date range with a particular invoice status
@@ -156,7 +156,7 @@
         /// <returns>
         /// The <see cref="QueryResultDisplay"/>.
         /// </returns>
-        QueryResultDisplay Search(DateTime invoiceDateStart, DateTime invoiceDateEnd, Guid invoiceStatusKey, long page, long itemsPerPage, string sortBy = "invoiceDate", SortDirection sortDirection = SortDirection.Descending, bool customerOnly = false);
+        QueryResultDisplay Search(DateTime invoiceDateStart, DateTime invoiceDateEnd, Guid invoiceStatusKey, long page, long itemsPerPage, int storeId, string sortBy = "invoiceDate", SortDirection sortDirection = SortDirection.Descending, bool customerOnly = false);
 
         /// <summary>
         /// Searches invoices that have invoice dates within a specified date range with an export value
@@ -188,7 +188,7 @@
         /// <returns>
         /// The <see cref="QueryResultDisplay"/>.
         /// </returns>
-        QueryResultDisplay Search(DateTime invoiceDateStart, DateTime invoiceDateEnd, bool exported, long page, long itemsPerPage, string sortBy = "invoiceDate", SortDirection sortDirection = SortDirection.Descending, bool customerOnly = false);
+        QueryResultDisplay Search(DateTime invoiceDateStart, DateTime invoiceDateEnd, bool exported, long page, long itemsPerPage, int storeId, string sortBy = "invoiceDate", SortDirection sortDirection = SortDirection.Descending, bool customerOnly = false);
 
         /// <summary>
         /// Searches invoices that have invoice dates within a specified date range with a particular invoice status and export value
@@ -223,7 +223,7 @@
         /// <returns>
         /// The <see cref="QueryResultDisplay"/>.
         /// </returns>
-        QueryResultDisplay Search(DateTime invoiceDateStart, DateTime invoiceDateEnd, Guid invoiceStatusKey, bool exported, long page, long itemsPerPage, string sortBy = "invoiceDate", SortDirection sortDirection = SortDirection.Descending, bool customerOnly = false);
+        QueryResultDisplay Search(DateTime invoiceDateStart, DateTime invoiceDateEnd, Guid invoiceStatusKey, bool exported, long page, long itemsPerPage, int storeId, string sortBy = "invoiceDate", SortDirection sortDirection = SortDirection.Descending, bool customerOnly = false);
 
         /// <summary>
         /// Searches for invoices by invoice status.
@@ -246,7 +246,7 @@
         /// <returns>
         /// The <see cref="QueryResultDisplay"/>.
         /// </returns>
-        QueryResultDisplay SearchByInvoiceStatus(Guid invoiceStatusKey, long page, long itemsPerPage, string sortBy = "invoiceNumber", SortDirection sortDirection = SortDirection.Descending);
+        QueryResultDisplay SearchByInvoiceStatus(Guid invoiceStatusKey, long page, long itemsPerPage, int storeId, string sortBy = "invoiceNumber", SortDirection sortDirection = SortDirection.Descending);
 
         /// <summary>
         /// Searches for invoices by invoice status and exported value
@@ -272,7 +272,7 @@
         /// <returns>
         /// The <see cref="QueryResultDisplay"/>.
         /// </returns>
-        QueryResultDisplay SearchByInvoiceStatus(Guid invoiceStatusKey, bool exported, long page, long itemsPerPage, string sortBy = "invoiceNumber", SortDirection sortDirection = SortDirection.Descending);
+        QueryResultDisplay SearchByInvoiceStatus(Guid invoiceStatusKey, bool exported, long page, long itemsPerPage, int storeId, string sortBy = "invoiceNumber", SortDirection sortDirection = SortDirection.Descending);
 
         /// <summary>
         /// Searches for invoices associated with a customer

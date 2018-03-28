@@ -21,7 +21,7 @@
         {
             var factory = new ShipmentStatusFactory();
 
-            var shipment = new Shipment(factory.BuildEntity(dto.ShipmentStatusDto))
+            var shipment = new Shipment(factory.BuildEntity(dto.ShipmentStatusDto), dto.StoreId)
             {
                 Key = dto.Key,
                 ShipmentNumberPrefix = dto.ShipmentNumberPrefix,
@@ -75,6 +75,7 @@
             var dto = new ShipmentDto()
             {
                 Key = entity.Key,
+                StoreId = entity.StoreId,
                 ShipmentNumberPrefix = entity.ShipmentNumberPrefix,
                 ShipmentNumber = entity.ShipmentNumber,
                 ShipmentStatusKey = entity.ShipmentStatusKey,

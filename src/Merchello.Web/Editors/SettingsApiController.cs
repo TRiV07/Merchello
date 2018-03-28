@@ -174,13 +174,11 @@
         /// Returns settings for domain id
         /// GET /umbraco/Merchello/SettingsApi/GetAllSettings
         /// </summary>
-        [EnsureUserPermissionForStore("id", true)]
-        public SettingDisplay GetAllSettings(int? id)
+        [EnsureUserPermissionForStore("storeId", true)]
+        public SettingDisplay GetAllSettings(int storeId)
 		{
             // TODO - why is this done this way?												   
-            var settings = id.HasValue
-                ? _storeSettingService.GetAll(id.Value)
-                : _storeSettingService.GetAll();
+            var settings = _storeSettingService.GetAll(storeId);
 			var settingDisplay = new SettingDisplay();
 
 			if (settings == null)
@@ -195,12 +193,12 @@
         /// Gets the nextInvoiceNumber and nextOrderNumber
         /// </summary>
         /// <returns>Next Invoice Number and Next Order Number</returns>
-        public SettingDisplay GetInvoiceAndOrderNumbers()
+        public SettingDisplay GetInvoiceAndOrderNumbers(int storeId)
         {
             var settingDisplay = new SettingDisplay
             {
-                NextInvoiceNumber = _storeSettingService.GetNextInvoiceNumber(),
-                NextOrderNumber = _storeSettingService.GetNextOrderNumber()
+                NextInvoiceNumber = _storeSettingService.GetNextInvoiceNumber(storeId),
+                NextOrderNumber = _storeSettingService.GetNextOrderNumber(storeId)
             };
             
             return settingDisplay;

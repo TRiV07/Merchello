@@ -70,7 +70,7 @@
             if (unpaid == null)
                 return Attempt<IInvoice>.Fail(new NullReferenceException("Unpaid invoice status query returned null"));
 
-            var invoice = new Invoice(unpaid) { VersionKey = _salePreparation.ItemCache.VersionKey };
+            var invoice = new Invoice(unpaid, Core.Constants.MultiStore.DefaultId) { VersionKey = _salePreparation.ItemCache.VersionKey };
 
             // Associate a customer with the invoice if it is a known customer.
             if (!_salePreparation.Customer.IsAnonymous) invoice.CustomerKey = _salePreparation.Customer.Key;

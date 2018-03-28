@@ -194,7 +194,7 @@
                             Totals = this.ActiveCurrencies.Select(c => new ResultCurrencyValue()
                             {
                                 Currency = c.ToCurrencyDisplay(),
-                                Value = this._invoiceService.SumLineItemTotalsBySku(startDate, endDate, c.CurrencyCode, dto.Sku)
+                                Value = this._invoiceService.SumLineItemTotalsBySku(startDate, endDate, c.CurrencyCode, dto.Sku, -1)//TODOMS
                             }).ToList()
                         };
 

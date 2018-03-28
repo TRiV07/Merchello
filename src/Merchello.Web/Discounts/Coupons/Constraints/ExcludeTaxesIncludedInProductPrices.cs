@@ -52,7 +52,7 @@
         {
             if (MerchelloContext.Current != null)
             {
-                if (!MerchelloContext.Current.Gateways.Taxation.ProductPricingEnabled) return this.Success(value);
+                if (!MerchelloContext.Current.Gateways.Taxation.ProductPricingEnabled(customer.StoreId)) return this.Success(value);
                 var vistor = new ExcludeTaxesInProductPricesVisitor();
                 value.Items.Accept(vistor);
                 return this.Success(value);

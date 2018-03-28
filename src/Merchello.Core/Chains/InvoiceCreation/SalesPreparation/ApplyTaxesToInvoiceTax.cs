@@ -66,7 +66,7 @@
 
                     var currencyCode =
                         this.SalePreparation.MerchelloContext.Services.StoreSettingService.GetByKey(
-                            Core.Constants.StoreSetting.CurrencyCodeKey).Value;
+                            Core.Constants.StoreSetting.CurrencyCodeKey, value.StoreId).Value;
 
                     taxLineItem.ExtendedData.SetValue(Core.Constants.ExtendedDataKeys.CurrencyCode, currencyCode);
 
@@ -99,7 +99,7 @@
         /// </remarks>
         private void SetTaxableSetting(IInvoice invoice, bool taxable = false)
         {
-            if (!this.SalePreparation.MerchelloContext.Gateways.Taxation.ProductPricingEnabled) return;
+            if (!this.SalePreparation.MerchelloContext.Gateways.Taxation.ProductPricingEnabled(invoice.StoreId)) return;
 
             foreach (var item in invoice.Items.Where(x => x.ExtendedData.TaxIncludedInProductPrice()))
             {

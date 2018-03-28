@@ -57,33 +57,43 @@
         /// <summary>
         /// Gets a value indicating whether product pricing enabled.
         /// </summary>
-        public bool ProductPricingEnabled
+        public bool ProductPricingEnabled(int storeId)
         {
-            get
+            //TODOMS need to cache store setting
+            var setting = _storeSettingService.GetByKey(Core.Constants.StoreSetting.GlobalTaxationApplicationKey, storeId);
+            if (setting == null)
             {
-                return TaxationApplication == TaxationApplication.Product && ProductPricingTaxMethod != null;
-            }         
-        }
-
-        /// <summary>
-        /// Gets or sets the taxation application.
-        /// </summary>
-        public TaxationApplication TaxationApplication
-        {
-            get
+                return false;
+            }
+            else
             {
-                if (!TaxApplicationInitialized)
+                if (!Enum.TryParse(setting.Value, true, out TaxationApplication taxApp))
                 {
-                    this.SetTaxApplicationSetting();
+                    return false;
                 }
-                return _taxationApplication;
-            }
-
-            internal set
-            {
-                _taxationApplication = value;
+                return taxApp == TaxationApplication.Product && ProductPricingTaxMethod != null;
             }
         }
+
+        ///// <summary>
+        ///// Gets or sets the taxation application.
+        ///// </summary>
+        //public TaxationApplication TaxationApplication
+        //{
+        //    get
+        //    {
+        //        if (!TaxApplicationInitialized)
+        //        {
+        //            this.SetTaxApplicationSetting();
+        //        }
+        //        return _taxationApplication;
+        //    }
+
+        //    internal set
+        //    {
+        //        _taxationApplication = value;
+        //    }
+        //}
 
         /// <summary>
         /// Gets the product pricing tax method.
@@ -183,11 +193,10 @@
         {
             var empty = ProductTaxCalculationResult.GetEmptyResult();
 
+            if (ProductPricingEnabled(product.StoreId)) return empty;
 
-            if (!ProductPricingEnabled) return empty;
-
-            return this.ProductPricingTaxMethod == null ? 
-                empty : 
+            return this.ProductPricingTaxMethod == null ?
+                empty :
                 this.ProductPricingTaxMethod.CalculateTaxForProduct(product);
         }
 
@@ -270,26 +279,26 @@
             return null;
         }
 
-        /// <summary>
-        /// The set tax application setting.
-        /// </summary>
-        private void SetTaxApplicationSetting()
-        {
-            var setting = _storeSettingService.GetByKey(Core.Constants.StoreSetting.GlobalTaxationApplicationKey);
-            if (setting == null)
-            {
-                TaxationApplication = TaxationApplication.Invoice;
-            }
-            else
-            {
-                TaxationApplication taxApp;
-                this.TaxationApplication = Enum.TryParse(setting.Value, true, out taxApp) ? 
-                    taxApp : 
-                    TaxationApplication.Invoice;
-            }
+        ///// <summary>
+        ///// The set tax application setting.
+        ///// </summary>
+        //private void SetTaxApplicationSetting()
+        //{
+        //    var setting = _storeSettingService.GetByKey(Core.Constants.StoreSetting.GlobalTaxationApplicationKey);
+        //    if (setting == null)
+        //    {
+        //        TaxationApplication = TaxationApplication.Invoice;
+        //    }
+        //    else
+        //    {
+        //        TaxationApplication taxApp;
+        //        this.TaxationApplication = Enum.TryParse(setting.Value, true, out taxApp) ? 
+        //            taxApp : 
+        //            TaxationApplication.Invoice;
+        //    }
 
-            _taxMethodNotQueried = true;
-            TaxApplicationInitialized = true;
-        }
+        //    _taxMethodNotQueried = true;
+        //    TaxApplicationInitialized = true;
+        //}
     }
 }

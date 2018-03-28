@@ -71,9 +71,9 @@
         /// <returns>
         /// The <see cref="Page{IInvoice}"/>.
         /// </returns>
-        protected override Page<IInvoice> PerformGetPagedEntities(long page, long itemsPerPage, string sortBy = "", SortDirection sortDirection = SortDirection.Ascending)
+        protected override Page<IInvoice> PerformGetPagedEntities(long page, long itemsPerPage, int storeId, string sortBy = "", SortDirection sortDirection = SortDirection.Ascending)
         {
-            var keyPage = this.PerformGetPagedEntityKeys(page, itemsPerPage, sortBy, sortDirection);
+            var keyPage = this.PerformGetPagedEntityKeys(page, itemsPerPage, storeId, sortBy, sortDirection);
             return _invoiceService.GetPageFromKeyPage(keyPage, () => _invoiceService.GetByKeys(keyPage.Items));
         }
 
@@ -98,6 +98,7 @@
         protected override Page<Guid> PerformGetPagedEntityKeys(
             long page,
             long itemsPerPage,
+            int storeId,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Ascending)
         {
@@ -105,6 +106,7 @@
                 Constants.OrderStatus.Fulfilled,
                 page,
                 itemsPerPage,
+                storeId,
                 sortBy,
                 sortDirection);
         }
@@ -134,10 +136,11 @@
             Dictionary<string, object> args,
             long page,
             long itemsPerPage,
+            int storeId,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Ascending)
         {
-            if (!args.ContainsKey("searchTerm")) return PerformGetPagedEntityKeys(page, itemsPerPage, sortBy, sortDirection);
+            if (!args.ContainsKey("searchTerm")) return PerformGetPagedEntityKeys(page, itemsPerPage, storeId, sortBy, sortDirection);
 
             return
                     this._invoiceService.GetInvoiceKeysMatchingOrderStatus(
@@ -145,6 +148,7 @@
                         Constants.OrderStatus.Fulfilled,
                         page,
                         itemsPerPage,
+                        storeId,
                         sortBy,
                         sortDirection);
         }
@@ -178,6 +182,7 @@
                 Constants.OrderStatus.Fulfilled,
                 page,
                 itemsPerPage,
+                storeId,
                 sortBy,
                 sortDirection);
         }
@@ -211,7 +216,7 @@
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Ascending)
         {
-            if (!args.ContainsKey("searchTerm")) return PerformGetPagedEntityKeys(page, itemsPerPage, sortBy, sortDirection);
+            if (!args.ContainsKey("searchTerm")) return PerformGetPagedEntityKeys(page, itemsPerPage, storeId, sortBy, sortDirection);
 
             return
                     this._invoiceService.GetInvoiceKeysMatchingTermNotOrderStatus(
@@ -219,6 +224,7 @@
                         Constants.OrderStatus.Fulfilled,
                         page,
                         itemsPerPage,
+                        storeId,
                         sortBy,
                         sortDirection);
         }

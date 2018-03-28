@@ -291,7 +291,7 @@ namespace Merchello.Core
         {
             var patterns = new List<IReplaceablePattern>
             {
-                ReplaceablePattern.GetConfigurationReplaceablePattern("ShippedDate", shipment.ShippedDate.FormatAsStoreDate()),
+                ReplaceablePattern.GetConfigurationReplaceablePattern("ShippedDate", shipment.ShippedDate.FormatAsStoreDate(shipment.StoreId)),
                 ReplaceablePattern.GetConfigurationReplaceablePattern("ShipToOrganization", shipment.ToOrganization),
                 ReplaceablePattern.GetConfigurationReplaceablePattern("ShipToName", shipment.ToName),
                 ReplaceablePattern.GetConfigurationReplaceablePattern("ShipToAddress1", shipment.ToAddress1),
@@ -351,7 +351,7 @@ namespace Merchello.Core
                 lineItemCollection.Add(li.AsLineItemOf<OrderLineItem>());
             }
 
-            return new Shipment(org.ShipmentStatus, org.GetOriginAddress(), org.GetDestinationAddress(), lineItemCollection)
+            return new Shipment(org.ShipmentStatus, org.StoreId, org.GetOriginAddress(), org.GetDestinationAddress(), lineItemCollection)
             {
                 ShipmentNumberPrefix = org.ShipmentNumberPrefix,
                 ShipmentNumber = org.ShipmentNumber,

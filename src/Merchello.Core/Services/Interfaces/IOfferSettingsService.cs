@@ -200,7 +200,7 @@
         /// The exclude Expired.
         /// </param>
         /// <returns>
-        /// The <see cref="IEnumerable{IOfferSettings"/>.
+        /// The <see cref="IEnumerable{IOfferSettings}"/>.
         /// </returns>
         IEnumerable<IOfferSettings> GetAllActive(bool excludeExpired = true);
 

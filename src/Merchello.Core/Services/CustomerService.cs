@@ -21,6 +21,8 @@
 
     using RepositoryFactory = Merchello.Core.Persistence.RepositoryFactory;
 
+    using MS = Merchello.Core.Constants.MultiStore;
+
     /// <summary>
     /// Represents the Customer Service, 
     /// </summary>
@@ -1209,9 +1211,9 @@
         /// <returns>
         /// The collection of all customers.
         /// </returns>
-        public IEnumerable<ICustomer> GetAll(int storeId)
+        internal IEnumerable<ICustomer> GetAll()
         {
-            using (var repository = RepositoryFactory.CreateCustomerRepository(UowProvider.GetUnitOfWork(), storeId))
+            using (var repository = RepositoryFactory.CreateCustomerRepository(UowProvider.GetUnitOfWork(), MS.DefaultId))
             {
                 return repository.GetAll();
             }

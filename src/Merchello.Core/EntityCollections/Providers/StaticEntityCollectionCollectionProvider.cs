@@ -60,7 +60,7 @@
         /// <returns>
         /// The <see cref="Page{IEntityCollection}"/>.
         /// </returns>
-        protected override Page<IEntityCollection> PerformGetPagedEntities(long page, long itemsPerPage, string sortBy = "", SortDirection sortDirection = SortDirection.Ascending)
+        protected override Page<IEntityCollection> PerformGetPagedEntities(long page, long itemsPerPage, int storeId, string sortBy = "", SortDirection sortDirection = SortDirection.Ascending)
         {
             return MerchelloContext.Services.EntityCollectionService.GetFromCollection(
                 CollectionKey,

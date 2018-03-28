@@ -196,7 +196,7 @@
         /// </returns>
         internal virtual ICustomerRepository CreateCustomerRepository(IDatabaseUnitOfWork uow, int storeId)
         {
-            return new CustomerRepository(uow, CreateCustomerAddressRepository(uow), CreateNoteRepository(uow), _logger, _sqlSyntax, storeId);
+            return new CustomerRepository(uow, storeId, CreateCustomerAddressRepository(uow), CreateNoteRepository(uow), _logger, _sqlSyntax);
         }
 
         /// <summary>
@@ -210,7 +210,7 @@
         /// </returns>
         internal virtual IAnonymousCustomerRepository CreateAnonymousCustomerRepository(IDatabaseUnitOfWork uow, int storeId)
         {
-            return new AnonymousCustomerRepository(uow, _logger, _sqlSyntax, storeId);                
+            return new AnonymousCustomerRepository(uow, storeId, _logger, _sqlSyntax);                
         }
 
         /// <summary>
@@ -266,7 +266,7 @@
         /// </returns>
         internal virtual IEntityCollectionRepository CreateEntityCollectionRepository(IDatabaseUnitOfWork uow, int storeId)
         {
-            return new EntityCollectionRepository(uow, _logger, _sqlSyntax, storeId);
+            return new EntityCollectionRepository(uow, storeId, _logger, _sqlSyntax);
         }
 
         /// <summary>
@@ -302,12 +302,13 @@
         /// <returns>
         /// The <see cref="IInvoiceRepository"/>.
         /// </returns>
-        internal virtual IInvoiceRepository CreateInvoiceRepository(IDatabaseUnitOfWork uow)
+        internal virtual IInvoiceRepository CreateInvoiceRepository(IDatabaseUnitOfWork uow, int storeId)
         {
             return new InvoiceRepository(
                 uow,
+                storeId,
                 CreateInvoiceLineItemRepository(uow),
-                CreateOrderRepository(uow),
+                CreateOrderRepository(uow, storeId),
                 CreateNoteRepository(uow), 
                 _logger, 
                 _sqlSyntax);
@@ -420,9 +421,9 @@
         /// <returns>
         /// The <see cref="IOrderRepository"/>.
         /// </returns>
-        internal virtual IOrderRepository CreateOrderRepository(IDatabaseUnitOfWork uow)
+        internal virtual IOrderRepository CreateOrderRepository(IDatabaseUnitOfWork uow, int storeId)
         {
-            return new OrderRepository(uow, CreateOrderLineItemRepository(uow), _logger, _sqlSyntax);
+            return new OrderRepository(uow, storeId, CreateOrderLineItemRepository(uow), _logger, _sqlSyntax);
         }
 
         /// <summary>
@@ -495,10 +496,10 @@
         /// </returns>
         internal virtual IProductRepository CreateProductRepository(IDatabaseUnitOfWork uow, int storeId)
         {
-            return new ProductRepository(uow, _logger, _sqlSyntax,
+            return new ProductRepository(uow, storeId,
                 CreateProductVariantRepository(uow, storeId),
                 CreateProductOptionRepository(uow),
-                storeId);
+                _logger, _sqlSyntax);
         }
 
         /// <summary>
@@ -526,9 +527,9 @@
         /// </returns>
         internal virtual IProductVariantRepository CreateProductVariantRepository(IDatabaseUnitOfWork uow, int storeId)
         {
-            return new ProductVariantRepository(uow, _logger, _sqlSyntax,
+            return new ProductVariantRepository(uow, storeId,
                 CreateProductOptionRepository(uow),
-                storeId);
+                _logger, _sqlSyntax);
         }
 
         /// <summary>
@@ -586,9 +587,9 @@
         /// <returns>
         /// The <see cref="IShipmentRepository"/>.
         /// </returns>
-        internal virtual IShipmentRepository CreateShipmentRepository(IDatabaseUnitOfWork uow)
+        internal virtual IShipmentRepository CreateShipmentRepository(IDatabaseUnitOfWork uow, int storeId)
         {
-            return new ShipmentRepository(uow, CreateOrderLineItemRepository(uow), _logger, _sqlSyntax);
+            return new ShipmentRepository(uow, storeId, CreateOrderLineItemRepository(uow), _logger, _sqlSyntax);
         }
 
         /// <summary>
@@ -614,9 +615,9 @@
         /// <returns>
         /// The <see cref="IStoreSettingRepository"/>.
         /// </returns>
-        internal virtual IStoreSettingRepository CreateStoreSettingRepository(IDatabaseUnitOfWork uow)
+        internal virtual IStoreSettingRepository CreateStoreSettingRepository(IDatabaseUnitOfWork uow, int storeId)
         {
-            return new StoreSettingRepository(uow, _logger, _sqlSyntax);
+            return new StoreSettingRepository(uow, storeId, _logger, _sqlSyntax);
         }
 
         /// <summary>
@@ -644,7 +645,7 @@
         /// </returns>
         internal virtual IWarehouseRepository CreateWarehouseRepository(IDatabaseUnitOfWork uow, int storeId)
         {
-            return new WarehouseRepository(uow, this.CreateWarehouseCatalogRepository(uow), _logger, _sqlSyntax, storeId);
+            return new WarehouseRepository(uow, storeId, CreateWarehouseCatalogRepository(uow), _logger, _sqlSyntax);
         }
 
         /// <summary>

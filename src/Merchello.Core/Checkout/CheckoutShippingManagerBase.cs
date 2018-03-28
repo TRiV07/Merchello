@@ -12,14 +12,6 @@
     public abstract class CheckoutShippingManagerBase : CheckoutCustomerDataManagerBase, ICheckoutShippingManager
     {
         /// <summary>
-        /// A value indicating whether or not shipping charges are taxable.
-        /// </summary>
-        /// <remarks>
-        /// Determined by the global back office setting.
-        /// </remarks>
-        private Lazy<bool> _shippingTaxable;
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="CheckoutShippingManagerBase"/> class.
         /// </summary>
         /// <param name="context">
@@ -34,13 +26,10 @@
         /// <summary>
         /// Gets a value indicating whether or not shipping is taxable.
         /// </summary>
-        protected virtual bool ShippingIsTaxable
+        protected virtual bool ShippingIsTaxable(int storeId)
         {
-            get
-            {
-                return _shippingTaxable.Value;
-            }
-        } 
+            return Convert.ToBoolean(Context.Services.StoreSettingService.GetByKey(Constants.StoreSetting.GlobalShippingIsTaxableKey, storeId).Value);
+        }
 
         /// <summary>
         /// Saves a <see cref="IShipmentRateQuote"/> as a shipment line item
@@ -78,7 +67,7 @@
         protected virtual void AddShipmentRateQuoteLineItem(IShipmentRateQuote shipmentRateQuote)
         {
             var lineItem = shipmentRateQuote.AsLineItemOf<ItemCacheLineItem>();
-            if (_shippingTaxable.Value) lineItem.ExtendedData.SetValue(Core.Constants.ExtendedDataKeys.Taxable, true.ToString());
+            if (ShippingIsTaxable(shipmentRateQuote.Shipment.StoreId)) lineItem.ExtendedData.SetValue(Core.Constants.ExtendedDataKeys.Taxable, true.ToString());
             Context.ItemCache.AddItem(lineItem);
         }
 
@@ -87,8 +76,6 @@
         /// </summary>
         private void Initialize()
         {
-            _shippingTaxable = new Lazy<bool>(() => Convert.ToBoolean(Context.Services.StoreSettingService.GetByKey(Constants.StoreSetting.GlobalShippingIsTaxableKey).Value));
-
             if (Context.IsNewVersion && Context.Settings.ResetShippingManagerDataOnVersionChange)
             {
                 this.ClearShipmentRateQuotes();

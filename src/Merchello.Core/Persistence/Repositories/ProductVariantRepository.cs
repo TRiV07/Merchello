@@ -54,7 +54,7 @@
         /// <param name="productOptionRepository">
         /// The <see cref="IProductOptionRepository"/>.
         /// </param>
-        public ProductVariantRepository(IDatabaseUnitOfWork work, ILogger logger, ISqlSyntaxProvider sqlSyntax, IProductOptionRepository productOptionRepository, int storeId)
+        public ProductVariantRepository(IDatabaseUnitOfWork work, int storeId, IProductOptionRepository productOptionRepository, ILogger logger, ISqlSyntaxProvider sqlSyntax)
             : base(work, logger, sqlSyntax, () => new ProductVariantFactory())
         {
             Mandate.ParameterNotNull(productOptionRepository, "productOptionRepository");

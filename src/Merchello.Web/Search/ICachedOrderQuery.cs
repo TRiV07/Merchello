@@ -40,7 +40,7 @@
         /// <returns>
         /// The <see cref="QueryResultDisplay"/>.
         /// </returns>
-        QueryResultDisplay Search(long page, long itemsPerPage, string sortBy = "orderNumber", SortDirection sortDirection = SortDirection.Descending);
+        QueryResultDisplay Search(long page, long itemsPerPage, int storeId, string sortBy = "orderNumber", SortDirection sortDirection = SortDirection.Descending);
         
         /// <summary>
         /// Searches orders that have order dates within a specified date range
@@ -66,7 +66,7 @@
         /// <returns>
         /// The <see cref="QueryResultDisplay"/>.
         /// </returns>
-        QueryResultDisplay Search(DateTime orderDateStart, DateTime orderDateEnd, long page, long itemsPerPage, string sortBy = "orderDate", SortDirection sortDirection = SortDirection.Descending);
+        QueryResultDisplay Search(DateTime orderDateStart, DateTime orderDateEnd, long page, long itemsPerPage, int storeId, string sortBy = "orderDate", SortDirection sortDirection = SortDirection.Descending);
 
         /// <summary>
         /// Searches order that have order dates within a specified date range with a particular order status
@@ -95,7 +95,7 @@
         /// <returns>
         /// The <see cref="QueryResultDisplay"/>.
         /// </returns>
-        QueryResultDisplay Search(DateTime orderDateStart, DateTime orderDateEnd, Guid orderStatusKey, long page, long itemsPerPage, string sortBy = "ordereDate", SortDirection sortDirection = SortDirection.Descending);
+        QueryResultDisplay Search(DateTime orderDateStart, DateTime orderDateEnd, Guid orderStatusKey, long page, long itemsPerPage, int storeId, string sortBy = "ordereDate", SortDirection sortDirection = SortDirection.Descending);
 
         /// <summary>
         /// Searches orders that have order dates within a specified date range with an export value
@@ -124,7 +124,7 @@
         /// <returns>
         /// The <see cref="QueryResultDisplay"/>.
         /// </returns>
-        QueryResultDisplay Search(DateTime orderDateStart, DateTime orderDateEnd, bool exported, long page, long itemsPerPage, string sortBy = "orderDate", SortDirection sortDirection = SortDirection.Descending);
+        QueryResultDisplay Search(DateTime orderDateStart, DateTime orderDateEnd, bool exported, long page, long itemsPerPage, int storeId, string sortBy = "orderDate", SortDirection sortDirection = SortDirection.Descending);
 
         /// <summary>
         /// Searches orders that have order dates within a specified date range with a particular order status and export value
@@ -156,7 +156,7 @@
         /// <returns>
         /// The <see cref="QueryResultDisplay"/>.
         /// </returns>
-        QueryResultDisplay Search(DateTime orderDateStart, DateTime orderDateEnd, Guid orderStatusKey, bool exported, long page, long itemsPerPage, string sortBy = "orderDate", SortDirection sortDirection = SortDirection.Descending);
+        QueryResultDisplay Search(DateTime orderDateStart, DateTime orderDateEnd, Guid orderStatusKey, bool exported, long page, long itemsPerPage, int storeId, string sortBy = "orderDate", SortDirection sortDirection = SortDirection.Descending);
 
         /// <summary>
         /// Searches for orders by order status.
@@ -179,7 +179,7 @@
         /// <returns>
         /// The <see cref="QueryResultDisplay"/>.
         /// </returns>
-        QueryResultDisplay SearchByOrderStatus(Guid orderStatusKey, long page, long itemsPerPage, string sortBy = "orderNumber", SortDirection sortDirection = SortDirection.Descending);
+        QueryResultDisplay SearchByOrderStatus(Guid orderStatusKey, long page, long itemsPerPage, int storeId, string sortBy = "orderNumber", SortDirection sortDirection = SortDirection.Descending);
 
         /// <summary>
         /// Searches for orders by order status and exported value
@@ -205,7 +205,7 @@
         /// <returns>
         /// The <see cref="QueryResultDisplay"/>.
         /// </returns>
-        QueryResultDisplay SearchByOrderStatus(Guid orderStatusKey, bool exported, long page, long itemsPerPage, string sortBy = "orderNumber", SortDirection sortDirection = SortDirection.Descending);
+        QueryResultDisplay SearchByOrderStatus(Guid orderStatusKey, bool exported, long page, long itemsPerPage, int storeId, string sortBy = "orderNumber", SortDirection sortDirection = SortDirection.Descending);
 
         /// <summary>
         /// Gets a collection of orders by the invoice key.

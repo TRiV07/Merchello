@@ -84,7 +84,7 @@
         /// </summary>
         /// <param name="orderNumber">The order number of the <see cref="IOrder"/> to be retrieved</param>
         /// <returns><see cref="IOrder"/></returns>
-        IOrder GetByOrderNumber(int orderNumber);
+        IOrder GetByOrderNumber(int orderNumber, int storeId);
 
         /// <summary>
         /// Gets a collection of <see cref="IOrder"/> for a given <see cref="IInvoice"/> key

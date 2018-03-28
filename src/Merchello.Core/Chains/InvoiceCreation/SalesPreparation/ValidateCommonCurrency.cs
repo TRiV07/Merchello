@@ -46,7 +46,7 @@
             {
                 var defaultCurrency =
                     this.SalePreparation.MerchelloContext.Services.StoreSettingService.GetByKey(
-                        Constants.StoreSetting.CurrencyCodeKey);
+                        Constants.StoreSetting.CurrencyCodeKey, value.StoreId);
 
                 foreach (var item in unTagged)
                 {

@@ -51,8 +51,8 @@
         {
             //TODOMS
             return MerchelloContext.HasCurrent
-                       ? MerchelloContext.Current.Services.OrderService.GetPage(1, 100, -1).Items
-                       : new OrderService(Logger.CreateWithDefaultLog4NetConfiguration()).GetPage(1, 100).Items;
+                       ? ((OrderService)MerchelloContext.Current.Services.OrderService).GetAll()
+                       : new OrderService(Logger.CreateWithDefaultLog4NetConfiguration()).GetAll();
         }
 
         /// <summary>

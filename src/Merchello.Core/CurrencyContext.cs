@@ -21,17 +21,17 @@
         /// </summary>
         private readonly IStoreSettingService _storeSettingService;
 
-        /// <summary>
-        /// The store currency.
-        /// </summary>
-        // ReSharper disable once InconsistentNaming
-        private ICurrency _storeCurrency;
+        ///// <summary>
+        ///// The store currency.
+        ///// </summary>
+        //// ReSharper disable once InconsistentNaming
+        //private ICurrency _storeCurrency;
 
-        /// <summary>
-        /// The currency format.
-        /// </summary>
-        // ReSharper disable InconsistentNaming
-        private ICurrencyFormat _currencyFormat;
+        ///// <summary>
+        ///// The currency format.
+        ///// </summary>
+        //// ReSharper disable InconsistentNaming
+        //private ICurrencyFormat _currencyFormat;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CurrencyContext"/> class.
@@ -80,28 +80,18 @@
         /// <remarks>
         /// This assumes that all stores will use the same currency
         /// </remarks>
-        public ICurrency StoreCurrency
+        public ICurrency StoreCurrency(int storeId)
         {
-            get
-            {
-                if (this._storeCurrency != null) return this._storeCurrency;
-                var storeSetting = this._storeSettingService.GetByKey(Core.Constants.StoreSetting.CurrencyCodeKey);
-                this._storeCurrency = this._storeSettingService.GetCurrencyByCode(storeSetting.Value);
-                return this._storeCurrency;
-            }
+            var storeSetting = this._storeSettingService.GetByKey(Core.Constants.StoreSetting.CurrencyCodeKey, storeId);
+            return this._storeSettingService.GetCurrencyByCode(storeSetting.Value);
         }
 
         /// <summary>
         /// Gets the store currency format.
         /// </summary>
-        private ICurrencyFormat StoreCurrencyFormat
+        private ICurrencyFormat StoreCurrencyFormat(int storeId)
         {
-            get
-            {
-                if (this._currencyFormat != null) return this._currencyFormat;
-                this._currencyFormat = this._storeSettingService.GetCurrencyFormat(this.StoreCurrency);
-                return this._currencyFormat;
-            }
+            return this._storeSettingService.GetCurrencyFormat(this.StoreCurrency(storeId));
         }
 
         /// <summary>
@@ -116,9 +106,9 @@
         /// <remarks>
         /// Overrides for currency format are made in the Merchello.config
         /// </remarks>
-        public string FormatCurrency(decimal amount)
+        public string FormatCurrency(decimal amount, int storeId)
         {
-            return string.Format(this.StoreCurrencyFormat.Format, this._storeCurrency.Symbol, amount);
+            return string.Format(this.StoreCurrencyFormat(storeId).Format, this.StoreCurrency(storeId).Symbol, amount);
         }
 
         /// <summary>
@@ -126,8 +116,7 @@
         /// </summary>
         internal void ResetCurrency()
         {
-            this._storeCurrency = null;
-            this._currencyFormat = null;
+
         }
     }
 }

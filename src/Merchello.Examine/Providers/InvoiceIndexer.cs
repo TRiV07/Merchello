@@ -21,6 +21,7 @@
         internal static readonly List<StaticField> IndexFieldPolicies = new List<StaticField>()
             {
                 new StaticField("invoiceKey", FieldIndexTypes.ANALYZED, false, string.Empty),
+                new StaticField("storeId", FieldIndexTypes.ANALYZED, false, "INT"),
                 new StaticField("customerKey", FieldIndexTypes.ANALYZED, false, string.Empty),
                 new StaticField("invoiceNumberPrefix", FieldIndexTypes.NOT_ANALYZED, true, string.Empty),
                 new StaticField("invoiceNumber", FieldIndexTypes.ANALYZED, true, string.Empty),

@@ -12,13 +12,8 @@
     /// <summary>
     /// The product display abstract.
     /// </summary>
-    public abstract class ProductDisplayBase : ProductVariantDataModifierData, IHasDomainRoot
+    public abstract class ProductDisplayBase : ProductVariantDataModifierData
     {
-        /// <summary>
-        /// Gets or sets the Store Id
-        /// </summary>
-        public int StoreId { get; set; }
-
         /// <summary>
         /// Gets or sets the version key.
         /// </summary>

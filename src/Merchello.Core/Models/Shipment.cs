@@ -22,6 +22,11 @@
         #region Fields
 
         /// <summary>
+        /// The domain root structure ID.
+        /// </summary>
+        private int _storeId;
+
+        /// <summary>
         /// The shipment status.
         /// </summary>
         private IShipmentStatus _shipmentStatus;
@@ -174,8 +179,8 @@
         /// <param name="shipmentStatus">
         /// The shipment Status.
         /// </param>
-        internal Shipment(IShipmentStatus shipmentStatus)
-            : this(shipmentStatus, new Address(), new Address(), new LineItemCollection())
+        internal Shipment(IShipmentStatus shipmentStatus, int storeId)
+            : this(shipmentStatus, storeId, new Address(), new Address(), new LineItemCollection())
         {
         }
 
@@ -191,8 +196,8 @@
         /// <param name="destination">
         /// The destination.
         /// </param>
-        internal Shipment(IShipmentStatus shipmentStatus, IAddress origin, IAddress destination)
-            : this(shipmentStatus, origin, destination, new LineItemCollection())
+        internal Shipment(IShipmentStatus shipmentStatus, int storeId, IAddress origin, IAddress destination)
+            : this(shipmentStatus, storeId, origin, destination, new LineItemCollection())
         {
         }
 
@@ -211,7 +216,7 @@
         /// <param name="items">
         /// The items.
         /// </param>
-        internal Shipment(IShipmentStatus shipmentStatus, IAddress origin, IAddress destination, LineItemCollection items)
+        internal Shipment(IShipmentStatus shipmentStatus, int storeId, IAddress origin, IAddress destination, LineItemCollection items)
         {
             Ensure.ParameterNotNull(shipmentStatus, "shipmentStatus");
             Ensure.ParameterNotNull(origin, "origin");
@@ -242,7 +247,23 @@
             _email = destination.Email;
 
             _shipmentStatus = shipmentStatus;
+            _storeId = storeId;
             _items = items;
+        }
+
+        /// <inheritdoc/>
+        [DataMember]
+        public int StoreId
+        {
+            get
+            {
+                return _storeId;
+            }
+
+            set
+            {
+                SetPropertyValueAndDetectChanges(value, ref _storeId, _ps.Value.StoreIdSelector);
+            }
         }
 
         /// <inheritdoc/>
@@ -841,6 +862,11 @@
             /// The carrier selector.
             /// </summary>
             public readonly PropertyInfo CarrierSelector = ExpressionHelper.GetPropertyInfo<Shipment, string>(x => x.Carrier);
+
+            /// <summary>
+            /// The domain root structure ID selector.
+            /// </summary>
+            public readonly PropertyInfo StoreIdSelector = ExpressionHelper.GetPropertyInfo<Shipment, int>(x => x.StoreId);
 
         }
     }

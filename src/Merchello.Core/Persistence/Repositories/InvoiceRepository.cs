@@ -18,10 +18,12 @@
     using Umbraco.Core.Persistence.Querying;
     using Umbraco.Core.Persistence.SqlSyntax;
 
+    using MS = Merchello.Core.Constants.MultiStore;
+
     /// <summary>
     /// Represents the Invoice Repository
     /// </summary>
-    internal class InvoiceRepository : PagedRepositoryBase<IInvoice, InvoiceDto>, IInvoiceRepository
+    internal class InvoiceRepository : PagedMSRepositoryBase<IInvoice, InvoiceDto>, IInvoiceRepository
     {
         /// <summary>
         /// The invoice line item repository.
@@ -61,12 +63,13 @@
         /// </param>
         public InvoiceRepository(
             IDatabaseUnitOfWork work,
+            int storeId,
             IInvoiceLineItemRepository invoiceLineItemRepository,
             IOrderRepository orderRepository,
             INoteRepository noteRepository,
             ILogger logger,
             ISqlSyntaxProvider sqlSyntax)
-            : base(work, logger, sqlSyntax)
+            : base(work, storeId, logger, sqlSyntax)
         {
             Mandate.ParameterNotNull(invoiceLineItemRepository, "lineItemRepository");
             Mandate.ParameterNotNull(orderRepository, "orderRepository");
@@ -160,8 +163,12 @@
         public int GetMaxDocumentNumber()
         {
             var value =
-                Database.ExecuteScalar<object>(
-                    "SELECT TOP 1 invoiceNumber FROM merchInvoice ORDER BY invoiceNumber DESC");
+                Database.ExecuteScalar<object>(@"
+                    SELECT TOP 1 invoiceNumber
+                    FROM merchInvoice
+                    WHERE storeId = @StoreId
+                    ORDER BY invoiceNumber DESC",
+                    new { @StoreId = _storeId });
             return value == null ? 0 : int.Parse(value.ToString());
         }
 
@@ -469,7 +476,7 @@
                 .Append(
                     "WHERE [merchInvoice2EntityCollection].[entityCollectionKey] = @eckey",
                     new { @eckey = collectionKey })
-                .Append(")");
+                .Append(") AND [merchInvoice].storeId = @storeId", new { storeId = _storeId });
 
             return GetPagedKeys(page, itemsPerPage, sql, orderExpression, sortDirection);
         }
@@ -511,7 +518,7 @@
                 .Append(
                     "WHERE [merchInvoice2EntityCollection].[entityCollectionKey] IN (@eckeys)",
                     new { @eckeys = collectionKeys })
-                .Append(")");
+                .Append(") AND [merchInvoice].storeId = @storeId", new { storeId = _storeId });
 
             return GetPagedKeys(page, itemsPerPage, sql, orderExpression, sortDirection);
         }
@@ -851,10 +858,10 @@
                 endDate > startDate)
             {
                 const string SQL =
-                    @"SELECT SUM([merchInvoice].total) FROM merchInvoice WHERE [merchInvoice].invoiceDate BETWEEN @starts and @ends AND [merchInvoice].currencyCode = @cc";
+                    @"SELECT SUM([merchInvoice].total) FROM merchInvoice WHERE [merchInvoice].invoiceDate BETWEEN @starts and @ends AND [merchInvoice].currencyCode = @cc AND [merchInvoice].storeId = @storeId";
 
                 return Database.ExecuteScalar<decimal>(SQL, new { @starts = startDate.GetDateForSqlStartOfDay(),
-                    @ends = endDate.GetDateForSqlEndOfDay(), @cc = currencyCode });
+                    @ends = endDate.GetDateForSqlEndOfDay(), @cc = currencyCode, storeId = _storeId });
             }
 
             return -1;
@@ -885,11 +892,12 @@
                         INNER JOIN [merchInvoiceItem] T2 ON T1.[pk] = T2.[invoiceKey]
                         WHERE T2.sku = @sku
                         AND T1.currencyCode = @cc
-                        AND T1.invoiceDate BETWEEN @starts AND @ends";
+                        AND T1.invoiceDate BETWEEN @starts AND @ends
+                        AND T1.storeId = @storeId";
 
             return Database.ExecuteScalar<decimal>(
                 SQL,
-                new { @starts = startDate.GetDateForSqlStartOfDay(), @ends = endDate.GetDateForSqlEndOfDay(), @cc = currencyCode, @sku = sku });
+                new { @starts = startDate.GetDateForSqlStartOfDay(), @ends = endDate.GetDateForSqlEndOfDay(), @cc = currencyCode, @sku = sku, storeId = _storeId });
         }
 
         #region Filter Queries
@@ -1146,7 +1154,8 @@
             var sql = new Sql();
             sql.Append("SELECT *")
                 .Append("FROM [merchInvoice]")
-                .Append("WHERE [merchInvoice].[pk] IN (")
+                .Append("WHERE [merchInvoice].storeId = @storeId", new { storeId = _storeId })
+                .Append("AND ([merchInvoice].[pk] IN (")
                 .Append("SELECT DISTINCT(invoiceKey)")
                 .Append("FROM [merchOrder]")
                 .Append("WHERE [merchOrder].[orderStatusKey] = @osk", new { @osk = orderStatusKey })
@@ -1157,6 +1166,10 @@
                 sql.Append("OR [merchInvoice].[pk] NOT IN (");
                 sql.Append("SELECT DISTINCT(invoiceKey)");
                 sql.Append("FROM [merchOrder]");
+                sql.Append("))");
+            }
+            else
+            {
                 sql.Append(")");
             }
 
@@ -1343,7 +1356,8 @@
             var sql = new Sql();
             sql.Append("SELECT *")
                 .Append("FROM [merchInvoice]")
-                .Append("WHERE [merchInvoice].[pk] NOT IN (")
+                .Append("WHERE [merchInvoice].storeId = @storeId", new { storeId = _storeId })
+                .Append("AND [merchInvoice].[pk] NOT IN (")
                 .Append("SELECT DISTINCT(invoiceKey)")
                 .Append("FROM [merchOrder]")
                 .Append("WHERE [merchOrder].[orderStatusKey] != @osk", new { @osk = orderStatusKey })
@@ -1443,6 +1457,9 @@
                 {
                     dtos.AddRange(Database.Fetch<InvoiceDto, InvoiceIndexDto, InvoiceStatusDto>(GetBaseQuery(false).WhereIn<InvoiceDto>(x => x.Key, keyList, SqlSyntax)));
                 }
+
+                // Saving keys order
+                dtos = keys.Select(k => dtos.FirstOrDefault(x => x.Key == k)).ToList();
             }
             else
             {
@@ -1514,6 +1531,11 @@
                 .On<InvoiceDto, InvoiceIndexDto>(SqlSyntax, left => left.Key, right => right.InvoiceKey)
                 .InnerJoin<InvoiceStatusDto>(SqlSyntax)
                 .On<InvoiceDto, InvoiceStatusDto>(SqlSyntax, left => left.InvoiceStatusKey, right => right.Key);
+
+            if (_storeId != MS.DefaultId)
+            {
+                sql.Where<InvoiceDto>(x => x.StoreId == _storeId, SqlSyntax);
+            }
 
             return sql;
         }
@@ -1674,6 +1696,11 @@
 
             sql.Select("*").From<InvoiceDto>(SqlSyntax);
 
+            if (_storeId != MS.DefaultId)
+            {
+                sql.Where<InvoiceDto>(x => x.StoreId == _storeId, SqlSyntax);
+            }
+
             if (numbers.Any() && terms.Any())
             {
                 sql.Where(
@@ -1751,7 +1778,9 @@
         private LineItemCollection GetLineItemCollection(Guid invoiceKey)
         {
             var sql = new Sql();
-            sql.Select("*").From<InvoiceItemDto>(SqlSyntax).Where<InvoiceItemDto>(x => x.ContainerKey == invoiceKey);
+            sql.Select("*")
+                .From<InvoiceItemDto>(SqlSyntax)
+                .Where<InvoiceItemDto>(x => x.ContainerKey == invoiceKey, SqlSyntax);
 
             var dtos = Database.Fetch<InvoiceItemDto>(sql);
 

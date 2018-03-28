@@ -115,9 +115,9 @@
         /// <returns>
         /// The <see cref="QueryResultDisplay"/>.
         /// </returns>
-        public QueryResultDisplay Search(long page, long itemsPerPage, string sortBy = "orderNumber", SortDirection sortDirection = SortDirection.Descending)
+        public QueryResultDisplay Search(long page, long itemsPerPage, int storeId, string sortBy = "orderNumber", SortDirection sortDirection = SortDirection.Descending)
         {
-            return GetQueryResultDisplay(_orderService.GetPagedKeys(page, itemsPerPage, sortBy, sortDirection));
+            return GetQueryResultDisplay(_orderService.GetPagedKeys(page, itemsPerPage, storeId, sortBy, sortDirection));
         }
 
         /// <summary>
@@ -144,11 +144,11 @@
         /// <returns>
         /// The <see cref="QueryResultDisplay"/>.
         /// </returns>
-        public QueryResultDisplay Search(DateTime orderDateStart, DateTime orderDateEnd, long page, long itemsPerPage, string sortBy = "orderDate", SortDirection sortDirection = SortDirection.Descending)
+        public QueryResultDisplay Search(DateTime orderDateStart, DateTime orderDateEnd, long page, long itemsPerPage, int storeId, string sortBy = "orderDate", SortDirection sortDirection = SortDirection.Descending)
         {
             var query = Query<IOrder>.Builder.Where(x => x.OrderDate >= orderDateStart && x.OrderDate <= orderDateEnd);
 
-            return GetQueryResultDisplay(_orderService.GetPage(query, page, itemsPerPage, sortBy, sortDirection));
+            return GetQueryResultDisplay(_orderService.GetPage(query, page, itemsPerPage, storeId, sortBy, sortDirection));
         }
 
         /// <summary>
@@ -178,11 +178,11 @@
         /// <returns>
         /// The <see cref="QueryResultDisplay"/>.
         /// </returns>
-        public QueryResultDisplay Search(DateTime orderDateStart, DateTime orderDateEnd, Guid orderStatusKey, long page, long itemsPerPage, string sortBy = "ordereDate", SortDirection sortDirection = SortDirection.Descending)
+        public QueryResultDisplay Search(DateTime orderDateStart, DateTime orderDateEnd, Guid orderStatusKey, long page, long itemsPerPage, int storeId, string sortBy = "ordereDate", SortDirection sortDirection = SortDirection.Descending)
         {
             var query = Query<IOrder>.Builder.Where(x => x.OrderDate >= orderDateStart && x.OrderDate <= orderDateEnd && x.OrderStatusKey == orderStatusKey);
 
-            return GetQueryResultDisplay(_orderService.GetPage(query, page, itemsPerPage, sortBy, sortDirection));
+            return GetQueryResultDisplay(_orderService.GetPage(query, page, itemsPerPage, storeId, sortBy, sortDirection));
         }
 
         /// <summary>
@@ -212,11 +212,11 @@
         /// <returns>
         /// The <see cref="QueryResultDisplay"/>.
         /// </returns>
-        public QueryResultDisplay Search(DateTime orderDateStart, DateTime orderDateEnd, bool exported, long page, long itemsPerPage, string sortBy = "orderDate", SortDirection sortDirection = SortDirection.Descending)
+        public QueryResultDisplay Search(DateTime orderDateStart, DateTime orderDateEnd, bool exported, long page, long itemsPerPage, int storeId, string sortBy = "orderDate", SortDirection sortDirection = SortDirection.Descending)
         {
             var query = Query<IOrder>.Builder.Where(x => x.OrderDate >= orderDateStart && x.OrderDate <= orderDateEnd && x.Exported == exported);
 
-            return GetQueryResultDisplay(_orderService.GetPage(query, page, itemsPerPage, sortBy, sortDirection));
+            return GetQueryResultDisplay(_orderService.GetPage(query, page, itemsPerPage, storeId, sortBy, sortDirection));
         }
 
         /// <summary>
@@ -249,11 +249,11 @@
         /// <returns>
         /// The <see cref="QueryResultDisplay"/>.
         /// </returns>
-        public QueryResultDisplay Search(DateTime orderDateStart, DateTime orderDateEnd, Guid orderStatusKey, bool exported, long page, long itemsPerPage, string sortBy = "orderDate", SortDirection sortDirection = SortDirection.Descending)
+        public QueryResultDisplay Search(DateTime orderDateStart, DateTime orderDateEnd, Guid orderStatusKey, bool exported, long page, long itemsPerPage, int storeId, string sortBy = "orderDate", SortDirection sortDirection = SortDirection.Descending)
         {
             var query = Query<IOrder>.Builder.Where(x => x.OrderDate >= orderDateStart && x.OrderDate <= orderDateEnd && x.OrderStatusKey == orderStatusKey && x.Exported == exported);
 
-            return GetQueryResultDisplay(_orderService.GetPage(query, page, itemsPerPage, sortBy, sortDirection));
+            return GetQueryResultDisplay(_orderService.GetPage(query, page, itemsPerPage, storeId, sortBy, sortDirection));
         }
 
         /// <summary>
@@ -277,11 +277,11 @@
         /// <returns>
         /// The <see cref="QueryResultDisplay"/>.
         /// </returns>
-        public QueryResultDisplay SearchByOrderStatus(Guid orderStatusKey, long page, long itemsPerPage, string sortBy = "orderNumber", SortDirection sortDirection = SortDirection.Descending)
+        public QueryResultDisplay SearchByOrderStatus(Guid orderStatusKey, long page, long itemsPerPage, int storeId, string sortBy = "orderNumber", SortDirection sortDirection = SortDirection.Descending)
         {
             var query = Query<IOrder>.Builder.Where(x => x.OrderStatusKey == orderStatusKey);
 
-            return GetQueryResultDisplay(_orderService.GetPage(query, page, itemsPerPage, sortBy, sortDirection));
+            return GetQueryResultDisplay(_orderService.GetPage(query, page, itemsPerPage, storeId, sortBy, sortDirection));
         }
 
         /// <summary>
@@ -308,11 +308,11 @@
         /// <returns>
         /// The <see cref="QueryResultDisplay"/>.
         /// </returns>
-        public QueryResultDisplay SearchByOrderStatus(Guid orderStatusKey, bool exported, long page, long itemsPerPage, string sortBy = "orderNumber", SortDirection sortDirection = SortDirection.Descending)
+        public QueryResultDisplay SearchByOrderStatus(Guid orderStatusKey, bool exported, long page, long itemsPerPage, int storeId, string sortBy = "orderNumber", SortDirection sortDirection = SortDirection.Descending)
         {
             var query = Query<IOrder>.Builder.Where(x => x.OrderStatusKey == orderStatusKey && x.Exported == exported);
 
-            return GetQueryResultDisplay(_orderService.GetPage(query, page, itemsPerPage, sortBy, sortDirection));
+            return GetQueryResultDisplay(_orderService.GetPage(query, page, itemsPerPage, storeId, sortBy, sortDirection));
         }
 
         /// <summary>
@@ -328,7 +328,7 @@
         {
             var query = Query<IOrder>.Builder.Where(x => x.InvoiceKey == invoiceKey);
 
-            return GetQueryResultDisplay(_orderService.GetPage(query, 1, int.MaxValue, "orderNumber")).Items.Select(x => (OrderDisplay)x);
+            return GetQueryResultDisplay(_orderService.GetPage(query, 1, int.MaxValue, Core.Constants.MultiStore.DefaultId, "orderNumber")).Items.Select(x => (OrderDisplay)x);
         }
 
         /// <summary>

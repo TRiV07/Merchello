@@ -63,10 +63,18 @@
             this.Initialize();
         }
 
+
         /// <summary>
         /// Gets the culture name.
         /// </summary>
         public string CultureName { get; private set; }
+
+        public int StoreId {
+            get
+            {
+                return _productBase.StoreId;
+            }
+        }
 
         /// <summary>
         /// Gets the price.

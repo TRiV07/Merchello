@@ -59,7 +59,7 @@
         /// <param name="storeId">
         /// The domain root structure ID.
         /// </param>
-        public ProductRepository(IDatabaseUnitOfWork work, ILogger logger, ISqlSyntaxProvider sqlSyntax, IProductVariantRepository productVariantRepository, IProductOptionRepository productOptionRepository, int storeId)
+        public ProductRepository(IDatabaseUnitOfWork work, int storeId, IProductVariantRepository productVariantRepository, IProductOptionRepository productOptionRepository, ILogger logger, ISqlSyntaxProvider sqlSyntax)
             : base(work, logger, sqlSyntax)
         {
             Mandate.ParameterNotNull(productVariantRepository, "productVariantRepository");
