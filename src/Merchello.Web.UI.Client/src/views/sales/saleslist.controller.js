@@ -55,7 +55,7 @@ angular.module('merchello').controller('Merchello.Backoffice.SalesListController
                     localizationService.localize('merchelloOrder_fulfilled'),
                     localizationService.localize('merchelloOrder_unfulfilled'),
                     localizationService.localize('merchelloOrder_open'),
-                    settingsResource.getAllCombined(),
+                    settingsResource.getAllCombined($routeParams.storeId),
                     localizationService.localize('merchelloSales_cancelled')
                 ];
 

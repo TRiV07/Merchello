@@ -63,7 +63,7 @@ angular.module('merchello').controller('Merchello.Common.Dialogs.DateRangeSelect
         }
 
         function loadSettings() {
-            var promise = settingsResource.getAllSettings();
+            var promise = settingsResource.getAllSettings($scope.dialogData.storeId);
             return promise.then(function(allSettings) {
                 $scope.settings = settingDisplayBuilder.transform(allSettings);
             }, function(reason) {

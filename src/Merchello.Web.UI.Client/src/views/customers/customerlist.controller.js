@@ -47,7 +47,7 @@ angular.module('merchello').controller('Merchello.Backoffice.CustomerListControl
 
             function loadSettings() {
                 // currency matching
-                settingsResource.getAllCombined().then(function (combined) {
+                settingsResource.getAllCombined($routeParams.storeId).then(function (combined) {
                     allCurrencies = combined.currencies;
                     globalCurrency = combined.currencySymbol;
                     $scope.preValuesLoaded = true;

@@ -100,7 +100,7 @@ angular.module('merchello').controller('Merchello.Customer.Dialogs.ProductSelect
              * Load the settings from the settings service to get the currency symbol
              */
             function loadSettings() {
-                var currencySymbolPromise = settingsResource.getCurrencySymbol();
+                var currencySymbolPromise = settingsResource.getCurrencySymbol($scope.dialogData.storeId);
                 currencySymbolPromise.then(function (currencySymbol) {
                     $scope.currencySymbol = currencySymbol;
 

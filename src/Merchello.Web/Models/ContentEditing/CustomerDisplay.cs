@@ -7,16 +7,22 @@
 
     using Merchello.Core;
     using Merchello.Core.Models;
+    using Merchello.Core.Models.EntityBase;
 
     /// <summary>
     /// The customer display class.
     /// </summary>
-    public class CustomerDisplay
+    public class CustomerDisplay : IHasDomainRoot
     {
         /// <summary>
         /// Gets or sets the key.
         /// </summary>
         public Guid Key { get; set; }
+
+        /// <summary>
+        /// Gets the domain root structure ID
+        /// </summary>
+        public int StoreId { get; set; }
 
         /// <summary>
         /// Gets or sets the first name.

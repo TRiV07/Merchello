@@ -74,14 +74,14 @@
         /// </returns>
         public virtual Page<TEntity> GetPage(long page, long itemsPerPage, IQuery<TEntity> query, string orderExpression, SortDirection sortDirection = SortDirection.Descending)
         {
-            var sqlClause = GetBaseQuery(false);
-            //var sqlClause = new Sql();
-            //sqlClause.Select("*").From<TDto>(SqlSyntax);
+            //var sqlClause = GetBaseQuery(false);
+            var sqlClause = new Sql();
+            sqlClause.Select("*").From<TDto>(SqlSyntax);
 
-            //if (_storeId != MS.DefaultId)
-            //{
-            //    sqlClause.Where<TDto>(x => x.StoreId == _storeId, SqlSyntax);
-            //}
+            if (typeof(IHasDomainRoot).IsAssignableFrom(typeof(TDto)) && _storeId != MS.DefaultId)
+            {
+                sqlClause.Where("storeId = @StoreId", new { StoreId = _storeId });
+            }
 
             var translator = new SqlTranslator<TEntity>(sqlClause, query);
             var sql = translator.Translate();
@@ -114,14 +114,14 @@
         /// </returns>
         public virtual Page<Guid> GetPagedKeys(long page, long itemsPerPage, IQuery<TEntity> query, string orderExpression, SortDirection sortDirection = SortDirection.Descending)
         {
-            var sqlClause = GetBaseQuery(false);
-            //var sqlClause = new Sql();
-            //sqlClause.Select("*").From<TDto>(SqlSyntax);
+            //var sqlClause = GetBaseQuery(false);
+            var sqlClause = new Sql();
+            sqlClause.Select("*").From<TDto>(SqlSyntax);
 
-            //if (_storeId != MS.DefaultId)
-            //{
-            //    sqlClause.Where<TDto>(x => x.StoreId == _storeId, SqlSyntax);
-            //}
+            if (typeof(IHasDomainRoot).IsAssignableFrom(typeof(TDto)) && _storeId != MS.DefaultId)
+            {
+                sqlClause.Where("storeId = @StoreId", new { StoreId = _storeId });
+            }
 
             var translator = new SqlTranslator<TEntity>(sqlClause, query);
             var sql = translator.Translate();

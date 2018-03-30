@@ -135,7 +135,7 @@
                 });
 
                 // gets all of the settings
-                var promiseSettings = settingsResource.getAllSettings();
+                var promiseSettings = settingsResource.getAllSettings($routeParams.storeId);
                 promiseSettings.then(function(settingsResponse) {
                     $scope.settings = settingDisplayBuilder.transform(settingsResponse);
 

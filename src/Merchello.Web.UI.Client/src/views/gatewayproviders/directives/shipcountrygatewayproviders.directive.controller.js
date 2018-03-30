@@ -1,10 +1,10 @@
 angular.module('merchello').controller('Merchello.Directives.ShipCountryGatewaysProviderDirectiveController',
-    ['$scope', 'notificationsService', 'dialogService', 'settingsResource',
+    ['$scope', '$routeParams', 'notificationsService', 'dialogService', 'settingsResource',
         'shippingGatewayProviderResource', 'shippingGatewayProviderDisplayBuilder', 'shipMethodDisplayBuilder',
         'shippingGatewayMethodDisplayBuilder', 'gatewayResourceDisplayBuilder', 'dialogDataFactory',
-        function($scope, notificationsService, dialogService, settingsResource,
-                 shippingGatewayProviderResource, shippingGatewayProviderDisplayBuilder, shipMethodDisplayBuilder,
-                 shippingGatewayMethodDisplayBuilder, gatewayResourceDisplayBuilder, dialogDataFactory) {
+        function ($scope, $routeParams, notificationsService, dialogService, settingsResource,
+            shippingGatewayProviderResource, shippingGatewayProviderDisplayBuilder, shipMethodDisplayBuilder,
+            shippingGatewayMethodDisplayBuilder, gatewayResourceDisplayBuilder, dialogDataFactory) {
 
             $scope.providersLoaded = false;
             $scope.allProviders = [];
@@ -42,8 +42,8 @@ angular.module('merchello').controller('Merchello.Directives.ShipCountryGateways
              * Loads the currency settings
              */
             function loadSettings() {
-                var currencySymbolPromise = settingsResource.getCurrencySymbol();
-                currencySymbolPromise.then(function(currencySymbol) {
+                var currencySymbolPromise = settingsResource.getCurrencySymbol($routeParams.storeId);
+                currencySymbolPromise.then(function (currencySymbol) {
                     $scope.currencySymbol = currencySymbol;
                 }, function (reason) {
                     notificationsService.error("Settings Load Failed", reason.message);
@@ -70,13 +70,13 @@ angular.module('merchello').controller('Merchello.Directives.ShipCountryGateways
                         if (angular.isArray(assigned)) {
                             $scope.assignedProviders = shippingGatewayProviderDisplayBuilder.transform(assigned);
 
-                            var available = _.filter($scope.allProviders, function(provider) {
-                                var found = _.find($scope.assignedProviders, function(ap) {
+                            var available = _.filter($scope.allProviders, function (provider) {
+                                var found = _.find($scope.assignedProviders, function (ap) {
                                     return ap.key === provider.key;
                                 });
                                 return found === undefined || found === null;
                             });
-                            angular.forEach(available, function(pusher) {
+                            angular.forEach(available, function (pusher) {
                                 $scope.availableProviders.push(pusher);
                             });
 
@@ -100,11 +100,11 @@ angular.module('merchello').controller('Merchello.Directives.ShipCountryGateways
              * in Merchello models and add to the scope via the provider in the shipMethods collection.
              */
             function loadProviderMethods() {
-                angular.forEach($scope.assignedProviders, function(shipProvider) {
+                angular.forEach($scope.assignedProviders, function (shipProvider) {
                     var promiseShipMethods = shippingGatewayProviderResource.getShippingGatewayMethodsByCountry(shipProvider, $scope.country);
                     promiseShipMethods.then(function (shipMethods) {
                         var shippingGatewayMethods = shippingGatewayMethodDisplayBuilder.transform(shipMethods);
-                        shipProvider.shippingGatewayMethods = _.sortBy(shippingGatewayMethods, function(gatewayMethod) {
+                        shipProvider.shippingGatewayMethods = _.sortBy(shippingGatewayMethods, function (gatewayMethod) {
                             return gatewayMethod.getName();
                         });
                     }, function (reason) {
@@ -122,7 +122,7 @@ angular.module('merchello').controller('Merchello.Directives.ShipCountryGateways
              * @description
              * Opens the shipping provider dialog via the Umbraco dialogService.
              */
-             function addShippingProviderDialogOpen() {
+            function addShippingProviderDialogOpen() {
                 var dialogData = dialogDataFactory.createAddShipCountryProviderDialogData();
                 //dialogData.country = country;
                 dialogData.availableProviders = $scope.availableProviders;
@@ -190,7 +190,7 @@ angular.module('merchello').controller('Merchello.Directives.ShipCountryGateways
              */
             function shippingProviderDialogConfirm(dialogData) {
                 var newShippingMethod = shipMethodDisplayBuilder.createDefault();
-                if(dialogData.shipMethodName ==='') {
+                if (dialogData.shipMethodName === '') {
                     newShippingMethod.name = $scope.country.name + " " + dialogData.selectedResource.name;
                 } else {
                     newShippingMethod.name = dialogData.shipMethodName;
@@ -238,7 +238,7 @@ angular.module('merchello').controller('Merchello.Directives.ShipCountryGateways
             function deleteShipMethodDialogConfirm(dialogData) {
                 var shipMethod = dialogData.shipMethod;
                 var promise = shippingGatewayProviderResource.deleteShipMethod(shipMethod);
-                promise.then(function() {
+                promise.then(function () {
                     reload();
                 });
             }
@@ -276,7 +276,7 @@ angular.module('merchello').controller('Merchello.Directives.ShipCountryGateways
              */
             function shippingMethodDialogConfirm(dialogData) {
                 var promiseShipMethodSave = shippingGatewayProviderResource.saveShipMethod(dialogData.shippingGatewayMethod.shipMethod);
-                promiseShipMethodSave.then(function() {
+                promiseShipMethodSave.then(function () {
                 }, function (reason) {
                     notificationsService.error("Shipping Method Save Failed", reason.message);
                 });

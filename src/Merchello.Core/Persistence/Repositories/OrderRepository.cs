@@ -75,7 +75,7 @@
             var sql = GetBaseQuery(false)
               .Where(GetBaseWhereClause(), new { Key = key });
 
-            var dto = Database.Fetch<OrderDto, OrderIndexDto, OrderStatusDto>(sql).FirstOrDefault();
+            var dto = Database.Fetch<OrderDto, InvoiceDto, OrderIndexDto, OrderStatusDto>(sql).FirstOrDefault();
 
             if (dto == null)
                 return null;
@@ -107,7 +107,7 @@
                 // Loop the split keys and get them
                 foreach (var keyList in keyLists)
                 {
-                    dtos.AddRange(Database.Fetch<OrderDto, OrderIndexDto, OrderStatusDto>(GetBaseQuery(false).WhereIn<OrderDto>(x => x.Key, keyList, SqlSyntax)));
+                    dtos.AddRange(Database.Fetch<OrderDto, InvoiceDto, OrderIndexDto, OrderStatusDto>(GetBaseQuery(false).WhereIn<OrderDto>(x => x.Key, keyList, SqlSyntax)));
                 }
 
                 // Saving keys order
@@ -115,7 +115,7 @@
             }
             else
             {
-                dtos = Database.Fetch<OrderDto, OrderIndexDto, OrderStatusDto>(GetBaseQuery(false));
+                dtos = Database.Fetch<OrderDto, InvoiceDto, OrderIndexDto, OrderStatusDto>(GetBaseQuery(false));
             }
 
 
@@ -136,7 +136,7 @@
             //}
             //else
             //{                
-            //    var dtos = Database.Fetch<OrderDto, OrderIndexDto, OrderStatusDto>(GetBaseQuery(false));
+            //    var dtos = Database.Fetch<OrderDto, InvoiceDto, OrderIndexDto, OrderStatusDto>(GetBaseQuery(false));
             //    foreach (var dto in dtos)
             //    {
             //        yield return Get(dto.Key);
@@ -159,7 +159,7 @@
             var translator = new SqlTranslator<IOrder>(sqlClause, query);
             var sql = translator.Translate();
 
-            var dtos = Database.Fetch<OrderDto, OrderIndexDto, OrderStatusDto>(sql);
+            var dtos = Database.Fetch<OrderDto, InvoiceDto, OrderIndexDto, OrderStatusDto>(sql);
 
             return dtos.DistinctBy(x => x.Key).Select(dto => Get(dto.Key)).ToArray();
         }
@@ -300,10 +300,11 @@
         public int GetMaxDocumentNumber()
         {
             var value = Database.ExecuteScalar<object>(@"
-                            SELECT TOP 1 orderNumber
-                            FROM merchOrder
-                            WHERE storeId = @StoreId
-                            ORDER BY orderNumber DESC",
+                            SELECT TOP 1 [merchOrder].[orderNumber]
+                            FROM [merchInvoice]
+                            INNER JOIN [merchOrder] ON [merchInvoice].[pk] = [merchOrder].[invoiceKey]
+                            WHERE [merchInvoice].[storeId] = @StoreId
+                            ORDER BY [merchOrder].[orderNumber] DESC",
                             new { @StoreId = _storeId });
             return value == null ? 0 : int.Parse(value.ToString());
         }

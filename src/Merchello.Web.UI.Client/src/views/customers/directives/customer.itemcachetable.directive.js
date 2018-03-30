@@ -41,7 +41,7 @@ angular.module('merchello.directives').directive('customerItemCacheTable',
                     function getItemCacheData() {
                         $q.all([
                             localizationService.localize('merchelloCustomers_customer' + scope.itemCacheType),
-                            settingsResource.getAllCombined(),
+                            settingsResource.getAllCombined($routeParams.storeId),
                             customerResource.getCustomerItemCache(scope.customer.key, scope.itemCacheType)
                         ]).then(function (data) {
                             scope.title = data[0];
