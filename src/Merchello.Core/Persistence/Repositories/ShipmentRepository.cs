@@ -2,12 +2,12 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;    
+    using System.Linq;
     using Factories;
     using Models;
     using Models.EntityBase;
     using Models.Rdbms;
-    using Querying;    
+    using Querying;
     using Umbraco.Core;
     using Umbraco.Core.Cache;
     using Umbraco.Core.Logging;
@@ -61,7 +61,7 @@
         /// <summary>
         /// The get max document number.
         /// </summary>
-        /// <returns>
+        /// <returns> 
         /// The <see cref="int"/>.
         /// </returns>
         public int GetMaxDocumentNumber()
@@ -73,6 +73,26 @@
                             ORDER BY shipmentNumber DESC",
                             new { @StoreId = _storeId });
             return value == null ? 0 : int.Parse(value.ToString());
+        }
+
+        public IEnumerable<IShipment> GetShipmentsByCustomer(Guid customer)
+        {
+            var sql = new Sql();
+            sql.Select("[merchShipment].[pk]")
+                .From<ShipmentDto>(SqlSyntax)
+                .InnerJoin<ShipmentStatusDto>(SqlSyntax)
+                .On<ShipmentDto, ShipmentStatusDto>(SqlSyntax, left => left.ShipmentStatusKey, right => right.Key)
+                .InnerJoin<OrderItemDto>(SqlSyntax)
+                .On<ShipmentDto, OrderItemDto>(SqlSyntax, left => left.Key, right => right.ShipmentKey)
+                .InnerJoin<OrderDto>(SqlSyntax)
+                .On<OrderItemDto, OrderDto>(SqlSyntax, left => left.ContainerKey, right => right.Key)
+                .InnerJoin<InvoiceDto>(SqlSyntax)
+                .On<OrderDto, InvoiceDto>(SqlSyntax, left => left.InvoiceKey, right => right.Key)
+                .Where<InvoiceDto>(x => x.CustomerKey == customer, SqlSyntax);
+
+            var keys = Database.Fetch<Guid>(sql);
+
+            return GetAll(keys.ToArray());
         }
 
 
@@ -137,7 +157,7 @@
 
             var factory = new ShipmentFactory();
             foreach (var dto in dtos)
-            {                
+            {
                 var shipment = factory.BuildEntity(dto);
                 ((Shipment)shipment).Items = this.GetLineItems(dto.Key);
                 yield return shipment;
@@ -252,7 +272,7 @@
             var existing = _orderLineItemRepository.GetByQuery(query);
 
             var removers = existing.Where(x => entity.Items.All(y => y.Key != x.Key));
-                
+
             foreach (var remove in removers)
             {
                 ((IOrderLineItem)remove).ShipmentKey = null;

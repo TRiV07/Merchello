@@ -188,7 +188,7 @@ angular.module('merchello').controller('Merchello.Backoffice.SalesListController
             }
 
             function getEditUrl(invoice) {
-                return baseUrl + invoice.key;
+                return baseUrl + invoice.key + '/store/' + $routeParams.storeId;
             }
 
             init();

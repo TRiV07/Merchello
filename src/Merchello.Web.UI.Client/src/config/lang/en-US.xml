@@ -340,6 +340,10 @@
     <key alias="paymentExpirationWarning">You may not receive payment for expired authorization.</key>
     <key alias="processedBy">Processed by</key>
     <key alias="refundMethod">Refund method</key>
+    <key alias="tblPaymentsDescription">Description</key>
+    <key alias="tblPaymentsAmount">Amount</key>
+    <key alias="tblInvoiceUnitPrice">Unit Price</key>
+    <key alias="tblInvoiceTotalPrice">Total Price</key>
     <key alias="noSales">
       <![CDATA[
         <h5>You Have No Sales Yet</h5>
@@ -365,6 +369,8 @@
     <key alias="addAdjustment">Add adjustment</key>
     <key alias="adjustments">Adjustments</key>
     <key alias="adjustmentAssignedBy">Assigned by</key>
+    <key alias="lineItemPreview">Line Item Preview</key>
+    <key alias="noLineItemPreview">Unable to preview line item</key>
   </area>
   <area alias="merchelloCustomers">
     <key alias="loginName">Login</key>

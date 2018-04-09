@@ -76,7 +76,7 @@ angular.module('merchello').controller('Merchello.Backoffice.InvoicePaymentsCont
                     $scope.invoice = invoiceDisplayBuilder.transform(invoice);
                     $scope.billingAddress = $scope.invoice.getBillToAddress();
                     // append the customer tab if needed
-                    $scope.tabs.appendCustomerTab($scope.invoice.customerKey);
+                    $scope.tabs.appendCustomerTab($scope.invoice.customerKey, $routeParams.storeId);
                     loadPayments(id);
                     loadSettings();
                     $scope.loaded = true;
@@ -94,7 +94,7 @@ angular.module('merchello').controller('Merchello.Backoffice.InvoicePaymentsCont
              */
             function loadSettings() {
 
-                var settingsPromise = settingsResource.getAllSettings();
+                var settingsPromise = settingsResource.getAllSettings($routeParams.storeId);
                 settingsPromise.then(function(settings) {
                     $scope.settings = settings;
                 }, function(reason) {
@@ -111,7 +111,7 @@ angular.module('merchello').controller('Merchello.Backoffice.InvoicePaymentsCont
                     } else {
                         // this handles a legacy error where in some cases the invoice may not have saved the ISO currency code
                         // default currency
-                        var defaultCurrencyPromise = settingsResource.getCurrencySymbol();
+                        var defaultCurrencyPromise = settingsResource.getCurrencySymbol($routeParams.storeId);
                         defaultCurrencyPromise.then(function (currencySymbol) {
                             $scope.currencySymbol = currencySymbol;
                         }, function (reason) {

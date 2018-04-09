@@ -466,6 +466,24 @@
             }
         }
 
+        public IEnumerable<IShipment> GetShipmentsByCarrier(string carrier, int storeId)
+        {
+            using (var repository = RepositoryFactory.CreateShipmentRepository(UowProvider.GetUnitOfWork(), storeId))
+            {
+                var query = Query<IShipment>.Builder.Where(x => x.Carrier == carrier);
+
+                return repository.GetByQuery(query);
+            }
+        }
+
+        public IEnumerable<IShipment> GetShipmentsByCustomer(Guid customer, int storeId)
+        {
+            using (var repository = RepositoryFactory.CreateShipmentRepository(UowProvider.GetUnitOfWork(), storeId))
+            {
+                return repository.GetShipmentsByCustomer(customer);
+            }
+        }
+
         /// <summary>
         /// Gets list of <see cref="IShipment"/> objects given a list of Unique keys
         /// </summary>

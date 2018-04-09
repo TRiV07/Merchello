@@ -308,5 +308,45 @@
                             new { @StoreId = _storeId });
             return value == null ? 0 : int.Parse(value.ToString());
         }
+
+        public override Page<IOrder> GetPage(long page, long itemsPerPage, IQuery<IOrder> query, string orderExpression, SortDirection sortDirection = SortDirection.Descending)
+        {
+            var sqlClause = new Sql();
+            sqlClause.Select("[merchOrder].[pk]")
+                .From<OrderDto>(SqlSyntax)
+                .InnerJoin<InvoiceDto>(SqlSyntax)
+                .On<OrderDto, InvoiceDto>(SqlSyntax, left => left.InvoiceKey, right => right.Key);
+
+            if (_storeId != MS.DefaultId)
+            {
+                sqlClause.Where<InvoiceDto>(x => x.StoreId == _storeId, SqlSyntax);
+            }
+
+            var translator = new SqlTranslator<IOrder>(sqlClause, query);
+            var sql = translator.Translate();
+
+            var p = GetDtoPage(page, itemsPerPage, sql, orderExpression, sortDirection);
+
+            return this.MapPageDtoToPageEntity(p);
+        }
+
+        public override Page<Guid> GetPagedKeys(long page, long itemsPerPage, IQuery<IOrder> query, string orderExpression, SortDirection sortDirection = SortDirection.Descending)
+        {
+            var sqlClause = new Sql();
+            sqlClause.Select("[merchOrder].[pk]")
+                .From<OrderDto>(SqlSyntax)
+                .InnerJoin<InvoiceDto>(SqlSyntax)
+                .On<OrderDto, InvoiceDto>(SqlSyntax, left => left.InvoiceKey, right => right.Key);
+
+            if (_storeId != MS.DefaultId)
+            {
+                sqlClause.Where<InvoiceDto>(x => x.StoreId == _storeId, SqlSyntax);
+            }
+
+            var translator = new SqlTranslator<IOrder>(sqlClause, query);
+            var sql = translator.Translate();
+
+            return GetPagedKeys(page, itemsPerPage, sql, orderExpression, sortDirection);
+        }
     }
 }

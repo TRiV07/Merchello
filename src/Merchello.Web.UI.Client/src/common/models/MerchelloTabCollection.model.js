@@ -111,9 +111,9 @@
 
 
         // appends a customer tab to the current collection
-        function appendCustomerTab(customerKey) {
+        function appendCustomerTab(customerKey, storeId) {
             if (customerKey !== '00000000-0000-0000-0000-000000000000' && customerKey !== null && customerKey !== undefined) {
-                addTab.call(this, 'customer', 'merchelloTabs_customer', '#/merchello/merchello/customeroverview/' + customerKey);
+                addTab.call(this, 'customer', 'merchelloTabs_customer', '#/merchello/merchello/customeroverview/' + customerKey + '/store/' + storeId);
             }
         }
 

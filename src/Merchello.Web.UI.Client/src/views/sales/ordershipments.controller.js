@@ -56,7 +56,7 @@ angular.module('merchello').controller('Merchello.Backoffice.OrderShipmentsContr
                 invoicePromise.then(function(invoice) {
                     $scope.invoice = invoice;
                     // append the customer tab
-                    $scope.tabs.appendCustomerTab($scope.invoice.customerKey);
+                    $scope.tabs.appendCustomerTab($scope.invoice.customerKey, $routeParams.storeId);
                     loadSettings();
                     var shipmentsPromise = shipmentResource.getShipmentsByInvoice(invoice);
                     shipmentsPromise.then(function(shipments) {
@@ -76,7 +76,7 @@ angular.module('merchello').controller('Merchello.Backoffice.OrderShipmentsContr
              * @description - Load the Merchello settings.
              */
             function loadSettings() {
-                var settingsPromise = settingsResource.getAllSettings();
+                var settingsPromise = settingsResource.getAllSettings($routeParams.storeId);
                 settingsPromise.then(function (settings) {
                     $scope.settings = settings;
                 }, function (reason) {

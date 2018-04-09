@@ -1,6 +1,7 @@
 ﻿namespace Merchello.Core.Persistence.Repositories
 {
     using System;
+    using System.Collections.Generic;
     using Models;
     using Umbraco.Core.Persistence.Repositories;
 
@@ -9,5 +10,6 @@
     /// </summary>
     internal interface IShipmentRepository : IRepositoryQueryable<Guid, IShipment>, IAssertsMaxDocumentNumber
     {
+        IEnumerable<IShipment> GetShipmentsByCustomer(Guid customer);
     }
 }

@@ -95,5 +95,11 @@
         [ResultColumn]
         public OrderStatusDto OrderStatusDto { get; set; }
 
+        /// <summary>
+        /// Gets or sets the invoice dto.
+        /// </summary>
+        [ResultColumn]
+        public InvoiceDto InvoiceDto { get; set; }
+
     }
 }

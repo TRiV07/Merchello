@@ -1,19 +1,19 @@
-    /**
-     * @ngdoc controller
-     * @name Merchello.Editors.Sales.OverviewController
-     * @function
-     *
-     * @description
-     * The controller for the sales overview view
-     */
-    angular.module('merchello').controller('Merchello.Backoffice.SalesOverviewController',
-        ['$scope', '$routeParams', '$timeout', '$log', '$location', 'assetsService', 'dialogService', 'localizationService', 'notificationsService', 'invoiceHelper',
-            'auditLogResource', 'noteResource', 'invoiceResource', 'settingsResource', 'paymentResource', 'shipmentResource', 'paymentGatewayProviderResource',
-            'orderResource', 'dialogDataFactory', 'merchelloTabsFactory', 'addressDisplayBuilder', 'countryDisplayBuilder', 'salesHistoryDisplayBuilder', 'noteDisplayBuilder',
-            'invoiceDisplayBuilder', 'paymentDisplayBuilder', 'paymentMethodDisplayBuilder', 'shipMethodsQueryDisplayBuilder', 'noteDisplayBuilder',
-        function($scope, $routeParams, $timeout, $log, $location, assetsService, dialogService, localizationService, notificationsService, invoiceHelper,
-                 auditLogResource, noteResource, invoiceResource, settingsResource, paymentResource, shipmentResource, paymentGatewayProviderResource, orderResource, dialogDataFactory,
-                 merchelloTabsFactory, addressDisplayBuilder, countryDisplayBuilder, salesHistoryDisplayBuilder, noteDisplayBuilder, invoiceDisplayBuilder, paymentDisplayBuilder, paymentMethodDisplayBuilder, shipMethodsQueryDisplayBuilder, noteDisplayBuilder) {
+/**
+ * @ngdoc controller
+ * @name Merchello.Editors.Sales.OverviewController
+ * @function
+ *
+ * @description
+ * The controller for the sales overview view
+ */
+angular.module('merchello').controller('Merchello.Backoffice.SalesOverviewController',
+    ['$scope', '$routeParams', '$timeout', '$log', '$location', 'assetsService', 'dialogService', 'localizationService', 'notificationsService', 'invoiceHelper',
+        'auditLogResource', 'noteResource', 'invoiceResource', 'settingsResource', 'paymentResource', 'shipmentResource', 'paymentGatewayProviderResource',
+        'orderResource', 'dialogDataFactory', 'merchelloTabsFactory', 'addressDisplayBuilder', 'countryDisplayBuilder', 'salesHistoryDisplayBuilder', 'noteDisplayBuilder',
+        'invoiceDisplayBuilder', 'paymentDisplayBuilder', 'paymentMethodDisplayBuilder', 'shipMethodsQueryDisplayBuilder', 'noteDisplayBuilder',
+        function ($scope, $routeParams, $timeout, $log, $location, assetsService, dialogService, localizationService, notificationsService, invoiceHelper,
+            auditLogResource, noteResource, invoiceResource, settingsResource, paymentResource, shipmentResource, paymentGatewayProviderResource, orderResource, dialogDataFactory,
+            merchelloTabsFactory, addressDisplayBuilder, countryDisplayBuilder, salesHistoryDisplayBuilder, noteDisplayBuilder, invoiceDisplayBuilder, paymentDisplayBuilder, paymentMethodDisplayBuilder, shipMethodsQueryDisplayBuilder, noteDisplayBuilder) {
 
             // exposed properties
             $scope.loaded = false;
@@ -48,7 +48,7 @@
             $scope.openDeleteInvoiceDialog = openDeleteInvoiceDialog;
             $scope.cancelInvoice = cancelInvoice;
             $scope.processDeleteInvoiceDialog = processDeleteInvoiceDialog,
-            $scope.openFulfillShipmentDialog = openFulfillShipmentDialog;
+                $scope.openFulfillShipmentDialog = openFulfillShipmentDialog;
             $scope.processFulfillShipmentDialog = processFulfillShipmentDialog;
 
             $scope.toggleNewPaymentOpen = toggleNewPaymentOpen;
@@ -75,13 +75,13 @@
              *
              * @description - Method called on intial page load.  Loads in data from server and sets up scope.
              */
-            function init () {
+            function init() {
                 $scope.preValuesLoaded = false;
                 $scope.newPaymentOpen = false;
                 loadInvoice($routeParams.id);
                 $scope.tabs = merchelloTabsFactory.createSalesTabs($routeParams.id);
                 $scope.tabs.setActive('overview');
-                if(Umbraco.Sys.ServerVariables.isDebuggingEnabled) {
+                if (Umbraco.Sys.ServerVariables.isDebuggingEnabled) {
                     $scope.debugAllowDelete = true;
                 }
 
@@ -143,14 +143,14 @@
                         // TODO this is a patch for a problem in the API
                         if (history.dailyLogs.length) {
                             $scope.salesHistory = history.dailyLogs;
-                            angular.forEach(history.dailyLogs, function(daily) {
-                              angular.forEach(daily.logs, function(log) {
-                                  if (log.message.formattedMessage ==='') {
-                                     localizationService.localize(log.message.localizationKey(), log.message.localizationTokens()).then(function(value) {
-                                        log.message.formattedMessage = value;
-                                     });
-                                  }
-                              });
+                            angular.forEach(history.dailyLogs, function (daily) {
+                                angular.forEach(daily.logs, function (log) {
+                                    if (log.message.formattedMessage === '') {
+                                        localizationService.localize(log.message.localizationKey(), log.message.localizationTokens()).then(function (value) {
+                                            log.message.formattedMessage = value;
+                                        });
+                                    }
+                                });
                             });
                         }
                         $scope.historyLoaded = history.dailyLogs.length > 0;
@@ -195,7 +195,7 @@
                         $scope.shipmentLineItems.push(shipmentLineItem);
                     }
 
-                    $scope.tabs.appendCustomerTab($scope.invoice.customerKey);
+                    $scope.tabs.appendCustomerTab($scope.invoice.customerKey, $routeParams.storeId);
 
                     $scope.canAddLineItems = $scope.invoice.enableInvoiceEditQty;
 
@@ -204,31 +204,31 @@
                 });
             }
 
-           /**
-             * @ngdoc method
-             * @name loadSettings
-             * @function
-             *
-             * @description - Load the Merchello settings.
-             */
+            /**
+              * @ngdoc method
+              * @name loadSettings
+              * @function
+              *
+              * @description - Load the Merchello settings.
+              */
             function loadSettings() {
-               settingsResource.getAllCombined().then(function(combined) {
-                   $scope.settings = combined.settings;
-                   countries = combined.countries;
-                   if ($scope.invoice.currency.symbol === '') {
-                       var currency = _.find(combined.currencies, function (symbol) {
-                           return symbol.currecyCode === $scope.invoice.getCurrencyCode()
-                       });
-                       if (currency !== undefined) {
-                           $scope.currencySymbol = currency.symbol;
-                       } else {
-                           $scope.currencySymbol = combined.currencySymbol;
-                       }
-                   } else {
-                       $scope.currencySymbol = $scope.invoice.currency.symbol;
-                   }
-               });
-           }
+                settingsResource.getAllCombined($routeParams.storeId).then(function (combined) {
+                    $scope.settings = combined.settings;
+                    countries = combined.countries;
+                    if ($scope.invoice.currency.symbol === '') {
+                        var currency = _.find(combined.currencies, function (symbol) {
+                            return symbol.currecyCode === $scope.invoice.getCurrencyCode()
+                        });
+                        if (currency !== undefined) {
+                            $scope.currencySymbol = currency.symbol;
+                        } else {
+                            $scope.currencySymbol = combined.currencySymbol;
+                        }
+                    } else {
+                        $scope.currencySymbol = $scope.invoice.currency.symbol;
+                    }
+                });
+            }
 
 
             /**
@@ -241,7 +241,7 @@
             function loadPayments(key) {
 
                 var paymentsPromise = paymentResource.getPaymentsByInvoice(key);
-                paymentsPromise.then(function(payments) {
+                paymentsPromise.then(function (payments) {
                     $scope.allPayments = paymentDisplayBuilder.transform(payments);
                     $scope.payments = _.filter($scope.allPayments, function (p) { return !p.voided && !p.collected && p.authorized; });
 
@@ -251,7 +251,7 @@
                     // Set the remaining balance after the payments have loaded
                     $scope.remainingBalance = invoiceHelper.round($scope.invoice.remainingBalance($scope.allPayments), 2);
 
-                }, function(reason) {
+                }, function (reason) {
                     notificationsService.error('Failed to load payments for invoice', reason.message);
                 });
             }
@@ -264,9 +264,9 @@
              * @description - Load the available Merchello payment methods for the invoice.
              */
             function loadPaymentMethods() {
-                if($scope.payments.length === 0) {
+                if ($scope.payments.length === 0) {
                     var promise = paymentGatewayProviderResource.getAvailablePaymentMethods();
-                    promise.then(function(methods) {
+                    promise.then(function (methods) {
                         $scope.paymentMethods = paymentMethodDisplayBuilder.transform(methods);
                         $scope.preValuesLoaded = true;
                         $scope.paymentMethodsLoaded = true;
@@ -283,10 +283,10 @@
              */
             function loadShippingAddress(key) {
                 var shippingAddressPromise = orderResource.getShippingAddress(key);
-                shippingAddressPromise.then(function(result) {
-                      $scope.shippingAddress = addressDisplayBuilder.transform(result);
-                      $scope.hasShippingAddress = true;
-                }, function(reason) {
+                shippingAddressPromise.then(function (result) {
+                    $scope.shippingAddress = addressDisplayBuilder.transform(result);
+                    $scope.hasShippingAddress = true;
+                }, function (reason) {
                     notificationsService.error('Failed to load shipping address', reason.message);
                 });
             }
@@ -333,7 +333,7 @@
                 */
 
                 var promise = paymentResource.getPaymentMethod(dialogData.paymentMethodKey);
-                promise.then(function(paymentMethod) {
+                promise.then(function (paymentMethod) {
                     var pm = paymentMethodDisplayBuilder.transform(paymentMethod);
                     if (pm.capturePaymentEditorView.editorView !== '') {
                         dialogData.capturePaymentEditorView = pm.capturePaymentEditorView.editorView;
@@ -392,7 +392,7 @@
                 var promiseCancelInvoice = invoiceResource.cancelInvoice($scope.invoice.key);
                 promiseCancelInvoice.then(function (response) {
                     notificationsService.success('Invoice Cancelled');
-                    $location.url("/merchello/merchello/saleslist/manage", true);
+                    $location.url("/merchello/merchello/saleslist/manage" + '/store/' + $routeParams.storeId, true);
                 }, function (reason) {
                     notificationsService.error('Failed to cancel Invoice', reason.message);
                 });
@@ -407,7 +407,7 @@
              */
             function openFulfillShipmentDialog() {
                 var promiseStatuses = shipmentResource.getAllShipmentStatuses();
-                promiseStatuses.then(function(statuses) {
+                promiseStatuses.then(function (statuses) {
                     var data = dialogDataFactory.createCreateShipmentDialogData();
 
                     // Loop orders until I find one without getUnShippedItems()!!
@@ -433,7 +433,7 @@
 
                     // packaging
                     var quotedKey = '7342dcd6-8113-44b6-bfd0-4555b82f9503';
-                    data.shipmentStatus = _.find(data.shipmentStatuses, function(status) {
+                    data.shipmentStatus = _.find(data.shipmentStatuses, function (status) {
                         return status.key === quotedKey;
                     });
                     data.invoiceKey = $scope.invoice.key;
@@ -445,9 +445,9 @@
                         var shipMethodKey = shipmentLineItems[0].extendedData.getValue('merchShipMethodKey');
                         var request = { shipMethodKey: shipMethodKey, invoiceKey: data.invoiceKey, lineItemKey: shipmentLineItems[0].key };
                         var shipMethodPromise = shipmentResource.getShipMethodAndAlternatives(request);
-                        shipMethodPromise.then(function(result) {
+                        shipMethodPromise.then(function (result) {
                             data.shipMethods = shipMethodsQueryDisplayBuilder.transform(result);
-                            data.shipMethods.selected = _.find(data.shipMethods.alternatives, function(method) {
+                            data.shipMethods.selected = _.find(data.shipMethods.alternatives, function (method) {
                                 return method.key === shipMethodKey;
                             });
 
@@ -474,7 +474,7 @@
                 var promiseDeleteInvoice = invoiceResource.deleteInvoice($scope.invoice.key);
                 promiseDeleteInvoice.then(function (response) {
                     notificationsService.success('Invoice Deleted');
-                    $location.url("/merchello/merchello/saleslist/manage", true);
+                    $location.url("/merchello/merchello/saleslist/manage" + '/store/' + $routeParams.storeId, true);
                 }, function (reason) {
                     notificationsService.error('Failed to Delete Invoice', reason.message);
                 });
@@ -489,10 +489,10 @@
              */
             function processFulfillShipmentDialog(data) {
                 $scope.preValuesLoaded = false;
-                if(data.shipmentRequest.order.items.length > 0) {
+                if (data.shipmentRequest.order.items.length > 0) {
                     var promiseNewShipment = shipmentResource.newShipment(data.shipmentRequest);
                     promiseNewShipment.then(function (shipment) {
-                        $timeout(function() {
+                        $timeout(function () {
                             //console.info(shipment);
                             loadInvoice(data.invoiceKey);
                             notificationsService.success('Shipment #' + shipment.shipmentNumber + ' created');
@@ -523,11 +523,11 @@
                 }
                 var i = 0; // order count
                 var found = false;
-                while(i < $scope.invoice.orders.length && !found) {
-                    var item = _.find($scope.invoice.orders[ i ].items, function(item) {
-                      return (item.shipmentKey === '' || item.shipmentKey === null) && item.extendedData.getValue('merchShippable').toLowerCase() === 'true';
+                while (i < $scope.invoice.orders.length && !found) {
+                    var item = _.find($scope.invoice.orders[i].items, function (item) {
+                        return (item.shipmentKey === '' || item.shipmentKey === null) && item.extendedData.getValue('merchShippable').toLowerCase() === 'true';
                     });
-                    if(item !== null && item !== undefined) {
+                    if (item !== null && item !== undefined) {
                         found = true;
                     } else {
                         i++;
@@ -548,25 +548,25 @@
             function openAddressAddEditDialog(address) {
                 var dialogData = dialogDataFactory.createEditAddressDialogData();
                 // if the address is not defined we need to create a default (empty) AddressDisplay
-                if(address === null || address === undefined) {
+                if (address === null || address === undefined) {
                     dialogData.address = addressDisplayBuilder.createDefault();
                     dialogData.selectedCountry = countries[0];
                 } else {
                     dialogData.address = address.clone();
                     dialogData.selectedCountry = address.countryCode === '' ? countries[0] :
-                        _.find(countries, function(country) {
+                        _.find(countries, function (country) {
                             return country.countryCode === address.countryCode;
                         });
                 }
                 dialogData.countries = countries;
 
                 if (dialogData.selectedCountry.hasProvinces()) {
-                    if(dialogData.address.region !== '') {
-                        dialogData.selectedProvince = _.find(dialogData.selectedCountry.provinces, function(province) {
+                    if (dialogData.address.region !== '') {
+                        dialogData.selectedProvince = _.find(dialogData.selectedCountry.provinces, function (province) {
                             return province.code === address.region;
                         });
                     }
-                    if(dialogData.selectedProvince === null || dialogData.selectedProvince === undefined) {
+                    if (dialogData.selectedProvince === null || dialogData.selectedProvince === undefined) {
                         dialogData.selectedProvince = dialogData.selectedCountry.provinces[0];
                     }
                 }
@@ -633,17 +633,17 @@
             function saveNotes() {
                 saveInvoice();
             }
-            
+
             function deleteNote(note) {
-                $scope.invoice.notes = _.reject($scope.invoice.notes, function(n) {
+                $scope.invoice.notes = _.reject($scope.invoice.notes, function (n) {
                     return n.key === note.key;
                 });
 
                 saveInvoice();
             }
-            
+
             function saveInvoice() {
-                invoiceResource.saveInvoice($scope.invoice).then(function(data) {
+                invoiceResource.saveInvoice($scope.invoice).then(function (data) {
                     refresh();
                 });
             }
@@ -656,4 +656,4 @@
 
             // initialize the controller
             init();
-    }]);
+        }]);
