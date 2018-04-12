@@ -64,9 +64,9 @@
         /// <remarks>
         /// This is only used by <see cref="BraintreeWebhooksControllerBase"/>
         /// </remarks>
-        internal static BraintreeProviderSettings GetBraintreeProviderSettings()
+        internal static BraintreeProviderSettings GetBraintreeProviderSettings(int storeId)
         {
-            var provider = (BraintreePaymentGatewayProvider)MerchelloContext.Current.Gateways.Payment.GetProviderByKey(Constants.Braintree.GatewayProviderSettingsKey);
+            var provider = (BraintreePaymentGatewayProvider)MerchelloContext.Current.Gateways.Payment.GetProviderByKey(Constants.Braintree.GatewayProviderSettingsKey, storeId);
 
             if (provider != null) return provider.ExtendedData.GetBrainTreeProviderSettings();
 

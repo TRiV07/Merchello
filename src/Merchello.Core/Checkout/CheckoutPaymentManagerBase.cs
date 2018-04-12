@@ -126,7 +126,7 @@
         /// <returns>A collection of <see cref="IPaymentGatewayMethod"/>s</returns>
         public virtual IEnumerable<IPaymentGatewayMethod> GetPaymentGatewayMethods()
         {
-            return Context.Gateways.Payment.GetPaymentGatewayMethods();
+            return Context.Gateways.Payment.GetPaymentGatewayMethods(this.Context.Customer.StoreId);
         }
 
         /// <summary>

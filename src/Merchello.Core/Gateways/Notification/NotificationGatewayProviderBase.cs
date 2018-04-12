@@ -27,7 +27,7 @@
             get
             {
                 return _notificationMethods ??
-                      (_notificationMethods = GatewayProviderService.GetNotificationMethodsByProviderKey(GatewayProviderSettings.Key));
+                      (_notificationMethods = GatewayProviderService.GetNotificationMethodsByProviderKey(GatewayProviderSettings.Key, GatewayProviderSettings.StoreId));
             }
 
             protected set

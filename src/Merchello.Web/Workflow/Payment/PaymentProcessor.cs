@@ -161,7 +161,7 @@
                 this._payment = this._merchelloContext.Services.PaymentService.GetByKey(request.PaymentKey.Value);
 
             this._paymentGatewayMethod =
-                this._merchelloContext.Gateways.Payment.GetPaymentGatewayMethodByKey(request.PaymentMethodKey);
+                this._merchelloContext.Gateways.Payment.GetPaymentGatewayMethodByKey(request.PaymentMethodKey, _invoice.StoreId);
 
             this._amount = request.Amount;
 

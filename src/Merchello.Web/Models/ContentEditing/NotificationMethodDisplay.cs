@@ -28,6 +28,8 @@
         /// </summary>
         public Guid ProviderKey { get; set; }
 
+        public int StoreId { get; set; }
+
         /// <summary>
         /// Gets or sets the service code.
         /// </summary>

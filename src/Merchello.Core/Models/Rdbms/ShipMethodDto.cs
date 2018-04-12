@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Merchello.Core.Models.EntityBase;
+using System;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 
@@ -7,7 +8,7 @@ namespace Merchello.Core.Models.Rdbms
     [TableName("merchShipMethod")]
     [PrimaryKey("pk", autoIncrement = false)]
     [ExplicitColumns]
-    internal class ShipMethodDto
+    internal class ShipMethodDto : IHasDomainRoot
     {
         [Column("pk")]
         [PrimaryKeyColumn(AutoIncrement = false)]
@@ -22,8 +23,12 @@ namespace Merchello.Core.Models.Rdbms
         public Guid ShipCountryKey { get; set; }
 
         [Column("providerKey")]
-        [ForeignKey(typeof(GatewayProviderSettingsDto), Name = "FK_merchShipMethod_merchGatewayProviderSettings", Column = "pk")]
+        //[ForeignKey(typeof(GatewayProviderSettingsDto), Name = "FK_merchShipMethod_merchGatewayProviderSettings", Column = "pk")]
         public Guid ProviderKey { get; set; }
+
+        [Column("storeId")]
+        [Constraint(Default = Constants.MultiStore.DefaultId)]
+        public int StoreId { get; set; }
 
         [Column("surcharge")]
         [Constraint(Default = "0")]
@@ -49,8 +54,8 @@ namespace Merchello.Core.Models.Rdbms
         [Constraint(Default = "getdate()")]
         public DateTime CreateDate { get; set; }
 
-        [ResultColumn]
-        public GatewayProviderSettingsDto GatewayProviderSettingsDto { get; set; }
+        //[ResultColumn]
+        //public GatewayProviderSettingsDto GatewayProviderSettingsDto { get; set; }
 
     }
 }

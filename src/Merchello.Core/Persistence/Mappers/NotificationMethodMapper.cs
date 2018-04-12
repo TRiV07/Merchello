@@ -16,6 +16,7 @@ namespace Merchello.Core.Persistence.Mappers
 
             CacheMap<NotificationMethod, NotificationMethodDto>(src => src.Key, dto => dto.Key);
             CacheMap<NotificationMethod, NotificationMethodDto>(src => src.ProviderKey, dto => dto.ProviderKey);
+            CacheMap<NotificationMethod, NotificationMethodDto>(src => src.StoreId, dto => dto.StoreId);
             CacheMap<NotificationMethod, NotificationMethodDto>(src => src.Name, dto => dto.Name);
             CacheMap<NotificationMethod, NotificationMethodDto>(src => src.Description, dto => dto.Description);
             CacheMap<NotificationMethod, NotificationMethodDto>(src => src.ServiceCode, dto => dto.ServiceCode);

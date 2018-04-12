@@ -16,6 +16,8 @@
     using Umbraco.Core.Events;
     using Umbraco.Core.Logging;
 
+    using MS = Merchello.Core.Constants.MultiStore;
+
     /// <summary>
     /// Represents the GatewayProviderService
     /// </summary>    
@@ -262,7 +264,7 @@
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreateGatewayProviderRepository(uow))
+                using (var repository = RepositoryFactory.CreateGatewayProviderRepository(uow, gatewayProviderSettings.StoreId))
                 {
                     repository.AddOrUpdate(gatewayProviderSettings);
                     uow.Commit();
@@ -285,23 +287,23 @@
             switch (gatewayProviderSettings.GatewayProviderType)
             {
                 case GatewayProviderType.Payment:
-                    var paymentMethods = _paymentMethodService.GetPaymentMethodsByProviderKey(gatewayProviderSettings.Key).ToArray();
+                    var paymentMethods = _paymentMethodService.GetPaymentMethodsByProviderKey(gatewayProviderSettings.Key, gatewayProviderSettings.StoreId).ToArray();
                     if (paymentMethods.Any()) _paymentMethodService.Delete(paymentMethods);
                     break;
                     
                 case GatewayProviderType.Shipping:
-                    var shippingMethods = _shipMethodService.GetShipMethodsByProviderKey(gatewayProviderSettings.Key).ToArray();
+                    var shippingMethods = _shipMethodService.GetShipMethodsByProviderKey(gatewayProviderSettings.Key, gatewayProviderSettings.StoreId).ToArray();
                     if (shippingMethods.Any()) _shipMethodService.Delete(shippingMethods);
                     break;
 
                 case GatewayProviderType.Taxation:
-                    var taxMethods = _taxMethodService.GetTaxMethodsByProviderKey(gatewayProviderSettings.Key).ToArray();
+                    var taxMethods = _taxMethodService.GetTaxMethodsByProviderKey(gatewayProviderSettings.Key, gatewayProviderSettings.StoreId).ToArray();
                     if (taxMethods.Any()) _taxMethodService.Delete(taxMethods);
                     break;
 
                 case GatewayProviderType.Notification:
                     var notificationMethods =
-                        _notificationMethodService.GetNotifcationMethodsByProviderKey(gatewayProviderSettings.Key).ToArray();
+                        _notificationMethodService.GetNotifcationMethodsByProviderKey(gatewayProviderSettings.Key, gatewayProviderSettings.StoreId).ToArray();
                     if (notificationMethods.Any()) _notificationMethodService.Delete(notificationMethods);
                     break;
             }
@@ -309,7 +311,7 @@
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreateGatewayProviderRepository(uow))
+                using (var repository = RepositoryFactory.CreateGatewayProviderRepository(uow, gatewayProviderSettings.StoreId))
                 {
                     repository.Delete(gatewayProviderSettings);
                     uow.Commit();
@@ -335,7 +337,7 @@
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreateGatewayProviderRepository(uow))
+                using (var repository = RepositoryFactory.CreateGatewayProviderRepository(uow, MS.DefaultId))
                 {
                     foreach (var gatewayProvider in gatewayProviderArray)
                     {
@@ -353,9 +355,9 @@
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        public IGatewayProviderSettings GetGatewayProviderByKey(Guid key)
+        public IGatewayProviderSettings GetGatewayProviderByKey(Guid key, int storeId)
         {
-            using (var repository = RepositoryFactory.CreateGatewayProviderRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateGatewayProviderRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 return repository.Get(key);
             }
@@ -366,9 +368,9 @@
         /// </summary>
         /// <param name="gatewayProviderType"></param>
         /// <returns></returns>
-        public IEnumerable<IGatewayProviderSettings> GetGatewayProvidersByType(GatewayProviderType gatewayProviderType)
+        public IEnumerable<IGatewayProviderSettings> GetGatewayProvidersByType(GatewayProviderType gatewayProviderType, int storeId)
         {
-            using (var repository = RepositoryFactory.CreateGatewayProviderRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateGatewayProviderRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 var query =
                     Query<IGatewayProviderSettings>.Builder.Where(
@@ -387,19 +389,28 @@
         /// <returns></returns>
         public IEnumerable<IGatewayProviderSettings> GetGatewayProvidersByShipCountry(IShipCountry shipCountry)
         {
-            using (var repository = RepositoryFactory.CreateGatewayProviderRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateGatewayProviderRepository(UowProvider.GetUnitOfWork(), MS.DefaultId))
             {
                 return repository.GetGatewayProvidersByShipCountryKey(shipCountry.Key);
             }
         }
 
+        public IEnumerable<int> GetAllStoresIds()
+        {
+            using (var repository = RepositoryFactory.CreateGatewayProviderRepository(UowProvider.GetUnitOfWork(), MS.DefaultId))
+            {
+                return repository.GetAllStoresIds();
+            }
+        }
+
+
         /// <summary>
         /// Gets a collection containing all <see cref="IGatewayProviderSettings"/>
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<IGatewayProviderSettings> GetAllGatewayProviders()
+        public IEnumerable<IGatewayProviderSettings> GetAllGatewayProviders(int storeId)
         {
-            using (var repository = RepositoryFactory.CreateGatewayProviderRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateGatewayProviderRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 return repository.GetAll();
             }
@@ -465,9 +476,9 @@
         /// <param name="description">The description of the payment method</param>
         /// <param name="paymentCode">The unique 'payment code' associated with the payment method.  (Eg. visa, mc)</param>
         /// <returns><see cref="Attempt"/> indicating whether or not the creation of the <see cref="IPaymentMethod"/> with respective success or fail</returns>
-        public Attempt<IPaymentMethod> CreatePaymentMethodWithKey(Guid providerKey, string name, string description, string paymentCode)
+        public Attempt<IPaymentMethod> CreatePaymentMethodWithKey(Guid providerKey, int storeId, string name, string description, string paymentCode)
         {
-            return ((PaymentMethodService)_paymentMethodService).CreatePaymentMethodWithKey(providerKey, name, description, paymentCode);
+            return ((PaymentMethodService)_paymentMethodService).CreatePaymentMethodWithKey(providerKey, storeId, name, description, paymentCode);
         }
 
         /// <summary>
@@ -493,9 +504,9 @@
         /// </summary>
         /// <param name="providerKey">The unique 'key' of the PaymentGatewayProvider</param>
         /// <returns>A collection of <see cref="IPaymentMethod"/></returns>
-        public IEnumerable<IPaymentMethod> GetPaymentMethodsByProviderKey(Guid providerKey)
+        public IEnumerable<IPaymentMethod> GetPaymentMethodsByProviderKey(Guid providerKey, int storeId)
         {
-            return _paymentMethodService.GetPaymentMethodsByProviderKey(providerKey);
+            return _paymentMethodService.GetPaymentMethodsByProviderKey(providerKey, storeId);
         }
 
 
@@ -574,9 +585,9 @@
         /// <param name="name">The name of the notification (used in back office)</param>
         /// <param name="serviceCode">The notification service code</param>
         /// <returns>An Attempt{<see cref="INotificationMethod"/>}</returns>
-        public Attempt<INotificationMethod> CreateNotificationMethodWithKey(Guid providerKey, string name, string serviceCode)
+        public Attempt<INotificationMethod> CreateNotificationMethodWithKey(Guid providerKey, int storeId, string name, string serviceCode)
         {
-            return _notificationMethodService.CreateNotificationMethodWithKey(providerKey, name, serviceCode);
+            return _notificationMethodService.CreateNotificationMethodWithKey(providerKey, storeId, name, serviceCode);
         }
 
         /// <summary>
@@ -636,9 +647,9 @@
         /// </summary>
         /// <param name="providerKey">The unique 'key' of the NotificationGatewayProvider</param>
         /// <returns>A collection of <see cref="INotificationMethod"/></returns>
-        public IEnumerable<INotificationMethod> GetNotificationMethodsByProviderKey(Guid providerKey)
+        public IEnumerable<INotificationMethod> GetNotificationMethodsByProviderKey(Guid providerKey, int storeId)
         {
-            return _notificationMethodService.GetNotifcationMethodsByProviderKey(providerKey);
+            return _notificationMethodService.GetNotifcationMethodsByProviderKey(providerKey, storeId);
         }
 
         /// <summary>
@@ -683,9 +694,9 @@
         /// <param name="shipCountry">The <see cref="IShipCountry"/> this ship method is to be associated with</param>
         /// <param name="name">The required name of the <see cref="IShipMethod"/></param>
         /// <param name="serviceCode">The ShipMethods service code</param>
-        public Attempt<IShipMethod> CreateShipMethodWithKey(Guid providerKey, IShipCountry shipCountry, string name, string serviceCode)
+        public Attempt<IShipMethod> CreateShipMethodWithKey(Guid providerKey, int storeId, IShipCountry shipCountry, string name, string serviceCode)
         {            
-            return ((ShipMethodService)_shipMethodService).CreateShipMethodWithKey(providerKey, shipCountry, name, serviceCode);
+            return ((ShipMethodService)_shipMethodService).CreateShipMethodWithKey(providerKey, storeId, shipCountry, name, serviceCode);
         }
 
         /// <summary>
@@ -728,9 +739,9 @@
         /// Gets a list of all <see cref="IShipMethod"/> objects given a <see cref="IGatewayProviderSettings"/> key
         /// </summary>
         /// <returns>A collection of <see cref="IShipMethod"/></returns>
-        public IEnumerable<IShipMethod> GetShipMethodsByShipCountryKey(Guid providerKey)
+        public IEnumerable<IShipMethod> GetShipMethodsByShipCountryKey(Guid providerKey, int storeId)
         {
-            return _shipMethodService.GetShipMethodsByProviderKey(providerKey);
+            return _shipMethodService.GetShipMethodsByProviderKey(providerKey, storeId);
         }
 
         /// <summary>
@@ -749,9 +760,9 @@
         /// <returns>
         /// The <see cref="IEnumerable{IShipMethod}"/>.
         /// </returns>
-        public IEnumerable<IShipMethod> GetAllShipMethods()
+        public IEnumerable<IShipMethod> GetAllShipMethods(int storeId)
         {
-            return _shipMethodService.GetAll();
+            return _shipMethodService.GetAll(storeId);
         }
 
         #endregion
@@ -827,6 +838,7 @@
         /// Returns a collection of all <see cref="IShipCountry"/>
         /// </summary>
         /// <returns>A collection of all <see cref="IShipCountry"/></returns>
+        /// TODOMS separate it by stores
         public IEnumerable<IShipCountry> GetAllShipCountries()
         {
             return ((ShipCountryService) _shipCountryService).GetAllShipCountries();
@@ -849,6 +861,10 @@
             return _orderService.GetAllOrderStatuses();
         }
 
+        #endregion
+
+        #region TaxMethod
+
         /// <summary>
         /// Attempts to create a <see cref="ITaxMethod"/> for a given provider and country.  If the provider already 
         /// defines a tax rate for the country, the creation fails.
@@ -857,25 +873,20 @@
         /// <param name="countryCode">The two character ISO country code</param>
         /// <param name="percentageTaxRate">The tax rate in percentage for the country</param>
         /// <returns><see cref="Attempt"/> indicating whether or not the creation of the <see cref="ITaxMethod"/> with respective success or fail</returns>
-        public Attempt<ITaxMethod> CreateTaxMethodWithKey(Guid providerKey, string countryCode, decimal percentageTaxRate)
+        public Attempt<ITaxMethod> CreateTaxMethodWithKey(Guid providerKey, int storeId, string countryCode, decimal percentageTaxRate)
         {
-            return ((TaxMethodService)_taxMethodService).CreateTaxMethodWithKey(providerKey, countryCode, percentageTaxRate);
+            return ((TaxMethodService)_taxMethodService).CreateTaxMethodWithKey(providerKey, storeId, countryCode, percentageTaxRate);
         }
 
-
-#endregion
-
-        #region TaxMethod
-        
         /// <summary>
         /// Gets a <see cref="ITaxMethod"/> based on a provider and country code
         /// </summary>
         /// <param name="providerKey">The unique 'key' of the <see cref="IGatewayProviderSettings"/></param>
         /// <param name="countryCode">The country code of the <see cref="ITaxMethod"/></param>
         /// <returns><see cref="ITaxMethod"/></returns>
-        public ITaxMethod GetTaxMethodByCountryCode(Guid providerKey, string countryCode)
+        public ITaxMethod GetTaxMethodByCountryCode(Guid providerKey, int storeId, string countryCode)
         {
-            return _taxMethodService.GetTaxMethodByCountryCode(providerKey, countryCode);
+            return _taxMethodService.GetTaxMethodByCountryCode(providerKey, storeId, countryCode);
         }
 
         /// <summary>
@@ -887,9 +898,9 @@
         /// <remarks>
         /// There can be only one =)
         /// </remarks>
-        public ITaxMethod GetTaxMethodForProductPricing()
+        public ITaxMethod GetTaxMethodForProductPricing(int storeId)
         {
-            return _taxMethodService.GetTaxMethodForProductPricing();
+            return _taxMethodService.GetTaxMethodForProductPricing(storeId);
         }
 
         /// <summary>
@@ -897,9 +908,9 @@
         /// </summary>
         /// <param name="countryCode">The country code of the <see cref="ITaxMethod"/></param>
         /// <returns>A collection <see cref="ITaxMethod"/></returns>
-        public IEnumerable<ITaxMethod> GetTaxMethodsByCountryCode(string countryCode)
+        public IEnumerable<ITaxMethod> GetTaxMethodsByCountryCode(int storeId, string countryCode)
         {
-            return _taxMethodService.GetTaxMethodsByCountryCode(countryCode);
+            return _taxMethodService.GetTaxMethodsByCountryCode(storeId, countryCode);
         }
 
         /// <summary>
@@ -925,9 +936,9 @@
         /// </summary>
         /// <param name="providerKey">The unique 'key' of the TaxationGatewayProvider</param>
         /// <returns>A collection of <see cref="ITaxMethod"/></returns>
-        public IEnumerable<ITaxMethod> GetTaxMethodsByProviderKey(Guid providerKey)
+        public IEnumerable<ITaxMethod> GetTaxMethodsByProviderKey(Guid providerKey, int storeId)
         {
-            return _taxMethodService.GetTaxMethodsByProviderKey(providerKey);
+            return _taxMethodService.GetTaxMethodsByProviderKey(providerKey, storeId);
         }
 
         

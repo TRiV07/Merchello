@@ -33,6 +33,7 @@
             var entity = new GatewayProviderSettings()
             {
                 Key = dto.Key,
+                StoreId = dto.StoreId,
                 ProviderTfKey = dto.ProviderTfKey,
                 Name = dto.Name,
                 Description = dto.Description,
@@ -65,6 +66,7 @@
             return new GatewayProviderSettingsDto()
             {
                 Key = entity.Key,
+                StoreId = entity.StoreId,
                 ProviderTfKey = entity.ProviderTfKey,
                 Name = entity.Name,
                 Description = entity.Description,
@@ -81,7 +83,7 @@
         /// <param name="t">The resolved Type t</param>
         /// <param name="gatewayProviderType">The gateway provider type</param>
         /// <returns>The <see cref="IGatewayProviderSettings"/></returns>
-        internal IGatewayProviderSettings BuildEntity(Type t, GatewayProviderType gatewayProviderType)
+        internal IGatewayProviderSettings BuildEntity(Type t, GatewayProviderType gatewayProviderType, int storeId)
         {
             Mandate.ParameterNotNull(t, "Type t cannot be null");
             Mandate.ParameterCondition(t.GetCustomAttribute<GatewayProviderActivationAttribute>(false) != null, "Type t must have a GatewayProviderActivationAttribute");
@@ -91,6 +93,7 @@
             var provider = new GatewayProviderSettings()
             {
                 Key = att.Key,
+                StoreId = storeId,
                 ProviderTfKey = EnumTypeFieldConverter.GatewayProvider.GetTypeField(gatewayProviderType).TypeKey,
                 Name = att.Name,
                 Description = att.Description,

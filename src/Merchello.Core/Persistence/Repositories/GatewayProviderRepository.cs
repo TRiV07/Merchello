@@ -19,11 +19,18 @@
     using Umbraco.Core.Persistence.Querying;
     using Umbraco.Core.Persistence.SqlSyntax;
 
+    using MS = Merchello.Core.Constants.MultiStore;
+
     /// <summary>
     /// The gateway provider repository.
     /// </summary>
     internal class GatewayProviderRepository : MerchelloPetaPocoRepositoryBase<IGatewayProviderSettings>, IGatewayProviderRepository
     {
+        /// <summary>
+        /// The domain root structure ID.
+        /// </summary>
+        private readonly int _storeId;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="GatewayProviderRepository"/> class.
         /// </summary>
@@ -36,9 +43,10 @@
         /// <param name="sqlSyntax">
         /// The SQL syntax.
         /// </param>
-        public GatewayProviderRepository(IDatabaseUnitOfWork work, ILogger logger, ISqlSyntaxProvider sqlSyntax) 
+        public GatewayProviderRepository(IDatabaseUnitOfWork work, int storeId, ILogger logger, ISqlSyntaxProvider sqlSyntax)
             : base(work, logger, sqlSyntax)
-        { 
+        {
+            _storeId = storeId;
         }
 
         /// <summary>
@@ -53,15 +61,23 @@
         public IEnumerable<IGatewayProviderSettings> GetGatewayProvidersByShipCountryKey(Guid shipCountryKey)
         {
             var sql = new Sql();
-            sql.Select("*")
-                .From<ShipMethodDto>(SqlSyntax)
-                .InnerJoin<GatewayProviderSettingsDto>(SqlSyntax)
-                .On<ShipMethodDto, GatewayProviderSettingsDto>(SqlSyntax, left => left.ProviderKey, right => right.Key)
-                .Where<ShipMethodDto>(x => x.ShipCountryKey == shipCountryKey);
 
-            var dtos = Database.Fetch<ShipMethodDto, GatewayProviderSettingsDto>(sql);
-            var factory = new GatewayProviderSettingsFactory();
-            return dtos.DistinctBy(x => x.GatewayProviderSettingsDto.Key).Select(dto => factory.BuildEntity(dto.GatewayProviderSettingsDto));
+            sql.Append("SELECT [merchGatewayProviderSettings].[pk]")
+                .Append("FROM [merchGatewayProviderSettings]")
+                .Append("INNER JOIN [merchShipMethod] ON [merchGatewayProviderSettings].[pk] = [merchShipMethod].[providerKey] AND [merchGatewayProviderSettings].[storeId] = [merchShipMethod].[storeId]")
+                .Append("WHERE [merchShipMethod].[shipCountryKey] = @ShipCountryKey", new { ShipCountryKey = shipCountryKey });
+
+            var keys = Database.Fetch<Guid>(sql);
+            return keys.Distinct().Select(key => Get(key));
+        }
+        public IEnumerable<int> GetAllStoresIds()
+        {
+            var sql = new Sql();
+
+            sql.Append("SELECT DISTINCT [domainRootStructureID] FROM [umbracoDomains]");
+
+            var keys = Database.Fetch<int>(sql);
+            return keys;
         }
 
         /// <summary>
@@ -76,7 +92,7 @@
         protected override IGatewayProviderSettings PerformGet(Guid key)
         {
             var sql = GetBaseQuery(false)
-                .Where(GetBaseWhereClause(), new {Key = key});
+                .Where(GetBaseWhereClause(), new { Key = key });
 
             var dto = Database.Fetch<GatewayProviderSettingsDto>(sql).FirstOrDefault();
 
@@ -111,6 +127,8 @@
                 {
                     dtos.AddRange(Database.Fetch<GatewayProviderSettingsDto>(GetBaseQuery(false).WhereIn<GatewayProviderSettingsDto>(x => x.Key, keyList, SqlSyntax)));
                 }
+
+                dtos = keys.Select(k => dtos.FirstOrDefault(x => x.Key == k)).ToList();
             }
             else
             {
@@ -161,6 +179,11 @@
             sql.Select(isCount ? "COUNT(*)" : "*")
                 .From<GatewayProviderSettingsDto>(SqlSyntax);
 
+            if (_storeId != MS.DefaultId)
+            {
+                sql.Where<GatewayProviderSettingsDto>(x => x.StoreId == _storeId, SqlSyntax);
+            }
+
             return sql;
         }
 
@@ -182,10 +205,10 @@
         /// The <see cref="IEnumerable{String}"/>.
         /// </returns>
         protected override IEnumerable<string> GetDeleteClauses()
-        {            
+        {
             var list = new List<string>
-            {                
-                "DELETE FROM merchGatewayProviderSettings WHERE pk = @Key"
+            {
+                "DELETE FROM merchGatewayProviderSettings WHERE pk = @Key AND storeId = @StoreId"
             };
 
             return list;
@@ -224,8 +247,15 @@
             var factory = new GatewayProviderSettingsFactory();
             var dto = factory.BuildDto(entity);
 
-            Database.Update(dto);
-            
+            Database.Delete<GatewayProviderSettingsDto>("WHERE pk = @Key AND storeId = @StoreId", new { dto.Key, dto.StoreId });
+            Database.Insert(dto);
+
+            entity.ResetDirtyProperties();
+        }
+
+        protected override void PersistDeletedItem(IGatewayProviderSettings entity)
+        {
+            Database.Delete<GatewayProviderSettingsDto>("WHERE pk = @Key AND storeId = @StoreId", new { entity.Key, entity.StoreId });
             entity.ResetDirtyProperties();
         }
     }

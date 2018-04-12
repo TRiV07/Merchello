@@ -93,6 +93,7 @@
 
             var attempt = this.GatewayProviderService.CreatePaymentMethodWithKey(
                 this.GatewayProviderSettings.Key,
+                this.StoreId,
                 name,
                 description,
                 available.ServiceCode);

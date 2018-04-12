@@ -19,7 +19,7 @@
         /// <returns>
         /// The collection of <see cref="IGatewayProviderSettings"/>s
         /// </returns>
-        IEnumerable<GatewayProviderBase> GetActivatedProviders<T>() where T : GatewayProviderBase;
+        IEnumerable<GatewayProviderBase> GetActivatedProviders<T>(int storeId) where T : GatewayProviderBase;
 
         /// <summary>
         /// Gets a collection of all "activated" providers regardless of type
@@ -27,7 +27,7 @@
         /// <returns>
         /// The collection of all "activated" providers.
         /// </returns>
-        IEnumerable<GatewayProviderBase> GetActivatedProviders();
+        IEnumerable<GatewayProviderBase> GetActivatedProviders(int storeId);
 
         /// <summary>
         /// Gets a collection of all providers regardless of type
@@ -35,7 +35,7 @@
         /// <returns>
         /// The collection of all providers.
         /// </returns>
-        IEnumerable<GatewayProviderBase> GetAllProviders();
+        IEnumerable<GatewayProviderBase> GetAllProviders(int storeId);
             
         /// <summary>
         /// Gets a collection of inactive (not saved) <see cref="IGatewayProviderSettings"/> by type
@@ -46,7 +46,7 @@
         /// <returns>
         /// The collection of inactive (not saved) <see cref="IGatewayProviderSettings"/>.
         /// </returns>
-        IEnumerable<GatewayProviderBase> GetAllProviders<T>() where T : GatewayProviderBase;
+        IEnumerable<GatewayProviderBase> GetAllProviders<T>(int storeId) where T : GatewayProviderBase;
 
         /// <summary>
         /// Instantiates a GatewayProvider given its registered Key
@@ -55,7 +55,7 @@
         /// <param name="gatewayProviderKey">The gateway provider key</param>
         /// <param name="activatedOnly">Search only activated providers</param>
         /// <returns>An instantiated GatewayProvider</returns>
-        T GetProviderByKey<T>(Guid gatewayProviderKey, bool activatedOnly = true) where T : GatewayProviderBase;
+        T GetProviderByKey<T>(Guid gatewayProviderKey, int storeId, bool activatedOnly = true) where T : GatewayProviderBase;
 
         /// <summary>
         /// Refreshes the <see cref="GatewayProviderBase"/> cache

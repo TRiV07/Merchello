@@ -179,9 +179,9 @@
         /// <returns>
         /// The collection of all <see cref="GatewayProviderDisplay"/>.
         /// </returns>
-        public IEnumerable<ShippingGatewayProviderDisplay> GetAllShipGatewayProviders()
+        public IEnumerable<ShippingGatewayProviderDisplay> GetAllShipGatewayProviders(int storeId)
         {
-            var providers = MerchelloContext.Gateways.Shipping.GetAllActivatedProviders().ToArray();
+            var providers = MerchelloContext.Gateways.Shipping.GetAllActivatedProviders(storeId).ToArray();
 
             return providers.Select(provider => ((ShippingGatewayProviderBase)provider).ToShipGatewayProviderDisplay());
         }
@@ -197,9 +197,9 @@
         /// <returns>
         /// The collection of <see cref="GatewayResourceDisplay"/>.
         /// </returns>
-        public IEnumerable<GatewayResourceDisplay> GetAllShipGatewayResourcesForProvider(Guid id)
+        public IEnumerable<GatewayResourceDisplay> GetAllShipGatewayResourcesForProvider(Guid id, int storeId)
         {
-            var provider = MerchelloContext.Gateways.Shipping.GetProviderByKey(id);
+            var provider = MerchelloContext.Gateways.Shipping.GetProviderByKey(id, storeId);
 
             if (provider == null) yield break;
             
@@ -255,14 +255,16 @@
         /// <returns>
         /// The collection of <see cref="ShipMethodDisplay"/>.
         /// </returns>
-        public IEnumerable<ShipMethodDisplay> GetShippingProviderShipMethods(Guid id, Guid shipCountryId)
+        public IEnumerable<ShipMethodDisplay> GetShippingProviderShipMethods(Guid id, int storeId)
         {
-            var provider = _shippingContext.GetProviderByKey(id);
+            var provider = _shippingContext.GetProviderByKey(id, storeId);
 
             if (provider == null) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
 
             return
-                provider.ShipMethods.Select(
+                provider.ShipMethods
+                //.Where(x => x.ShipCountryKey == shipCountryId)
+                .Select(
                     method => 
                         provider.GetShippingGatewayMethod(method.Key, method.ShipCountryKey).ToShipMethodDisplay());                  
         }
@@ -281,9 +283,9 @@
         /// <returns>
         /// The collection of <see cref="ShipMethodDisplay"/>.
         /// </returns>
-        public IEnumerable<ShippingGatewayMethodDisplay> GetShippingGatewayMethodsByCountry(Guid id, Guid shipCountryId)
+        public IEnumerable<ShippingGatewayMethodDisplay> GetShippingGatewayMethodsByCountry(Guid id, int storeId, Guid shipCountryId)
         {
-            var provider = _shippingContext.GetProviderByKey(id);
+            var provider = _shippingContext.GetProviderByKey(id, storeId);
 
             var shipCountry = _shipCountryService.GetByKey(shipCountryId);
             
@@ -318,11 +320,12 @@
         /// The <see cref="HttpResponseMessage"/>.
         /// </returns>
         [AcceptVerbs("POST")]
+        //TODOMS Check sending storeId
         public ShipMethodDisplay AddShipMethod(ShipMethodDisplay method)
         {
             ////var response = Request.CreateResponse(HttpStatusCode.OK);
 
-            var provider = _shippingContext.GetProviderByKey(method.ProviderKey);
+            var provider = _shippingContext.GetProviderByKey(method.ProviderKey, method.StoreId);
 
             var gatewayResource =
                 provider.ListResourcesOffered().FirstOrDefault(x => x.ServiceCode == method.ServiceCode);
@@ -353,9 +356,10 @@
         /// The <see cref="ShipMethodDisplay"/>.
         /// </returns>
         [AcceptVerbs("POST", "PUT")]
+        //TODOMS Check sending storeId
         public ShipMethodDisplay PutShipMethod(ShipMethodDisplay method)
         {            
-            var provider = _shippingContext.GetProviderByKey(method.ProviderKey);
+            var provider = _shippingContext.GetProviderByKey(method.ProviderKey, method.StoreId);
 
             var shippingMethod = provider.ShipMethods.FirstOrDefault(x => x.Key == method.Key);
 

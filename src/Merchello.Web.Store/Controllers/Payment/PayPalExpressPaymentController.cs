@@ -166,14 +166,14 @@
         /// </returns>
         private PayPalProviderSettings EnsureDeleteInvoiceOnCancel(Guid invoiceKey, Guid paymentKey)
         {
-            var provider = GatewayContext.Payment.GetProviderByKey(Merchello.Providers.Constants.PayPal.GatewayProviderSettingsKey);
+            var invoice = MerchelloServices.InvoiceService.GetByKey(invoiceKey);
+
+            var provider = GatewayContext.Payment.GetProviderByKey(Merchello.Providers.Constants.PayPal.GatewayProviderSettingsKey, invoice.StoreId);
             var settings = provider.ExtendedData.GetPayPalProviderSettings();
 
+            // validate that this invoice should be deleted
             if (settings.DeleteInvoiceOnCancel)
             {
-                // validate that this invoice should be deleted
-                var invoice = MerchelloServices.InvoiceService.GetByKey(invoiceKey);
-
                 var payments = invoice.Payments().ToArray();
 
                 // we don't want to delete if there is more than one payment

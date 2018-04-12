@@ -43,7 +43,7 @@
         /// </summary>
         public PaymentApiController()
             : this(Core.MerchelloContext.Current)
-        {            
+        {
         }
 
         /// <summary>
@@ -135,9 +135,9 @@
         /// The <see cref="PaymentMethodDisplay"/>.
         /// </returns>
         [HttpGet]
-        public PaymentMethodDisplay GetPaymentMethod(Guid id)
+        public PaymentMethodDisplay GetPaymentMethod(Guid id, int storeId)
         {
-            var paymentMethod = MerchelloContext.Gateways.Payment.GetPaymentGatewayMethodByKey(id);
+            var paymentMethod = MerchelloContext.Gateways.Payment.GetPaymentGatewayMethodByKey(id, storeId);
 
             if (paymentMethod == null)
             {
@@ -148,30 +148,30 @@
             return display;
         }
 
-		/// <summary>
-		/// Returns a collection of applied payments given an Invoice id (key)
-		/// 
-		/// GET /umbraco/Merchello/PaymentApi/GetAppliedPaymentsByInvoice/{guid}
-		/// </summary>
-		/// <param name="id">
-		/// The id.
-		/// </param>
-		/// <returns>
-		/// The collection of applied payments.
-		/// </returns>
-		[HttpGet]
+        /// <summary>
+        /// Returns a collection of applied payments given an Invoice id (key)
+        /// 
+        /// GET /umbraco/Merchello/PaymentApi/GetAppliedPaymentsByInvoice/{guid}
+        /// </summary>
+        /// <param name="id">
+        /// The id.
+        /// </param>
+        /// <returns>
+        /// The collection of applied payments.
+        /// </returns>
+        [HttpGet]
         public IEnumerable<AppliedPaymentDisplay> GetAppliedPaymentsByInvoice(Guid id)
-		{
-			var appliedPayments = _paymentService.GetAppliedPaymentsByInvoiceKey(id);
+        {
+            var appliedPayments = _paymentService.GetAppliedPaymentsByInvoiceKey(id);
 
-			if (appliedPayments == null)
-			{
-				throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
-			}
+            if (appliedPayments == null)
+            {
+                throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+            }
 
-			var stuff = appliedPayments.Select(x => x.ToAppliedPaymentDisplay());
-			return stuff;
-		}
+            var stuff = appliedPayments.Select(x => x.ToAppliedPaymentDisplay());
+            return stuff;
+        }
 
         /// <summary>
         /// Returns a payment for an AuthorizePayment PaymentRequestDisplay
@@ -204,10 +204,10 @@
                 Payment = authorize.Payment.Result.ToPaymentDisplay(),
                 ApproveOrderCreation = authorize.ApproveOrderCreation
             };
-            
+
             if (!authorize.Payment.Success)
             {
-                authorize.Payment.Result.AuditPaymentDeclined();                
+                authorize.Payment.Result.AuditPaymentDeclined();
             }
             else
             {
@@ -218,9 +218,9 @@
                 else
                 {
                     authorize.Payment.Result.AuditPaymentAuthorize(authorize.Invoice);
-                }                
+                }
             }
-                       
+
             return result;
         }
 
@@ -259,7 +259,7 @@
 
                 capture.Payment.Result.AuditPaymentCaptured(request.Amount);
             }
-           
+
             return result;
         }
 
@@ -299,7 +299,7 @@
                 authorizeCapture.Payment.Result.AuditPaymentAuthorize(authorizeCapture.Invoice, request.Amount);
                 authorizeCapture.Payment.Result.AuditPaymentCaptured(request.Amount);
             }
-            
+
             return result;
         }
 
@@ -328,11 +328,11 @@
                 ApproveOrderCreation = refund.ApproveOrderCreation
             };
 
-            if (refund.Payment.Success)            
+            if (refund.Payment.Success)
             {
-               refund.Payment.Result.AuditPaymentRefunded(request.Amount);
+                refund.Payment.Result.AuditPaymentRefunded(request.Amount);
             }
-            
+
 
             return result;
         }

@@ -61,7 +61,7 @@ angular.module('merchello').controller('Merchello.Directives.ShipCountryGateways
              * load is complete, it calls the loadProviderMethods to load in the methods.
              */
             function loadCountryProviders() {
-                var promiseAllProviders = shippingGatewayProviderResource.getAllShipGatewayProviders();
+                var promiseAllProviders = shippingGatewayProviderResource.getAllShipGatewayProviders($routeParams.storeId);
                 promiseAllProviders.then(function (allProviders) {
                     $scope.allProviders = shippingGatewayProviderDisplayBuilder.transform(allProviders);
 
@@ -162,7 +162,7 @@ angular.module('merchello').controller('Merchello.Directives.ShipCountryGateways
 
             /**
              * @ngdoc method
-             * @name editShippingMethodDialogOpen
+             * @name editShippingMethodRegionsOpen
              * @function
              *
              * @description
@@ -198,6 +198,7 @@ angular.module('merchello').controller('Merchello.Directives.ShipCountryGateways
                 newShippingMethod.providerKey = dialogData.selectedProvider.key;
                 newShippingMethod.serviceCode = dialogData.selectedResource.serviceCode;
                 newShippingMethod.shipCountryKey = $scope.country.key;
+                newShippingMethod.storeId = $routeParams.storeId;
                 var promiseAddMethod;
                 promiseAddMethod = shippingGatewayProviderResource.addShipMethod(newShippingMethod);
                 promiseAddMethod.then(function () {

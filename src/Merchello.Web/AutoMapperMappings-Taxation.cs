@@ -27,6 +27,7 @@
 
             AutoMapper.Mapper.CreateMap<ITaxationGatewayMethod, TaxMethodDisplay>()
                 .ForMember(dest => dest.Key, opt => opt.MapFrom(src => src.TaxMethod.Key))
+                .ForMember(dest => dest.StoreId, opt => opt.MapFrom(src => src.TaxMethod.StoreId))
                 .ForMember(dest => dest.ProviderKey, opt => opt.MapFrom(src => src.TaxMethod.ProviderKey))
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.TaxMethod.Name))
                 .ForMember(dest => dest.Provinces, opt => opt.MapFrom(src => src.TaxMethod.Provinces))

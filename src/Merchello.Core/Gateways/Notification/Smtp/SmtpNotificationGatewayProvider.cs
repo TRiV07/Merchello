@@ -54,7 +54,7 @@
          /// <returns></returns>
          public override INotificationGatewayMethod CreateNotificationMethod(IGatewayResource gatewayResource, string name, string serviceCode)
         {
-            var attempt = GatewayProviderService.CreateNotificationMethodWithKey(GatewayProviderSettings.Key, name, serviceCode);
+            var attempt = GatewayProviderService.CreateNotificationMethodWithKey(GatewayProviderSettings.Key, GatewayProviderSettings.StoreId, name, serviceCode);
 
             if (attempt.Success) return new SmtpNotificationGatewayMethod(GatewayProviderService, attempt.Result, GatewayProviderSettings.ExtendedData);
 

@@ -16,5 +16,7 @@ namespace Merchello.Core.Persistence.Repositories
         /// <param name="shipCountryKey"></param>
         /// <returns></returns>
         IEnumerable<IGatewayProviderSettings> GetGatewayProvidersByShipCountryKey(Guid shipCountryKey);
+
+        IEnumerable<int> GetAllStoresIds();
     }
 }

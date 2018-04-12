@@ -54,7 +54,7 @@
         public override ITaxationGatewayMethod CreateTaxMethod(string countryCode, decimal taxPercentageRate)
         {
             var attempt = ListResourcesOffered().FirstOrDefault(x => x.ServiceCode.Equals(countryCode)) != null
-                ? GatewayProviderService.CreateTaxMethodWithKey(GatewayProviderSettings.Key, countryCode, taxPercentageRate)
+                ? GatewayProviderService.CreateTaxMethodWithKey(GatewayProviderSettings.Key, GatewayProviderSettings.StoreId, countryCode, taxPercentageRate)
                 : Attempt<ITaxMethod>.Fail(new ConstraintException("A fixed tax rate method has already been defined for " + countryCode));
 
 
@@ -110,7 +110,11 @@
         /// <returns>A collection of <see cref="IGatewayResource"/></returns>
         public override IEnumerable<IGatewayResource> ListResourcesOffered()
         {
-            var countryCodes = GatewayProviderService.GetAllShipCountries().Select(x => x.CountryCode).Distinct();
+            var wh = MerchelloContext.Current.Services.WarehouseService.GetDefaultWarehouse(StoreId);
+            var catalog = MerchelloContext.Current.Services.WarehouseService.GetWarhouseCatalogByWarehouseKey(wh.Key).FirstOrDefault();
+            var countryCodes = (MerchelloContext.Current.Services as ServiceContext).ShipCountryService
+                .GetShipCountriesByCatalogKey(catalog.Key)
+                .Select(x => x.CountryCode).Distinct();
 
             var resources =
                 countryCodes.Select(x => new GatewayResource(x, x + "-FixedRate"))

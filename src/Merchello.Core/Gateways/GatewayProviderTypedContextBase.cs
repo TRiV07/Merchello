@@ -68,18 +68,18 @@
         /// Lists all activated <see cref="IGatewayProviderSettings"/>
         /// </summary>
         /// <returns>A collection of all "activated" GatewayProvider of the particular type T</returns>
-        public IEnumerable<GatewayProviderBase> GetAllActivatedProviders()
+        public IEnumerable<GatewayProviderBase> GetAllActivatedProviders(int storeId)
         {
-            return GatewayProviderResolver.GetActivatedProviders<T>();
+            return GatewayProviderResolver.GetActivatedProviders<T>(storeId);
         }
 
         /// <summary>
         /// Lists all available providers.  This list includes providers that are just resolved and not configured
         /// </summary>
         /// <returns>A collection of all GatewayProviders</returns>
-        public IEnumerable<GatewayProviderBase> GetAllProviders()
+        public IEnumerable<GatewayProviderBase> GetAllProviders(int storeId)
         {
-            return GatewayProviderResolver.GetAllProviders<T>();
+            return GatewayProviderResolver.GetAllProviders<T>(storeId);
         }
 
         /// <summary>
@@ -94,9 +94,9 @@
         /// <returns>
         /// An instantiated GatewayProvider
         /// </returns>
-        public T GetProviderByKey(Guid gatewayProviderKey, bool activatedOnly = true)
+        public T GetProviderByKey(Guid gatewayProviderKey, int storeId, bool activatedOnly = true)
         {
-            return GatewayProviderResolver.GetProviderByKey<T>(gatewayProviderKey, activatedOnly);
+            return GatewayProviderResolver.GetProviderByKey<T>(gatewayProviderKey, storeId, activatedOnly);
         }
 
         /// <summary>
@@ -104,7 +104,7 @@
         /// </summary>
         /// <param name="gatewayMethodKey">The unique key (GUID) of the <see cref="IGatewayMethod"/></param>
         /// <returns>An instantiated GatewayProvider</returns>
-        public abstract T GetProviderByMethodKey(Guid gatewayMethodKey);
+        public abstract T GetProviderByMethodKey(Guid gatewayMethodKey, int storeId);
 
         /// <summary>
         /// Creates an instance GatewayProvider given its registered Key
@@ -116,9 +116,9 @@
         /// An instance of the gateway provider.
         /// </returns>
         [Obsolete("Use GetProviderByKey instead")]
-        public T CreateInstance(Guid gatewayProviderKey)
+        public T CreateInstance(Guid gatewayProviderKey, int storeId)
         {
-            return GetProviderByKey(gatewayProviderKey);
+            return GetProviderByKey(gatewayProviderKey, storeId);
         }
 
         /// <summary>

@@ -15,6 +15,7 @@ namespace Merchello.Core.Persistence.Mappers
             if (!PropertyInfoCache.IsEmpty) return;
 
             CacheMap<GatewayProviderSettings, GatewayProviderSettingsDto>(src => src.Key, dto => dto.Key);
+            CacheMap<GatewayProviderSettings, GatewayProviderSettingsDto>(src => src.StoreId, dto => dto.StoreId);
             CacheMap<GatewayProviderSettings, GatewayProviderSettingsDto>(src => src.ProviderTfKey, dto => dto.ProviderTfKey);
             CacheMap<GatewayProviderSettings, GatewayProviderSettingsDto>(src => src.Name, dto => dto.Name);
             CacheMap<GatewayProviderSettings, GatewayProviderSettingsDto>(src => src.Description, dto => dto.Description);

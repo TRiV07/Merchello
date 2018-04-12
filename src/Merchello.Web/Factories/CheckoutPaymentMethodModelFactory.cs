@@ -50,9 +50,9 @@
         /// <returns>
         /// The <see cref="ICheckoutPaymentMethodModel"/>.
         /// </returns>
-        public TPaymentMethodModel Create()
+        public TPaymentMethodModel Create(int storeId)
         {
-            var gatewayMethods = _gatewayContext.Payment.GetPaymentGatewayMethods().ToArray().OrderBy(x => x.PaymentMethod.Name);
+            var gatewayMethods = _gatewayContext.Payment.GetPaymentGatewayMethods(storeId).ToArray().OrderBy(x => x.PaymentMethod.Name);
             
             var paymentMethodKey = gatewayMethods.Any() ?
                 gatewayMethods.First().PaymentMethod.Key :
@@ -68,7 +68,7 @@
                 {
                     PaymentMethodKey = paymentMethodKey,
                     PaymentMethods = paymentMethods,
-                    PaymentGatewayMethods = _gatewayContext.Payment.GetPaymentGatewayMethods()
+                    PaymentGatewayMethods = _gatewayContext.Payment.GetPaymentGatewayMethods(storeId)
                 };
 
             return OnCreate(model);

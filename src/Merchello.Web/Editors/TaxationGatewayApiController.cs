@@ -58,11 +58,11 @@
         /// <returns>
         /// The collection of <see cref="GatewayResourceDisplay"/>.
         /// </returns>
-        public IEnumerable<GatewayResourceDisplay> GetGatewayResources(Guid id)
+        public IEnumerable<GatewayResourceDisplay> GetGatewayResources(Guid id, int storeId)
         {
             try
             {
-                var provider = _taxationContext.GetProviderByKey(id);
+                var provider = _taxationContext.GetProviderByKey(id, storeId);
 
                 var resources = provider.ListResourcesOffered();
 
@@ -83,9 +83,9 @@
         /// <returns>
         /// The collection of <see cref="GatewayProviderDisplay"/>.
         /// </returns>
-        public IEnumerable<TaxationGatewayProviderDisplay> GetAllGatewayProviders()
+        public IEnumerable<TaxationGatewayProviderDisplay> GetAllGatewayProviders(int storeId)
         {
-            var providers = _taxationContext.GetAllActivatedProviders();
+            var providers = _taxationContext.GetAllActivatedProviders(storeId);
             if (providers == null)
             {
                 throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
@@ -105,9 +105,9 @@
         /// <returns>
         /// The collection of <see cref="TaxMethodDisplay"/>.
         /// </returns>
-        public IEnumerable<TaxMethodDisplay> GetTaxationProviderTaxMethods(Guid id)
+        public IEnumerable<TaxMethodDisplay> GetTaxationProviderTaxMethods(Guid id, int storeId)
         {
-            var provider = _taxationContext.GetProviderByKey(id);
+            var provider = _taxationContext.GetProviderByKey(id, storeId);
             if (provider != null)
             {
                 var methods = provider.GetAllGatewayTaxMethods().Select(x => x.ToTaxMethodDisplay());
@@ -129,16 +129,17 @@
         /// The <see cref="HttpResponseMessage"/>.
         /// </returns>
         [AcceptVerbs("POST")]
+        //TODOMS Check sending storeId
         public HttpResponseMessage AddTaxMethod(TaxMethodDisplay method)
         {
             var response = Request.CreateResponse(HttpStatusCode.OK);
 
             try
             {
-                var deleteMethod = _taxationContext.GetTaxMethodForCountryCode(method.CountryCode);
+                var deleteMethod = _taxationContext.GetTaxMethodForCountryCode(method.StoreId, method.CountryCode);
                 if (deleteMethod != null) this.DeleteTaxMethod(deleteMethod.Key);
 
-                var provider = _taxationContext.GetProviderByKey(method.ProviderKey);
+                var provider = _taxationContext.GetProviderByKey(method.ProviderKey, method.StoreId);
 
                 var taxationGatewayMethod = provider.CreateTaxMethod(method.CountryCode, method.PercentageTaxRate);
 
@@ -166,19 +167,20 @@
         /// The <see cref="HttpResponseMessage"/>.
         /// </returns>
         [AcceptVerbs("POST", "PUT")]
+        //TODOMS Check sending storeId
         public HttpResponseMessage PutTaxMethod(TaxMethodDisplay method)
         {
             var response = Request.CreateResponse(HttpStatusCode.OK);
 
             try
             {
-                var provider = _taxationContext.GetProviderByKey(method.ProviderKey);
+                var provider = _taxationContext.GetProviderByKey(method.ProviderKey, method.StoreId);
 
                 var taxMethod = provider.TaxMethods.FirstOrDefault(x => x.Key == method.Key);
 
                 if (taxMethod == null)
                 {
-                    var deleteMethod = _taxationContext.GetTaxMethodForCountryCode(method.CountryCode);
+                    var deleteMethod = _taxationContext.GetTaxMethodForCountryCode(method.StoreId, method.CountryCode);
                     this.DeleteTaxMethod(deleteMethod.Key);
                     return this.AddTaxMethod(method);
                 }

@@ -7,9 +7,9 @@
  * The controller for the gateway providers list view controller
  */
 angular.module("merchello").controller("Merchello.Backoffice.GatewayProvidersListController",
-    ['$scope', '$q', 'assetsService', 'notificationsService', 'dialogService', 'merchelloTabsFactory',
+    ['$scope', '$q', '$routeParams', 'assetsService', 'notificationsService', 'dialogService', 'merchelloTabsFactory',
         'gatewayProviderResource', 'gatewayProviderDisplayBuilder',
-        function($scope, $q, assetsService, notificationsService, dialogService, merchelloTabsFactory, gatewayProviderResource, gatewayProviderDisplayBuilder)
+        function ($scope, $q, $routeParams, assetsService, notificationsService, dialogService, merchelloTabsFactory, gatewayProviderResource, gatewayProviderDisplayBuilder)
         {
             // load the css file
             assetsService.loadCss('/App_Plugins/Merchello/assets/css/merchello.css');
@@ -55,7 +55,7 @@ angular.module("merchello").controller("Merchello.Backoffice.GatewayProvidersLis
              * Loads in notification gateway providers from server into the scope.  Called in init().
              */
             function loadAllNotificationGatwayProviders() {
-                var promiseAllProviders = gatewayProviderResource.getResolvedNotificationGatewayProviders();
+                var promiseAllProviders = gatewayProviderResource.getResolvedNotificationGatewayProviders($routeParams.storeId);
                 promiseAllProviders.then(function(allProviders) {
                     $scope.notificationGatewayProviders = sortProviders(gatewayProviderDisplayBuilder.transform(allProviders));
                     $scope.loaded = true;
@@ -74,7 +74,7 @@ angular.module("merchello").controller("Merchello.Backoffice.GatewayProvidersLis
              * Loads in payment gateway providers from server into the scope.  Called in init().
              */
             function loadAllPaymentGatewayProviders() {
-                var promiseAllProviders = gatewayProviderResource.getResolvedPaymentGatewayProviders();
+                var promiseAllProviders = gatewayProviderResource.getResolvedPaymentGatewayProviders($routeParams.storeId);
                 promiseAllProviders.then(function (allProviders) {
                     $scope.paymentGatewayProviders = sortProviders(gatewayProviderDisplayBuilder.transform(allProviders));
                     $scope.loaded = true;
@@ -93,7 +93,7 @@ angular.module("merchello").controller("Merchello.Backoffice.GatewayProvidersLis
              * Loads in shipping gateway providers from server into the scope.  Called in init().
              */
             function loadAllShippingGatewayProviders() {
-                var promiseAllProviders = gatewayProviderResource.getResolvedShippingGatewayProviders();
+                var promiseAllProviders = gatewayProviderResource.getResolvedShippingGatewayProviders($routeParams.storeId);
                 promiseAllProviders.then(function (allProviders) {
                     $scope.shippingGatewayProviders = sortProviders(gatewayProviderDisplayBuilder.transform(allProviders));
                     $scope.loaded = true;
@@ -112,7 +112,7 @@ angular.module("merchello").controller("Merchello.Backoffice.GatewayProvidersLis
              * Loads in taxation gateway providers from server into the scope.  Called in init().
              */
             function loadAllTaxationGatewayProviders() {
-                var promiseAllProviders = gatewayProviderResource.getResolvedTaxationGatewayProviders();
+                var promiseAllProviders = gatewayProviderResource.getResolvedTaxationGatewayProviders($routeParams.storeId);
                 promiseAllProviders.then(function (allProviders) {
                     $scope.taxationGatewayProviders = sortProviders(gatewayProviderDisplayBuilder.transform(allProviders));
                     $scope.loaded = true;

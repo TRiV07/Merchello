@@ -23,6 +23,7 @@
             AutoMapper.Mapper.CreateMap<INotificationGatewayMethod, NotificationMethodDisplay>()
                 .ForMember(dest => dest.Key, opt => opt.MapFrom(src => src.NotificationMethod.Key))
                 .ForMember(dest => dest.ProviderKey, opt => opt.MapFrom(src => src.NotificationMethod.ProviderKey))
+                .ForMember(dest => dest.StoreId, opt => opt.MapFrom(src => src.NotificationMethod.StoreId))
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.NotificationMethod.Name))
                 .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.NotificationMethod.Description))
                 .ForMember(dest => dest.ServiceCode, opt => opt.MapFrom(src => src.NotificationMethod.ServiceCode))

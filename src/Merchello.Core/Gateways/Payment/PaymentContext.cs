@@ -30,9 +30,9 @@
         /// </summary>
         /// <param name="gatewayMethodKey">The unique key (GUID) of the <see cref="IGatewayMethod"/></param>
         /// <returns>An instantiated GatewayProvider</returns>
-        public override PaymentGatewayProviderBase GetProviderByMethodKey(Guid gatewayMethodKey)
+        public override PaymentGatewayProviderBase GetProviderByMethodKey(Guid gatewayMethodKey, int storeId)
         {
-            return GetAllActivatedProviders()
+            return GetAllActivatedProviders(storeId)
                 .FirstOrDefault(x => ((PaymentGatewayProviderBase)x)
                     .PaymentMethods.Any(y => y.Key == gatewayMethodKey)) as PaymentGatewayProviderBase;
         }
@@ -41,9 +41,9 @@
         /// Gets a list of all possible Payment Methods
         /// </summary>
         /// <returns>A collection of <see cref="IPaymentGatewayMethod"/>s</returns>
-        public IEnumerable<IPaymentGatewayMethod> GetPaymentGatewayMethods()
+        public IEnumerable<IPaymentGatewayMethod> GetPaymentGatewayMethods(int storeId)
         {
-            var paymentProviders = GatewayProviderResolver.GetActivatedProviders<PaymentGatewayProviderBase>() as IEnumerable<PaymentGatewayProviderBase>;
+            var paymentProviders = GatewayProviderResolver.GetActivatedProviders<PaymentGatewayProviderBase>(storeId) as IEnumerable<PaymentGatewayProviderBase>;
             
             var methods = new List<IPaymentGatewayMethod>();
             if (paymentProviders == null) return methods;
@@ -61,9 +61,9 @@
         /// </summary>
         /// <param name="paymentMethodKey">The Key of the <see cref="IPaymentGatewayMethod"/></param>
         /// <returns>A <see cref="IPaymentGatewayMethod"/></returns>
-        public IPaymentGatewayMethod GetPaymentGatewayMethodByKey(Guid paymentMethodKey)
+        public IPaymentGatewayMethod GetPaymentGatewayMethodByKey(Guid paymentMethodKey, int storeId)
         {
-            return GetPaymentGatewayMethods().FirstOrDefault(x => x.PaymentMethod.Key.Equals(paymentMethodKey));
+            return GetPaymentGatewayMethods(storeId).FirstOrDefault(x => x.PaymentMethod.Key.Equals(paymentMethodKey));
         }
 
 

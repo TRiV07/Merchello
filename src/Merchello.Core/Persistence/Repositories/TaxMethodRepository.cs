@@ -18,11 +18,18 @@
     using Umbraco.Core.Persistence.Querying;
     using Umbraco.Core.Persistence.SqlSyntax;
 
+    using MS = Merchello.Core.Constants.MultiStore;
+
     /// <summary>
     /// The tax method repository.
     /// </summary>
     internal class TaxMethodRepository : MerchelloPetaPocoRepositoryBase<ITaxMethod>, ITaxMethodRepository
     {
+        /// <summary>
+        /// The domain root structure ID.
+        /// </summary>
+        private readonly int _storeId;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="TaxMethodRepository"/> class.
         /// </summary>
@@ -37,10 +44,12 @@
         /// </param>
         public TaxMethodRepository(
             IDatabaseUnitOfWork work,
+            int storeId,
             ILogger logger,
             ISqlSyntaxProvider sqlSyntax)
             : base(work, logger, sqlSyntax)
-        {            
+        {
+            _storeId = storeId;
         }
 
         /// <summary>
@@ -89,6 +98,8 @@
                 {
                     dtos.AddRange(Database.Fetch<TaxMethodDto>(GetBaseQuery(false).WhereIn<TaxMethodDto>(x => x.Key, keyList, SqlSyntax)));
                 }
+
+                dtos = keys.Select(k => dtos.FirstOrDefault(x => x.Key == k)).ToList();
             }
             else
             {
@@ -137,6 +148,11 @@
             var sql = new Sql();
             sql.Select(isCount ? "COUNT(*)" : "*")
                 .From<TaxMethodDto>(SqlSyntax);
+
+            if (_storeId != MS.DefaultId)
+            {
+                sql.Where<TaxMethodDto>(x => x.StoreId == _storeId, SqlSyntax);
+            }
 
             return sql;
         }

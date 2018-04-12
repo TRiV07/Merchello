@@ -31,6 +31,11 @@
         private string _name;
 
         /// <summary>
+        /// The domain root structure ID.
+        /// </summary>
+        private int _storeId;
+
+        /// <summary>
         /// The description.
         /// </summary>
         private string _description;
@@ -46,10 +51,11 @@
         /// <param name="providerKey">
         /// The provider key.
         /// </param>
-        internal NotificationMethod(Guid providerKey)
+        internal NotificationMethod(Guid providerKey, int storeId)
         {
             Ensure.ParameterCondition(!Guid.Empty.Equals(providerKey), "providerKey");
             _providerKey = providerKey;
+            _storeId = storeId;
         }
 
         /// <inheritdoc/>
@@ -59,6 +65,21 @@
             get
             {
                 return _providerKey;
+            }
+        }
+
+        /// <inheritdoc/>
+        [DataMember]
+        public int StoreId
+        {
+            get
+            {
+                return _storeId;
+            }
+
+            set
+            {
+                SetPropertyValueAndDetectChanges(value, ref _storeId, _ps.Value.StoreIdSelector);
             }
         }
 
@@ -126,6 +147,11 @@
             /// The service code selector.
             /// </summary>
             public readonly PropertyInfo ServiceCodeSelector = ExpressionHelper.GetPropertyInfo<NotificationMethod, string>(x => x.ServiceCode);
+
+            /// <summary>
+            /// The domain root structure ID selector.
+            /// </summary>
+            public readonly PropertyInfo StoreIdSelector = ExpressionHelper.GetPropertyInfo<NotificationMethod, int>(x => x.StoreId);
         }
     }
 }

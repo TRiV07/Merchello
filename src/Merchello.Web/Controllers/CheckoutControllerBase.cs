@@ -87,7 +87,7 @@
         protected virtual GatewayMethodUiAttribute GetGatewayMethodUiAttribute(IPaymentMethod paymentMethod)
         {
             // We really need the payment gateway method so we can resolve the attribute
-            var paymentGatewayMethod = this.GatewayContext.Payment.GetPaymentGatewayMethodByKey(paymentMethod.Key);
+            var paymentGatewayMethod = this.GatewayContext.Payment.GetPaymentGatewayMethodByKey(paymentMethod.Key, CurrentCustomer.StoreId);
 
             // Get the attribute from the method so that we can resolve the controller.
             return paymentGatewayMethod.GetType().GetCustomAttribute<GatewayMethodUiAttribute>(false);

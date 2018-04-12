@@ -18,11 +18,18 @@
     using Umbraco.Core.Persistence.Querying;
     using Umbraco.Core.Persistence.SqlSyntax;
 
+    using MS = Merchello.Core.Constants.MultiStore;
+
     /// <summary>
     /// Represents the NotificationMethodRepository
     /// </summary>
     internal class NotificationMethodRepository : MerchelloPetaPocoRepositoryBase<INotificationMethod>, INotificationMethodRepository
     {
+        /// <summary>
+        /// The domain root structure ID.
+        /// </summary>
+        private readonly int _storeId;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="NotificationMethodRepository"/> class.
         /// </summary>
@@ -35,9 +42,10 @@
         /// <param name="sqlSyntax">
         /// The SQL syntax.
         /// </param>
-        public NotificationMethodRepository(IDatabaseUnitOfWork work, ILogger logger, ISqlSyntaxProvider sqlSyntax)
+        public NotificationMethodRepository(IDatabaseUnitOfWork work, int storeId, ILogger logger, ISqlSyntaxProvider sqlSyntax)
             : base(work, logger, sqlSyntax)
-        {            
+        {
+            _storeId = storeId;
         }
 
         /// <summary>
@@ -87,6 +95,8 @@
                 {
                     dtos.AddRange(Database.Fetch<NotificationMethodDto>(GetBaseQuery(false).WhereIn<NotificationMethodDto>(x => x.Key, keyList, SqlSyntax)));
                 }
+
+                dtos = keys.Select(k => dtos.FirstOrDefault(x => x.Key == k)).ToList();
             }
             else
             {
@@ -135,6 +145,11 @@
             var sql = new Sql();
             sql.Select(isCount ? "COUNT(*)" : "*")
                 .From<NotificationMethodDto>(SqlSyntax);
+
+            if (_storeId != MS.DefaultId)
+            {
+                sql.Where<NotificationMethodDto>(x => x.StoreId == _storeId, SqlSyntax);
+            }
 
             return sql;
         }

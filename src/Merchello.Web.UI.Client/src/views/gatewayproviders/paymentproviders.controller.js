@@ -1,8 +1,8 @@
-    angular.module('merchello').controller('Merchello.Backoffice.PaymentProvidersController',
-        ['$scope', 'notificationsService', 'dialogService', 'paymentGatewayProviderResource', 'dialogDataFactory', 'merchelloTabsFactory',
-           'gatewayResourceDisplayBuilder', 'paymentGatewayProviderDisplayBuilder', 'paymentMethodDisplayBuilder',
-        function($scope, notificationsService, dialogService, paymentGatewayProviderResource, dialogDataFactory, merchelloTabsFactory,
-                 gatewayResourceDisplayBuilder, paymentGatewayProviderDisplayBuilder, paymentMethodDisplayBuilder) {
+angular.module('merchello').controller('Merchello.Backoffice.PaymentProvidersController',
+    ['$scope', '$routeParams', 'notificationsService', 'dialogService', 'paymentGatewayProviderResource', 'dialogDataFactory', 'merchelloTabsFactory',
+        'gatewayResourceDisplayBuilder', 'paymentGatewayProviderDisplayBuilder', 'paymentMethodDisplayBuilder',
+        function ($scope, $routeParams, notificationsService, dialogService, paymentGatewayProviderResource, dialogDataFactory, merchelloTabsFactory,
+            gatewayResourceDisplayBuilder, paymentGatewayProviderDisplayBuilder, paymentMethodDisplayBuilder) {
 
             $scope.loaded = false;
             $scope.preValuesLoaded = false;
@@ -54,12 +54,12 @@
              */
             function loadAllPaymentGatewayProviders() {
 
-                var promiseAllProviders = paymentGatewayProviderResource.getAllGatewayProviders();
-                promiseAllProviders.then(function(allProviders) {
+                var promiseAllProviders = paymentGatewayProviderResource.getAllGatewayProviders($routeParams.storeId);
+                promiseAllProviders.then(function (allProviders) {
 
                     $scope.paymentGatewayProviders = paymentGatewayProviderDisplayBuilder.transform(allProviders);
 
-                    angular.forEach($scope.paymentGatewayProviders, function(provider) {
+                    angular.forEach($scope.paymentGatewayProviders, function (provider) {
                         loadPaymentGatewayResources(provider.key);
                         loadPaymentMethods(provider.key);
                     });
@@ -67,7 +67,7 @@
                     $scope.loaded = true;
                     $scope.preValuesLoaded = true;
 
-                }, function(reason) {
+                }, function (reason) {
                     notificationsService.error("Available Payment Providers Load Failed", reason.message);
                 });
             }
@@ -86,7 +86,7 @@
 
                 var provider = getProviderByKey(providerKey);
                 provider.showSelectResource = false;
-                var promiseAllResources = paymentGatewayProviderResource.getGatewayResources(provider.key);
+                var promiseAllResources = paymentGatewayProviderResource.getGatewayResources(provider.key, provider.storeId);
                 promiseAllResources.then(function (allResources) {
                     provider.gatewayResources = gatewayResourceDisplayBuilder.transform(allResources);
                     if (provider.gatewayResources.length > 0) {
@@ -110,7 +110,7 @@
             function loadPaymentMethods(providerKey) {
 
                 var provider = getProviderByKey(providerKey);
-                var promiseAllResources = paymentGatewayProviderResource.getPaymentProviderPaymentMethods(providerKey);
+                var promiseAllResources = paymentGatewayProviderResource.getPaymentProviderPaymentMethods(providerKey, provider.storeId);
                 promiseAllResources.then(function (allMethods) {
                     provider.paymentMethods = paymentMethodDisplayBuilder.transform(allMethods);
                 }, function (reason) {
@@ -134,7 +134,7 @@
              */
             function removeMethod(method) {
                 $scope.preValuesLoaded = false;
-                var promiseDelete = paymentGatewayProviderResource.deletePaymentMethod(method.key);
+                var promiseDelete = paymentGatewayProviderResource.deletePaymentMethod(method.key, method.storeId);
                 promiseDelete.then(function () {
                     loadAllPaymentGatewayProviders();
                     notificationsService.success("Payment Method Deleted");
@@ -198,6 +198,7 @@
                     method.providerKey = provider.key; //Todo: When able to add external providers, make this select the correct provider
                     method.paymentCode = provider.selectedGatewayResource.serviceCode;
                     method.name = provider.selectedGatewayResource.name;
+                    method.storeId = $routeParams.storeId;
                 }
 
                 // assert that there is a method editor
@@ -251,4 +252,4 @@
             // Initializes the controller
             init();
 
-    }]);
+        }]);

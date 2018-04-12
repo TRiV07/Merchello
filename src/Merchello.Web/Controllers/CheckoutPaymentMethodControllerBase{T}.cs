@@ -82,7 +82,7 @@
         {
             try
             {
-                var gatewayMethod = GatewayContext.Payment.GetPaymentGatewayMethodByKey(model.PaymentMethodKey);
+                var gatewayMethod = GatewayContext.Payment.GetPaymentGatewayMethodByKey(model.PaymentMethodKey, CurrentCustomer.StoreId);
                 if (gatewayMethod == null)
                 {
                     var nullRef = new NullReferenceException("Payment method was not found");
@@ -111,7 +111,7 @@
         [ChildActionOnly]
         public virtual ActionResult PaymentMethodForm(string view = "")
         {
-            var model = CheckoutPaymentMethodModelFactory.Create();
+            var model = CheckoutPaymentMethodModelFactory.Create(CurrentCustomer.StoreId);
             return view.IsNullOrWhiteSpace() ? PartialView(model) : PartialView(view, model);
         }
 

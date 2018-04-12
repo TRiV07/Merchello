@@ -71,9 +71,9 @@
         /// The <see cref="IEnumerable{PaymentMethodDisplay}"/>.
         /// </returns>
         [HttpGet]
-        public IEnumerable<PaymentMethodDisplay> GetPaymentMethods()
+        public IEnumerable<PaymentMethodDisplay> GetPaymentMethods(int storeId)
         {
-            var paymentMethods = MerchelloContext.Gateways.Payment.GetPaymentGatewayMethods();
+            var paymentMethods = MerchelloContext.Gateways.Payment.GetPaymentGatewayMethods(storeId);
 
             return paymentMethods.Select(x => x.ToPaymentMethodDisplay());
         }

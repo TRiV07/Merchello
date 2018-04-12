@@ -18,6 +18,8 @@
 
     using Constants = Merchello.Core.Constants;
 
+    using MS = Merchello.Core.Constants.MultiStore;
+
     /// <summary>
     /// The tax method service.
     /// </summary>
@@ -176,7 +178,7 @@
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreateTaxMethodRepository(uow))
+                using (var repository = RepositoryFactory.CreateTaxMethodRepository(uow, taxMethod.StoreId))
                 {
                     repository.AddOrUpdate(taxMethod);
                     uow.Commit();
@@ -200,7 +202,7 @@
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreateTaxMethodRepository(uow))
+                using (var repository = RepositoryFactory.CreateTaxMethodRepository(uow, MS.DefaultId))
                 {
                     foreach (var countryTaxRate in taxMethodsArray)
                     {
@@ -230,7 +232,7 @@
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreateTaxMethodRepository(uow))
+                using (var repository = RepositoryFactory.CreateTaxMethodRepository(uow, taxMethod.StoreId))
                 {
                     repository.Delete(taxMethod);
                     uow.Commit();
@@ -255,7 +257,7 @@
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreateTaxMethodRepository(uow))
+                using (var repository = RepositoryFactory.CreateTaxMethodRepository(uow, MS.DefaultId))
                 {
                     foreach (var method in methods)
                     {
@@ -277,7 +279,7 @@
         /// <returns><see cref="ITaxMethod"/></returns>
         public ITaxMethod GetByKey(Guid key)
         {
-            using (var repository = RepositoryFactory.CreateTaxMethodRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateTaxMethodRepository(UowProvider.GetUnitOfWork(), MS.DefaultId))
             {
                 return repository.Get(key);
             }
@@ -289,9 +291,9 @@
         /// <returns>
         /// The <see cref="IEnumerable{ITaxMethod}"/>.
         /// </returns>
-        public IEnumerable<ITaxMethod> GetAll()
+        public IEnumerable<ITaxMethod> GetAll(int storeId)
         {
-            using (var repository = RepositoryFactory.CreateTaxMethodRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateTaxMethodRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 return repository.GetAll();
             }
@@ -303,9 +305,9 @@
         /// <param name="providerKey">The unique 'key' of the <see cref="IGatewayProviderSettings"/></param>
         /// <param name="countryCode">The country code of the <see cref="ITaxMethod"/></param>
         /// <returns><see cref="ITaxMethod"/></returns>
-        public ITaxMethod GetTaxMethodByCountryCode(Guid providerKey, string countryCode)
+        public ITaxMethod GetTaxMethodByCountryCode(Guid providerKey, int storeId, string countryCode)
         {
-            using (var repository = RepositoryFactory.CreateTaxMethodRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateTaxMethodRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 var allTaxMethods = repository.GetAll().ToArray();
 
@@ -329,9 +331,9 @@
         /// <remarks>
         /// There can be only one =)
         /// </remarks>
-        public ITaxMethod GetTaxMethodForProductPricing()
+        public ITaxMethod GetTaxMethodForProductPricing(int storeId)
         {
-            using (var repository = RepositoryFactory.CreateTaxMethodRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateTaxMethodRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 var query = Query<ITaxMethod>.Builder.Where(x => x.ProductTaxMethod);
                 return repository.GetByQuery(query).FirstOrDefault();
@@ -348,9 +350,9 @@
         /// There should only ever be one - but we've left this open
         /// 
         /// </remarks>
-        public IEnumerable<ITaxMethod> GetTaxMethodsByCountryCode(string countryCode)
+        public IEnumerable<ITaxMethod> GetTaxMethodsByCountryCode(int storeId, string countryCode)
         {
-            using (var repository = RepositoryFactory.CreateTaxMethodRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateTaxMethodRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 var query =
                     Query<ITaxMethod>.Builder.Where(x => x.CountryCode == countryCode || x.CountryCode == Constants.CountryCodes.EverywhereElse);
@@ -364,9 +366,9 @@
         /// </summary>
         /// <param name="providerKey">The unique 'key' of the TaxationGatewayProvider</param>
         /// <returns>A collection of <see cref="ITaxMethod"/></returns>
-        public IEnumerable<ITaxMethod> GetTaxMethodsByProviderKey(Guid providerKey)
+        public IEnumerable<ITaxMethod> GetTaxMethodsByProviderKey(Guid providerKey, int storeId)
         {
-            using (var repository = RepositoryFactory.CreateTaxMethodRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateTaxMethodRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 var query = Query<ITaxMethod>.Builder.Where(x => x.ProviderKey == providerKey);
 
@@ -383,12 +385,12 @@
         /// <param name="percentageTaxRate">The tax rate in percentage for the country</param>
         /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events</param>
         /// <returns><see cref="Attempt"/> indicating whether or not the creation of the <see cref="ITaxMethod"/> with respective success or fail</returns>
-        internal Attempt<ITaxMethod> CreateTaxMethodWithKey(Guid providerKey, string countryCode, decimal percentageTaxRate, bool raiseEvents = true)
+        internal Attempt<ITaxMethod> CreateTaxMethodWithKey(Guid providerKey, int storeId, string countryCode, decimal percentageTaxRate, bool raiseEvents = true)
         {
             var country = _storeSettingService.GetCountryByCode(countryCode);
             return country == null
                 ? Attempt<ITaxMethod>.Fail(new ArgumentException("Could not create a country for country code '" + countryCode + "'"))
-                : CreateTaxMethodWithKey(providerKey, country, percentageTaxRate, raiseEvents);
+                : CreateTaxMethodWithKey(providerKey, storeId, country, percentageTaxRate, raiseEvents);
         }
 
         /// <summary>
@@ -409,11 +411,11 @@
         /// <returns>
         /// The <see cref="Attempt"/>.
         /// </returns>
-        internal Attempt<ITaxMethod> CreateTaxMethodWithKey(Guid providerKey, ICountry country, decimal percentageTaxRate, bool raiseEvents = true)
+        internal Attempt<ITaxMethod> CreateTaxMethodWithKey(Guid providerKey, int storeId, ICountry country, decimal percentageTaxRate, bool raiseEvents = true)
         {
-            if (CountryTaxRateExists(providerKey, country.CountryCode)) return Attempt<ITaxMethod>.Fail(new ConstraintException("A TaxMethod already exists for the provider for the countryCode '" + country.CountryCode + "'"));
+            if (CountryTaxRateExists(providerKey, storeId, country.CountryCode)) return Attempt<ITaxMethod>.Fail(new ConstraintException("A TaxMethod already exists for the provider for the countryCode '" + country.CountryCode + "'"));
 
-            var taxMethod = new TaxMethod(providerKey, country.CountryCode)
+            var taxMethod = new TaxMethod(providerKey, storeId, country.CountryCode)
             {
                 Name = country.CountryCode == "ELSE" ? "Everywhere Else" : country.Name,
                 PercentageTaxRate = percentageTaxRate,
@@ -430,7 +432,7 @@
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreateTaxMethodRepository(uow))
+                using (var repository = RepositoryFactory.CreateTaxMethodRepository(uow, storeId))
                 {
                     repository.AddOrUpdate(taxMethod);
                     uow.Commit();
@@ -470,9 +472,9 @@
         /// <returns>
         /// The <see cref="bool"/>.
         /// </returns>
-        private bool CountryTaxRateExists(Guid providerKey, string countryCode)
+        private bool CountryTaxRateExists(Guid providerKey, int storeId, string countryCode)
         {
-            using (var repository = RepositoryFactory.CreateTaxMethodRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateTaxMethodRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 var allTaxMethods = repository.GetAll().ToArray();
 

@@ -70,11 +70,11 @@
         /// A collection for <see cref="GatewayResourceDisplay"/>
         /// </returns>
         [AcceptVerbs("GET")]
-        public IEnumerable<GatewayResourceDisplay> GetGatewayResources(Guid id)
+        public IEnumerable<GatewayResourceDisplay> GetGatewayResources(Guid id, int storeId)
         {
             try
             {
-                var provider = _notificationContext.GetProviderByKey(id);
+                var provider = _notificationContext.GetProviderByKey(id, storeId);
 
                 var resources = provider.ListResourcesOffered();
 
@@ -94,9 +94,9 @@
         /// <returns>
         /// A collection for <see cref="GatewayResourceDisplay"/>
         /// </returns>
-        public IEnumerable<GatewayProviderDisplay> GetAllGatewayProviders()
+        public IEnumerable<GatewayProviderDisplay> GetAllGatewayProviders(int storeId)
         {
-            var providers = _notificationContext.GetAllActivatedProviders();
+            var providers = _notificationContext.GetAllActivatedProviders(storeId);
             if (providers == null)
             {
                 throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
@@ -113,6 +113,7 @@
         /// <returns>
         /// A collection of <see cref="NotificationMonitorDisplay"/>
         /// </returns>
+        /// TODOMS separate
         public IEnumerable<NotificationMonitorDisplay> GetAllNotificationMonitors()
         {
             var monitors = MonitorResolver.Current.GetAllMonitors();
@@ -143,10 +144,10 @@
         /// <param name="id">The key (guid) of the NotificationGatewayProvider</param>
         /// <returns>A collection of <see cref="NotificationMethodDisplay"/></returns>
         [AcceptVerbs("GET")]
-        public IEnumerable<NotificationMethodDisplay> GetNotificationProviderNotificationMethods(Guid id)
+        public IEnumerable<NotificationMethodDisplay> GetNotificationProviderNotificationMethods(Guid id, int storeId)
         {
             // limit only to active providers
-            var provider = _notificationContext.GetProviderByKey(id);
+            var provider = _notificationContext.GetProviderByKey(id, storeId);
 
             if (provider == null) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
             var methods = provider.NotificationMethods.Select(method => provider.GetNotificationGatewayMethodByKey(method.Key).ToNotificationMethodDisplay());
@@ -171,7 +172,10 @@
 
             try
             {
-                var provider = _notificationContext.GetProviderByKey(method.ProviderKey);
+                var storeId = method.StoreId;
+                //TODOMS validate access
+
+                var provider = _notificationContext.GetProviderByKey(method.ProviderKey, storeId);
 
                 var gatewayResource =
                     provider.ListResourcesOffered().FirstOrDefault(x => x.ServiceCode == method.ServiceCode);
@@ -217,7 +221,10 @@
 
             try
             {
-                var provider = _notificationContext.GetProviderByKey(method.ProviderKey);
+                var storeId = ((ServiceContext)MerchelloContext.Services).NotificationMethodService.GetByKey(method.Key)?.StoreId ?? 0;
+                //TODOMS validate access
+
+                var provider = _notificationContext.GetProviderByKey(method.ProviderKey, storeId);
 
                 var notificationMethod = provider.NotificationMethods.FirstOrDefault(x => x.Key == method.Key);
 
@@ -251,7 +258,10 @@
 
             try
             {
-                var provider = _notificationContext.GetProviderByMethodKey(id);
+                var storeId = ((ServiceContext)MerchelloContext.Services).NotificationMethodService.GetByKey(id)?.StoreId ?? 0;
+                //TODOMS validate access
+
+                var provider = _notificationContext.GetProviderByMethodKey(id, storeId);
                 var method = provider.GetNotificationGatewayMethodByKey(id);
                 provider.DeleteNotificationMethod(method);
             }
@@ -304,8 +314,10 @@
 
             try
             {
+                var storeId = ((ServiceContext)MerchelloContext.Services).NotificationMethodService.GetByKey(message.MethodKey)?.StoreId ?? 0;
+                //TODOMS validate access
 
-                var provider = _notificationContext.GetProviderByMethodKey(message.MethodKey);
+                var provider = _notificationContext.GetProviderByMethodKey(message.MethodKey, storeId);
                 
                 var method = provider.GetNotificationGatewayMethodByKey(message.MethodKey);
 
@@ -344,7 +356,10 @@
         {
             try
             {
-                var provider = _notificationContext.GetProviderByMethodKey(message.MethodKey);
+                var storeId = ((ServiceContext)MerchelloContext.Services).NotificationMethodService.GetByKey(message.MethodKey)?.StoreId ?? 0;
+                //TODOMS validate access
+
+                var provider = _notificationContext.GetProviderByMethodKey(message.MethodKey, storeId);
 
                 var method = provider.GetNotificationGatewayMethodByKey(message.MethodKey);
 
@@ -382,15 +397,19 @@
             var response = Request.CreateResponse(HttpStatusCode.OK);
 
             var notificationMessageService = ((ServiceContext)MerchelloContext.Services).NotificationMessageService;
+            var notificationMethodService = ((ServiceContext)MerchelloContext.Services).NotificationMethodService;
+
             var messageToDelete = notificationMessageService.GetByKey(id);
+            var method = notificationMethodService.GetByKey(messageToDelete.MethodKey);
+            //TODOMS validate access to store
 
             if (messageToDelete == null) return Request.CreateResponse(HttpStatusCode.NotFound);
 
             try
             {
-                var provider = _notificationContext.GetProviderByMethodKey(messageToDelete.MethodKey);
-                var method = provider.GetNotificationGatewayMethodByKey(messageToDelete.MethodKey);
-                method.DeleteNotificationMessage(messageToDelete);
+                var provider = _notificationContext.GetProviderByMethodKey(messageToDelete.MethodKey, method.StoreId);
+                var gatewayMethod = provider.GetNotificationGatewayMethodByKey(messageToDelete.MethodKey);
+                gatewayMethod.DeleteNotificationMessage(messageToDelete);
             }
             catch (Exception ex)
             {

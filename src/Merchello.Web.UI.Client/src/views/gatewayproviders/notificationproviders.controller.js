@@ -1,10 +1,10 @@
-    angular.module('merchello').controller('Merchello.Backoffice.NotificationProvidersController',
-        ['$scope', '$location', 'notificationsService', 'dialogService', 'merchelloTabsFactory', 'dialogDataFactory', 'gatewayResourceDisplayBuilder',
+angular.module('merchello').controller('Merchello.Backoffice.NotificationProvidersController',
+    ['$scope', '$routeParams', '$location', 'notificationsService', 'dialogService', 'merchelloTabsFactory', 'dialogDataFactory', 'gatewayResourceDisplayBuilder',
         'notificationGatewayProviderResource', 'notificationGatewayProviderDisplayBuilder', 'notificationMethodDisplayBuilder',
         'notificationMonitorDisplayBuilder', 'notificationMessageDisplayBuilder',
-        function($scope, $location, notificationsService, dialogService, merchelloTabsFactory, dialogDataFactory, gatewayResourceDisplayBuilder,
-        notificationGatewayProviderResource, notificationGatewayProviderDisplayBuilder, notificationMethodDisplayBuilder,
-        notificationMonitorDisplayBuilder, notificationMessageDisplayBuilder) {
+        function ($scope, $routeParams, $location, notificationsService, dialogService, merchelloTabsFactory, dialogDataFactory, gatewayResourceDisplayBuilder,
+            notificationGatewayProviderResource, notificationGatewayProviderDisplayBuilder, notificationMethodDisplayBuilder,
+            notificationMonitorDisplayBuilder, notificationMessageDisplayBuilder) {
 
             $scope.loaded = false;
             $scope.preValuesLoaded = false;
@@ -19,7 +19,7 @@
             $scope.deleteNotificationMethod = deleteNotificationMethod;
             $scope.addNotificationMessage = addNotificationMessage;
             $scope.deleteNotificationMessage = deleteNotificationMessage;
-            
+
             $scope.goToEditor = goToEditor;
 
             function init() {
@@ -51,10 +51,10 @@
              * in Merchello models and add to the scope via the notificationGatewayProviders collection.
              */
             function loadAllNotificationGatewayProviders() {
-                var promiseAllProviders = notificationGatewayProviderResource.getAllGatewayProviders();
+                var promiseAllProviders = notificationGatewayProviderResource.getAllGatewayProviders($routeParams.storeId);
                 promiseAllProviders.then(function (allProviders) {
                     $scope.notificationGatewayProviders = notificationGatewayProviderDisplayBuilder.transform(allProviders);
-                    angular.forEach($scope.notificationGatewayProviders, function(provider) {
+                    angular.forEach($scope.notificationGatewayProviders, function (provider) {
                         loadNotificationGatewayResources(provider.key);
                         loadNotificationMethods(provider.key);
                     });
@@ -77,7 +77,7 @@
              */
             function loadNotificationGatewayResources(providerKey) {
                 var provider = getProviderByKey(providerKey);
-                var promiseAllResources = notificationGatewayProviderResource.getGatewayResources(provider.key);
+                var promiseAllResources = notificationGatewayProviderResource.getGatewayResources(provider.key, provider.storeId);
                 promiseAllResources.then(function (allResources) {
                     provider.gatewayResources = gatewayResourceDisplayBuilder.transform(allResources);
                     if (provider.gatewayResources.length > 0) {
@@ -115,7 +115,7 @@
             function loadNotificationMethods(providerKey) {
 
                 var provider = getProviderByKey(providerKey);
-                var promiseAllResources = notificationGatewayProviderResource.getNotificationProviderNotificationMethods(providerKey);
+                var promiseAllResources = notificationGatewayProviderResource.getNotificationProviderNotificationMethods(providerKey, provider.storeId);
                 promiseAllResources.then(function (allMethods) {
                     provider.notificationMethods = notificationMethodDisplayBuilder.transform(allMethods);
                 }, function (reason) {
@@ -138,10 +138,10 @@
             function addNotificationsDialogConfirm(dialogData) {
                 $scope.preValuesLoaded = false;
                 var promiseNotificationMethod = notificationGatewayProviderResource.addNotificationMethod(dialogData.notificationMethod);
-                promiseNotificationMethod.then(function(notificationFromServer) {
+                promiseNotificationMethod.then(function (notificationFromServer) {
                     notificationsService.success("Notification Method saved.", "");
                     init();
-                }, function(reason) {
+                }, function (reason) {
                     notificationsService.error("Notification Method save Failed", reason.message);
                 });
             }
@@ -149,10 +149,10 @@
             function saveNotificationDialogConfirm(dialogData) {
                 $scope.preValuesLoaded = false;
                 var promiseNotificationMethod = notificationGatewayProviderResource.saveNotificationMethod(dialogData.notificationMethod);
-                promiseNotificationMethod.then(function(notificationFromServer) {
+                promiseNotificationMethod.then(function (notificationFromServer) {
                     notificationsService.success("Notification Method saved.", "");
                     init();
-                }, function(reason) {
+                }, function (reason) {
                     notificationsService.error("Notification Method save Failed", reason.message);
                 });
             }
@@ -171,6 +171,7 @@
                 method.name = resource.name;
                 method.serviceCode = resource.serviceCode;
                 method.providerKey = provider.key;
+                method.storeId = $routeParams.storeId;
                 dialogData.notificationMethod = method;
                 dialogService.open({
                     template: '/App_Plugins/Merchello/Backoffice/Merchello/Dialogs/notification.notificationmethod.addedit.html',
@@ -315,17 +316,17 @@
                 });
             }
 
-            
+
             function goToEditor(message) {
-                var monitor = _.find($scope.notificationMonitors, function(m) {
+                var monitor = _.find($scope.notificationMonitors, function (m) {
                     return m.monitorKey === message.monitorKey;
                 });
 
                 if (monitor !== undefined) {
-                    $location.url('merchello/merchello/notificationmessageeditor/' + message.key, true);
+                    $location.url('merchello/merchello/notificationmessageeditor/' + message.key + '/store/' + $routeParams.storeId, true);
                 }
             }
-            
+
             // Initialize the controller
             init();
-    }]);
+        }]);

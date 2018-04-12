@@ -33,6 +33,7 @@ namespace Merchello.Web
             AutoMapper.Mapper.CreateMap<IPaymentGatewayMethod, PaymentMethodDisplay>()
                 .ForMember(dest => dest.Key, opt => opt.MapFrom(src => src.PaymentMethod.Key))
                 .ForMember(dest => dest.ProviderKey, opt => opt.MapFrom(src => src.PaymentMethod.ProviderKey))
+                .ForMember(dest => dest.StoreId, opt => opt.MapFrom(src => src.PaymentMethod.StoreId))
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.PaymentMethod.Name))
                 .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.PaymentMethod.Description))
                 .ForMember(dest => dest.PaymentCode, opt => opt.MapFrom(src => src.PaymentMethod.PaymentCode))

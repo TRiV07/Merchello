@@ -98,7 +98,7 @@
             Mandate.ParameterNotNull(shipCountry, "shipCountry");
             Mandate.ParameterNotNullOrEmpty(name, "name");
 
-            var attempt = GatewayProviderService.CreateShipMethodWithKey(GatewayProviderSettings.Key, shipCountry, name, gatewayResource.ServiceCode + string.Format("-{0}", Guid.NewGuid()));
+            var attempt = GatewayProviderService.CreateShipMethodWithKey(GatewayProviderSettings.Key, GatewayProviderSettings.StoreId, shipCountry, name, gatewayResource.ServiceCode + string.Format("-{0}", Guid.NewGuid()));
             
             if (!attempt.Success) throw attempt.Exception;
 

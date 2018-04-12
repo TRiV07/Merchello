@@ -47,7 +47,7 @@
             get
             {
                 return _shipMethods ??
-                       (_shipMethods = GatewayProviderService.GetShipMethodsByShipCountryKey(GatewayProviderSettings.Key));
+                       (_shipMethods = GatewayProviderService.GetShipMethodsByShipCountryKey(GatewayProviderSettings.Key, GatewayProviderSettings.StoreId));
             }
 
             protected set

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Merchello.Core.Models.EntityBase;
+using System;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 
@@ -7,7 +8,7 @@ namespace Merchello.Core.Models.Rdbms
     [TableName("merchNotificationMethod")]
     [PrimaryKey("pk", autoIncrement = false)]
     [ExplicitColumns]
-    internal class NotificationMethodDto
+    internal class NotificationMethodDto : IHasDomainRoot
     {
         [Column("pk")]
         [PrimaryKeyColumn(AutoIncrement = false)]
@@ -15,8 +16,12 @@ namespace Merchello.Core.Models.Rdbms
         public Guid Key { get; set; }
 
         [Column("providerKey")]
-        [ForeignKey(typeof(GatewayProviderSettingsDto), Name = "FK_merchNotificationMethod_merchGatewayProvider", Column = "pk")]
+        //[ForeignKey(typeof(GatewayProviderSettingsDto), Name = "FK_merchNotificationMethod_merchGatewayProvider", Column = "pk")]
         public Guid ProviderKey { get; set; }
+
+        [Column("storeId")]
+        [Constraint(Default = Constants.MultiStore.DefaultId)]
+        public int StoreId { get; set; }
 
         [Column("name")]
         public string Name { get; set; }

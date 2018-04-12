@@ -16,6 +16,8 @@
     using Umbraco.Core.Events;
     using Umbraco.Core.Logging;
 
+    using MS = Merchello.Core.Constants.MultiStore;
+
     /// <summary>
     /// Represents the PaymentMethodService
     /// </summary>
@@ -107,15 +109,15 @@
         /// <param name="paymentCode">The unique 'payment code' associated with the payment method.  (Eg. visa, mc)</param>
         /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events</param>
         /// <returns><see cref="Attempt"/> indicating whether or not the creation of the <see cref="IPaymentMethod"/> with respective success or fail</returns>
-        internal Attempt<IPaymentMethod> CreatePaymentMethodWithKey(Guid providerKey, string name, string description, string paymentCode, bool raiseEvents = true)
+        internal Attempt<IPaymentMethod> CreatePaymentMethodWithKey(Guid providerKey, int storeId, string name, string description, string paymentCode, bool raiseEvents = true)
         {
             Mandate.ParameterCondition(!Guid.Empty.Equals(providerKey), "providerKey");
             Mandate.ParameterNotNullOrEmpty(name, "name");
             Mandate.ParameterNotNullOrEmpty(paymentCode, "paymentCode");
 
-            if (GetPaymentMethodByPaymentCode(providerKey, paymentCode) != null) return Attempt<IPaymentMethod>.Fail(new ConstraintException("A PaymentMethod already exists for the provider for the paymentCode '" + paymentCode + "'"));
+            if (GetPaymentMethodByPaymentCode(providerKey, storeId, paymentCode) != null) return Attempt<IPaymentMethod>.Fail(new ConstraintException("A PaymentMethod already exists for the provider for the paymentCode '" + paymentCode + "'"));
 
-            var paymentMethod = new PaymentMethod(providerKey)
+            var paymentMethod = new PaymentMethod(providerKey, storeId)
                 {
                     Name = name,
                     Description = description,
@@ -132,7 +134,7 @@
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreatePaymentMethodRepository(uow))
+                using (var repository = RepositoryFactory.CreatePaymentMethodRepository(uow, storeId))
                 {
                     repository.AddOrUpdate(paymentMethod);
                     uow.Commit();
@@ -161,7 +163,7 @@
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreatePaymentMethodRepository(uow))
+                using (var repository = RepositoryFactory.CreatePaymentMethodRepository(uow, paymentMethod.StoreId))
                 {
                     repository.AddOrUpdate(paymentMethod);
                     uow.Commit();
@@ -184,7 +186,7 @@
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreatePaymentMethodRepository(uow))
+                using (var repository = RepositoryFactory.CreatePaymentMethodRepository(uow, MS.DefaultId))
                 {
                     foreach (var paymentMethod in paymentMethodsArray)
                     {
@@ -214,7 +216,7 @@
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreatePaymentMethodRepository(uow))
+                using (var repository = RepositoryFactory.CreatePaymentMethodRepository(uow, paymentMethod.StoreId))
                 {
                     repository.Delete(paymentMethod);
                     uow.Commit();
@@ -238,7 +240,7 @@
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreatePaymentMethodRepository(uow))
+                using (var repository = RepositoryFactory.CreatePaymentMethodRepository(uow, MS.DefaultId))
                 {
                     foreach (var method in methods)
                     {
@@ -259,7 +261,7 @@
         /// <returns><see cref="IPaymentMethod"/></returns>
         public IPaymentMethod GetByKey(Guid key)
         {
-            using (var repository = RepositoryFactory.CreatePaymentMethodRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreatePaymentMethodRepository(UowProvider.GetUnitOfWork(), MS.DefaultId))
             {
                 return repository.Get(key);
             }
@@ -270,9 +272,9 @@
         /// </summary>
         /// <param name="providerKey">The unique 'key' of the PaymentGatewayProvider</param>
         /// <returns>A collection of <see cref="IPaymentMethod"/></returns>
-        public IEnumerable<IPaymentMethod> GetPaymentMethodsByProviderKey(Guid providerKey)
+        public IEnumerable<IPaymentMethod> GetPaymentMethodsByProviderKey(Guid providerKey, int storeId)
         {
-            using (var repository = RepositoryFactory.CreatePaymentMethodRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreatePaymentMethodRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 var query = Query<IPaymentMethod>.Builder.Where(x => x.ProviderKey == providerKey);
 
@@ -285,9 +287,9 @@
         /// </summary>
         /// <param name="providerKey">The unique 'key' of the PaymentGatewayProvider</param>
         /// <param name="paymentCode">The paymentCode</param>
-        public IPaymentMethod GetPaymentMethodByPaymentCode(Guid providerKey, string paymentCode)
+        public IPaymentMethod GetPaymentMethodByPaymentCode(Guid providerKey, int storeId, string paymentCode)
         {
-            using (var repository = RepositoryFactory.CreatePaymentMethodRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreatePaymentMethodRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 var query =
                     Query<IPaymentMethod>.Builder.Where(
@@ -300,9 +302,9 @@
         /// <summary>
         /// Gets a collection of all <see cref="IPaymentMethod"/>
         /// </summary>
-        public IEnumerable<IPaymentMethod> GetAll()
+        public IEnumerable<IPaymentMethod> GetAll(int storeId)
         {
-            using (var repository = RepositoryFactory.CreatePaymentMethodRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreatePaymentMethodRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 return repository.GetAll();
             }

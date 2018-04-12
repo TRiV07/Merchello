@@ -9,53 +9,57 @@ angular.module('merchello.resources')
         function($http, umbRequestHelper) {
 
         return {
-            getGatewayProvider: function (providerKey) {
+            getGatewayProvider: function (providerKey, storeId) {
                 var url = Umbraco.Sys.ServerVariables['merchelloUrls']['merchelloGatewayProviderApiBaseUrl'] + 'GetGatewayProvider';
                 return umbRequestHelper.resourcePromise(
                     $http({
                         url: url,
                         method: "GET",
-                        params: { id: providerKey }
+                        params: { id: providerKey, storeId: storeId }
                     }),
                     'Failed to retreive gateway provider data');
             },
 
-            getResolvedNotificationGatewayProviders: function () {
+            getResolvedNotificationGatewayProviders: function (storeId) {
                 var url = Umbraco.Sys.ServerVariables['merchelloUrls']['merchelloGatewayProviderApiBaseUrl'] + 'GetResolvedNotificationGatewayProviders';
                 return umbRequestHelper.resourcePromise(
                     $http({
                         url: url,
-                        method: "GET"
+                        method: "GET",
+                        params: { storeId: storeId }
                     }),
                     'Failed to retrieve data for all resolved notification gateway providers');
             },
 
-            getResolvedPaymentGatewayProviders: function () {
+            getResolvedPaymentGatewayProviders: function (storeId) {
                 var url = Umbraco.Sys.ServerVariables['merchelloUrls']['merchelloGatewayProviderApiBaseUrl'] + 'GetResolvedPaymentGatewayProviders';
                 return umbRequestHelper.resourcePromise(
                     $http({
                         url: url,
-                        method: "GET"
+                        method: "GET",
+                        params: { storeId: storeId }
                     }),
                     'Failed to retreive data for all resolved payment gateway providers');
             },
 
-            getResolvedShippingGatewayProviders: function () {
+            getResolvedShippingGatewayProviders: function (storeId) {
                 var url = Umbraco.Sys.ServerVariables['merchelloUrls']['merchelloGatewayProviderApiBaseUrl'] + 'GetResolvedShippingGatewayProviders';
                 return umbRequestHelper.resourcePromise(
                     $http({
                         url: url,
-                        method: "GET"
+                        method: "GET",
+                        params: { storeId: storeId }
                     }),
                     'Failed to retreive data for all resolved shipping gateway providers');
             },
 
-            getResolvedTaxationGatewayProviders: function () {
+            getResolvedTaxationGatewayProviders: function (storeId) {
                 var url = Umbraco.Sys.ServerVariables['merchelloUrls']['merchelloGatewayProviderApiBaseUrl'] + 'GetResolvedTaxationGatewayProviders';
                 return umbRequestHelper.resourcePromise(
                     $http({
                         url: url,
-                        method: "GET"
+                        method: "GET",
+                        params: { storeId: storeId }
                     }),
                     'Failed to retreive data for all resolved taxation gateway providers');
             },

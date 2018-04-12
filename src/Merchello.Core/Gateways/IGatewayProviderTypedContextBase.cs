@@ -15,13 +15,13 @@ namespace Merchello.Core.Gateways
         /// Lists all available <see cref="IGatewayProviderSettings"/>
         /// </summary>
         /// <returns>A collection of all GatewayProvider of the particular type T</returns>
-        IEnumerable<GatewayProviderBase> GetAllActivatedProviders();
+        IEnumerable<GatewayProviderBase> GetAllActivatedProviders(int storeId);
 
         /// <summary>
         /// Lists all available providers.  This list includes providers that are just resolved and not configured
         /// </summary>
         /// <returns>A collection of all Gatewayprovider</returns>
-        IEnumerable<GatewayProviderBase> GetAllProviders();
+        IEnumerable<GatewayProviderBase> GetAllProviders(int storeId);
 
         /// <summary>
         /// Instantiates a GatewayProvider given its registered Key
@@ -30,14 +30,14 @@ namespace Merchello.Core.Gateways
         /// <param name="gatewayProviderKey"></param>
         /// <param name="activatedOnly">Search only activated providers</param>
         /// <returns>An instantiated GatewayProvider</returns>
-        T GetProviderByKey(Guid gatewayProviderKey, bool activatedOnly = true);
+        T GetProviderByKey(Guid gatewayProviderKey, int storeId, bool activatedOnly = true);
 
         /// <summary>
         /// Returns an instance of an 'active' GatewayProvider associated with a GatewayMethod based given the unique Key (Guid) of the GatewayMethod
         /// </summary>
         /// <param name="gatewayMethodKey">The unique key (Guid) of the <see cref="IGatewayMethod"/></param>
         /// <returns>An instantiated GatewayProvider</returns>
-        T GetProviderByMethodKey(Guid gatewayMethodKey);
+        T GetProviderByMethodKey(Guid gatewayMethodKey, int storeId);
 
         /// <summary>
         /// Obsolete method
@@ -45,7 +45,7 @@ namespace Merchello.Core.Gateways
         /// <param name="gatewayProviderKey"></param>
         /// <returns></returns>
         [Obsolete("Use GetProviderByKey instead")]
-        T CreateInstance(Guid gatewayProviderKey);
+        T CreateInstance(Guid gatewayProviderKey, int storeId);
 
         /// <summary>
         /// Activates a GatewayProvider

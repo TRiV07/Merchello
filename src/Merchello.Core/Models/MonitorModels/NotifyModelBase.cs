@@ -9,5 +9,7 @@
         /// Gets or sets an array of additional recipients (ex. email addresses, phone numbers, twitter handles ...)
         /// </summary>
         public string[] Contacts { get; set; }
+
+        public int StoreId { get; set; }
     }
 }

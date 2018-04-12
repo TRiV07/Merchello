@@ -47,6 +47,7 @@
             AutoMapper.Mapper.CreateMap<ShippingGatewayMethodBase, ShipMethodDisplay>()
                 .ForMember(dest => dest.Key, opt => opt.MapFrom(src => src.ShipMethod.Key))
                 .ForMember(dest => dest.ProviderKey, opt => opt.MapFrom(src => src.ShipMethod.ProviderKey))
+                .ForMember(dest => dest.StoreId, opt => opt.MapFrom(src => src.ShipMethod.StoreId))
                 .ForMember(dest => dest.ShipCountryKey, opt => opt.MapFrom(src => src.ShipMethod.ShipCountryKey))
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.ShipMethod.Name))
                 .ForMember(dest => dest.Provinces, opt => opt.MapFrom(src => src.ShipMethod.Provinces))

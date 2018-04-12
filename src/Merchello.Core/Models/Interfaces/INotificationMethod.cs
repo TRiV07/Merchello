@@ -7,7 +7,7 @@
     /// <summary>
     /// Represents a notification method.
     /// </summary>
-    public interface INotificationMethod : IEntity
+    public interface INotificationMethod : IHasDomainRoot, IEntity
     {
         /// <summary>
         /// Gets or sets the name of the notification

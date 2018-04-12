@@ -10,7 +10,7 @@ namespace Merchello.Core.Persistence.Factories
     {
         public INotificationMethod BuildEntity(NotificationMethodDto dto)
         {
-            var method = new NotificationMethod(dto.ProviderKey)
+            var method = new NotificationMethod(dto.ProviderKey, dto.StoreId)
             {
                 Key = dto.Key,
                 Name = dto.Name,
@@ -30,6 +30,7 @@ namespace Merchello.Core.Persistence.Factories
             return new NotificationMethodDto()
             {
                 Key = entity.Key,
+                StoreId = entity.StoreId,
                 ProviderKey = entity.ProviderKey,
                 Name = entity.Name,
                 Description = entity.Description,

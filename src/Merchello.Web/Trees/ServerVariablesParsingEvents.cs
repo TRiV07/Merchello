@@ -68,7 +68,7 @@
             merchelloUrls.Add(
              "merchelloBackOfficeCheckoutApiBaseUrl",
               url.GetUmbracoApiServiceBaseUrl<BackOfficeCheckoutApiController>(
-                  controller => controller.GetPaymentMethods()));
+                  controller => controller.GetPaymentMethods(0)));
 
             merchelloUrls.Add(
                 "merchelloCustomerApiBaseUrl",
@@ -98,7 +98,7 @@
             merchelloUrls.Add(
                 "merchelloGatewayProviderApiBaseUrl",
                 url.GetUmbracoApiServiceBaseUrl<GatewayProviderApiController>(
-                controller => controller.GetGatewayProvider(Guid.NewGuid())));
+                controller => controller.GetGatewayProvider(Guid.NewGuid(), 0)));
 
             merchelloUrls.Add(
                 "merchelloInvoiceApiBaseUrl",
@@ -123,7 +123,7 @@
             merchelloUrls.Add(
                 "merchelloNotificationApiBaseUrl",
                 url.GetUmbracoApiServiceBaseUrl<NotificationGatewayApiController>(
-                controller => controller.GetAllGatewayProviders()));
+                controller => controller.GetAllGatewayProviders(0)));
 
             merchelloUrls.Add(
                 "merchelloOrderApiBaseUrl",
@@ -138,7 +138,7 @@
             merchelloUrls.Add(
                 "merchelloPaymentGatewayApiBaseUrl",
                 url.GetUmbracoApiServiceBaseUrl<PaymentGatewayApiController>(
-                controller => controller.GetAllGatewayProviders()));
+                controller => controller.GetAllGatewayProviders(0)));
 
             merchelloUrls.Add(
                 "merchelloPluginViewEditorApiBaseUrl",
@@ -183,7 +183,7 @@
             merchelloUrls.Add(
                 "merchelloTaxationGatewayApiBaseUrl",
                 url.GetUmbracoApiServiceBaseUrl<TaxationGatewayApiController>(
-                controller => controller.GetAllGatewayProviders()));
+                controller => controller.GetAllGatewayProviders(0)));
 
             merchelloUrls.Add(
                 "merchelloWarehouseApiBaseUrl",

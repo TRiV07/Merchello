@@ -28,6 +28,11 @@
         private readonly Guid _providerKey;
 
         /// <summary>
+        /// The domain root structure ID.
+        /// </summary>
+        private int _storeId;
+
+        /// <summary>
         /// The country code.
         /// </summary>
         private readonly string _countryCode;
@@ -63,12 +68,13 @@
         /// <param name="countryCode">
         /// The country code.
         /// </param>
-        internal TaxMethod(Guid providerKey, string countryCode)
+        internal TaxMethod(Guid providerKey, int storeId, string countryCode)
         {
             Ensure.ParameterCondition(providerKey != Guid.Empty, "providerKey");
             Ensure.ParameterNotNullOrEmpty(countryCode, "countryCode");
 
             _providerKey = providerKey;
+            _storeId = storeId;
             _countryCode = countryCode;
             PercentageTaxRate = 0;
         }
@@ -80,6 +86,16 @@
             get
             {
                 return _providerKey;
+            }
+        }
+
+        /// <inheritdoc/>
+        [DataMember]
+        public int StoreId
+        {
+            get
+            {
+                return _storeId;
             }
         }
 

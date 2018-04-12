@@ -144,11 +144,18 @@
         /// </remarks>
         private void WarehouseCatalogServiceDeleted(IWarehouseCatalogService sender, DeleteEventArgs<IWarehouseCatalog> deleteEventArgs)
         {
-            var providers = GatewayProviderResolver.Current.GetActivatedProviders<ShippingGatewayProviderBase>();
+            var whs = MerchelloContext.Current.Services.WarehouseService
+                .GetByKeys(deleteEventArgs.DeletedEntities.Select(x => x.WarehouseKey));
+            var storesIds = whs.Select(x => x.StoreId).Distinct();
 
-            foreach (var provider in providers)
+            foreach(var storeId in storesIds)
             {
-                ((ShippingGatewayProviderBase)provider).ResetShipMethods();
+                var providers = GatewayProviderResolver.Current.GetActivatedProviders<ShippingGatewayProviderBase>(storeId);
+
+                foreach (var provider in providers)
+                {
+                    ((ShippingGatewayProviderBase)provider).ResetShipMethods();
+                }
             }
         }
     }

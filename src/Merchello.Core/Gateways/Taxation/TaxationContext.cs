@@ -71,7 +71,7 @@
                 {
                     return false;
                 }
-                return taxApp == TaxationApplication.Product && ProductPricingTaxMethod != null;
+                return taxApp == TaxationApplication.Product && ProductPricingTaxMethod(storeId) != null;
             }
         }
 
@@ -98,17 +98,14 @@
         /// <summary>
         /// Gets the product pricing tax method.
         /// </summary>
-        public ITaxationByProductMethod ProductPricingTaxMethod
+        public ITaxationByProductMethod ProductPricingTaxMethod(int storeId)
         {
-            get
+            if (_taxByProductMethod == null && this._taxMethodNotQueried)
             {
-                if (_taxByProductMethod == null && this._taxMethodNotQueried)
-                {
-                    _taxByProductMethod = this.GetTaxationByProductMethod();
-                }
-
-                return _taxByProductMethod;
+                _taxByProductMethod = this.GetTaxationByProductMethod(storeId);
             }
+
+            return _taxByProductMethod;
         }
 
         /// <summary>
@@ -122,10 +119,10 @@
         /// </summary>
         /// <param name="gatewayMethodKey">The unique key (GUID) of the <see cref="IGatewayMethod"/></param>
         /// <returns>An instantiated GatewayProvider</returns>
-        public override TaxationGatewayProviderBase GetProviderByMethodKey(Guid gatewayMethodKey)
+        public override TaxationGatewayProviderBase GetProviderByMethodKey(Guid gatewayMethodKey, int storeId)
         {
             return
-                GetAllActivatedProviders()
+                GetAllActivatedProviders(storeId)
                     .FirstOrDefault(x => ((TaxationGatewayProviderBase)x)
                         .TaxMethods.Any(y => y.Key == gatewayMethodKey)) as TaxationGatewayProviderBase;
         }
@@ -168,12 +165,12 @@
         public ITaxCalculationResult CalculateTaxesForInvoice(IInvoice invoice, IAddress taxAddress, bool quoteOnly = false)
         {
             var providersKey =
-                GatewayProviderService.GetTaxMethodsByCountryCode(taxAddress.CountryCode)
+                GatewayProviderService.GetTaxMethodsByCountryCode(invoice.StoreId, taxAddress.CountryCode)
                                       .Select(x => x.ProviderKey).FirstOrDefault();
 
             if (Guid.Empty.Equals(providersKey)) return new TaxCalculationResult(0, 0);
 
-            var provider = GatewayProviderResolver.GetProviderByKey<TaxationGatewayProviderBase>(providersKey);
+            var provider = GatewayProviderResolver.GetProviderByKey<TaxationGatewayProviderBase>(providersKey, invoice.StoreId);
 
             var gatewayTaxMethod = provider.GetGatewayTaxMethodByCountryCode(taxAddress.CountryCode);
 
@@ -194,10 +191,11 @@
             var empty = ProductTaxCalculationResult.GetEmptyResult();
 
             if (ProductPricingEnabled(product.StoreId)) return empty;
+            var method = this.ProductPricingTaxMethod(product.StoreId);
 
-            return this.ProductPricingTaxMethod == null ?
+            return method == null ?
                 empty :
-                this.ProductPricingTaxMethod.CalculateTaxForProduct(product);
+                method.CalculateTaxForProduct(product);
         }
 
 
@@ -210,9 +208,9 @@
         /// <returns>
         /// The <see cref="ITaxMethod"/>.
         /// </returns>
-        public ITaxMethod GetTaxMethodForTaxAddress(IAddress taxAddress)
+        public ITaxMethod GetTaxMethodForTaxAddress(int storeId, IAddress taxAddress)
         {
-            return GetTaxMethodForCountryCode(taxAddress.CountryCode);
+            return GetTaxMethodForCountryCode(storeId, taxAddress.CountryCode);
         }
 
         /// <summary>
@@ -224,9 +222,9 @@
         /// <returns>
         /// The <see cref="ITaxMethod"/>.
         /// </returns>
-        public ITaxMethod GetTaxMethodForCountryCode(string countryCode)
+        public ITaxMethod GetTaxMethodForCountryCode(int storeId, string countryCode)
         {
-            return GatewayProviderService.GetTaxMethodsByCountryCode(countryCode).FirstOrDefault();
+            return GatewayProviderService.GetTaxMethodsByCountryCode(storeId, countryCode).FirstOrDefault();
         }
 
 
@@ -248,9 +246,9 @@
         /// <exception cref="NullReferenceException">
         /// Throws a null reference exception if a provider cannot be resolved
         /// </exception>
-        private ITaxationByProductMethod GetTaxationByProductMethod()
+        private ITaxationByProductMethod GetTaxationByProductMethod(int storeId)
         {
-            var taxMethod = GatewayProviderService.GetTaxMethodForProductPricing();
+            var taxMethod = GatewayProviderService.GetTaxMethodForProductPricing(storeId);
             if (taxMethod == null)
             {
                 LogHelper.Debug<TaxationContext>("Product based pricing is set in settings, but a TaxMethod has not been assigned.");
@@ -258,7 +256,7 @@
                 return null;
             }
 
-            var provider = GatewayProviderResolver.GetProviderByKey<TaxationGatewayProviderBase>(taxMethod.ProviderKey);
+            var provider = GatewayProviderResolver.GetProviderByKey<TaxationGatewayProviderBase>(taxMethod.ProviderKey, storeId);
 
             if (provider == null)
             {

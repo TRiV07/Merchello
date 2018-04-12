@@ -19,7 +19,7 @@
         /// <param name="serviceCode">The notification service code</param>
         /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events</param>
         /// <returns>An Attempt{<see cref="INotificationMethod"/>}</returns>
-        Attempt<INotificationMethod> CreateNotificationMethodWithKey(Guid providerKey, string name, string serviceCode, bool raiseEvents = true);
+        Attempt<INotificationMethod> CreateNotificationMethodWithKey(Guid providerKey, int storeId, string name, string serviceCode, bool raiseEvents = true);
 
         /// <summary>
         /// Saves a single instance of <see cref="INotificationMethod"/>
@@ -61,6 +61,6 @@
         /// </summary>
         /// <param name="providerKey">The <see cref="IGatewayProviderSettings"/> key</param>
         /// <returns>A collection of all <see cref="INotificationMethod"/> associated with a provider</returns>
-        IEnumerable<INotificationMethod> GetNotifcationMethodsByProviderKey(Guid providerKey);
+        IEnumerable<INotificationMethod> GetNotifcationMethodsByProviderKey(Guid providerKey, int storeId);
     }
 }

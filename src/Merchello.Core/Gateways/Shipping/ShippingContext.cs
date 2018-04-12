@@ -43,9 +43,9 @@
         /// </summary>
         /// <param name="gatewayMethodKey">The unique key (GUID) of the <see cref="IGatewayMethod"/></param>
         /// <returns>An instantiated GatewayProvider</returns>
-        public override ShippingGatewayProviderBase GetProviderByMethodKey(Guid gatewayMethodKey)
+        public override ShippingGatewayProviderBase GetProviderByMethodKey(Guid gatewayMethodKey, int storeId)
         {
-            return GetAllActivatedProviders()
+            return GetAllActivatedProviders(storeId)
                 .FirstOrDefault(x => ((ShippingGatewayProviderBase)x)
                     .ShipMethods.Any(y => y.Key == gatewayMethodKey)) as ShippingGatewayProviderBase;
         }
@@ -60,7 +60,7 @@
         /// <returns>A collection of <see cref="IShipmentRateQuote"/></returns>
         public IEnumerable<IShipmentRateQuote> GetShipRateQuotesForShipment(IShipment shipment, bool tryGetCached = true)
         {
-            var providers = GatewayProviderResolver.GetActivatedProviders<ShippingGatewayProviderBase>() as IEnumerable<ShippingGatewayProviderBase>;
+            var providers = GatewayProviderResolver.GetActivatedProviders<ShippingGatewayProviderBase>(shipment.StoreId) as IEnumerable<ShippingGatewayProviderBase>;
             var quotes = new List<IShipmentRateQuote>();
 
             if (providers == null) return quotes;
@@ -117,7 +117,7 @@
 
             return
                 gatewayProviders.Select(
-                    provider => GatewayProviderResolver.GetProviderByKey<ShippingGatewayProviderBase>(provider.Key));
+                    provider => GatewayProviderResolver.GetProviderByKey<ShippingGatewayProviderBase>(provider.Key, provider.StoreId));
         }
     }
 }

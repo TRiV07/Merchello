@@ -24,6 +24,11 @@
         private readonly Guid _providerKey;
 
         /// <summary>
+        /// The domain root structure ID.
+        /// </summary>
+        private int _storeId;
+
+        /// <summary>
         /// The name.
         /// </summary>
         private string _name;
@@ -44,10 +49,11 @@
         /// <param name="providerKey">
         /// The provider key.
         /// </param>
-        internal PaymentMethod(Guid providerKey)
+        internal PaymentMethod(Guid providerKey, int storeId)
         {
             Ensure.ParameterCondition(!Guid.Empty.Equals(providerKey), "providerKey");
             _providerKey = providerKey;
+            _storeId = storeId;
         }
 
 
@@ -58,7 +64,17 @@
             get
             {
                 return _providerKey;
-            }         
+            }
+        }
+
+        /// <inheritdoc/>
+        [DataMember]
+        public int StoreId
+        {
+            get
+            {
+                return _storeId;
+            }
         }
 
         /// <inheritdoc/>

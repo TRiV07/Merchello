@@ -514,7 +514,7 @@ namespace Merchello.Core
         /// <returns>The <see cref="IPaymentResult"/></returns>
         internal static IPaymentResult AuthorizePayment(this IInvoice invoice, IMerchelloContext merchelloContext, Guid paymentMethodKey, ProcessorArgumentCollection args)
         {
-            var paymentMethod = merchelloContext.Gateways.Payment.GetPaymentGatewayMethodByKey(paymentMethodKey);
+            var paymentMethod = merchelloContext.Gateways.Payment.GetPaymentGatewayMethodByKey(paymentMethodKey, invoice.StoreId);
             return invoice.AuthorizePayment(paymentMethod, args);
         }
 
@@ -576,7 +576,7 @@ namespace Merchello.Core
         /// <returns>A <see cref="IPaymentResult"/></returns>
         internal static IPaymentResult AuthorizeCapturePayment(this IInvoice invoice, IMerchelloContext merchelloContext, Guid paymentMethodKey, ProcessorArgumentCollection args)
         {
-            var paymentMethod = merchelloContext.Gateways.Payment.GetPaymentGatewayMethodByKey(paymentMethodKey);
+            var paymentMethod = merchelloContext.Gateways.Payment.GetPaymentGatewayMethodByKey(paymentMethodKey, invoice.StoreId);
             return invoice.AuthorizeCapturePayment(paymentMethod, args);
         }
 
@@ -666,7 +666,7 @@ namespace Merchello.Core
         /// <returns>A <see cref="IPaymentResult"/></returns>
         internal static IPaymentResult CapturePayment(this IInvoice invoice, IMerchelloContext merchelloContext, IPayment payment, Guid paymentMethodKey, decimal amount, ProcessorArgumentCollection args)
         {
-            var paymentGatewayMethod = merchelloContext.Gateways.Payment.GetPaymentGatewayMethodByKey(paymentMethodKey);
+            var paymentGatewayMethod = merchelloContext.Gateways.Payment.GetPaymentGatewayMethodByKey(paymentMethodKey, invoice.StoreId);
             return invoice.CapturePayment(payment, paymentGatewayMethod, amount, args);
         }
 
@@ -736,7 +736,7 @@ namespace Merchello.Core
         /// <returns>A <see cref="IPaymentResult"/></returns>
         internal static IPaymentResult RefundPayment(this IInvoice invoice, IMerchelloContext merchelloContext, IPayment payment, Guid paymentMethodKey, decimal amount, ProcessorArgumentCollection args)
         {
-            var paymentGatewayMethod = merchelloContext.Gateways.Payment.GetPaymentGatewayMethodByKey(paymentMethodKey);
+            var paymentGatewayMethod = merchelloContext.Gateways.Payment.GetPaymentGatewayMethodByKey(paymentMethodKey, invoice.StoreId);
             return invoice.RefundPayment(payment, paymentGatewayMethod, amount, args);
         }
 
@@ -789,7 +789,7 @@ namespace Merchello.Core
         /// <returns>A <see cref="IPaymentResult"/></returns>
         internal static IPaymentResult VoidPayment(this IInvoice invoice, IMerchelloContext merchelloContext, IPayment payment, Guid paymentMethodKey, ProcessorArgumentCollection args)
         {
-            var paymentGatewayMethod = merchelloContext.Gateways.Payment.GetPaymentGatewayMethodByKey(paymentMethodKey);
+            var paymentGatewayMethod = merchelloContext.Gateways.Payment.GetPaymentGatewayMethodByKey(paymentMethodKey, invoice.StoreId);
             return paymentGatewayMethod.VoidPayment(invoice, payment, args);
         }
 

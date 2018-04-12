@@ -57,6 +57,14 @@
             get { return _gatewayProviderSettings.Key; }
         }
 
+        public int StoreId
+        {
+            get
+            {
+                return _gatewayProviderSettings.StoreId;
+            }
+        }
+
         /// <summary>
         /// Gets the <see cref="IGatewayProviderService"/>
         /// </summary>

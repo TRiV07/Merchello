@@ -5,6 +5,7 @@
     using System.Web.Http;
     using Core;
     using Core.Gateways.Shipping.FixedRate;
+    using Merchello.Core.Services;
     using Models.ContentEditing;    
     using Umbraco.Web.Mvc;
     using WebApi;
@@ -18,10 +19,10 @@
         #region Fields
 
 
-        /// <summary>
-        /// The fixed rate shipping gateway provider.
-        /// </summary>
-        private readonly FixedRateShippingGatewayProvider _fixedRateShippingGatewayProvider;
+        ///// <summary>
+        ///// The fixed rate shipping gateway provider.
+        ///// </summary>
+        //private readonly FixedRateShippingGatewayProvider _fixedRateShippingGatewayProvider;
 
 
         #endregion
@@ -44,7 +45,7 @@
         public FixedRateShippingApiController(IMerchelloContext merchelloContext)
             : base(merchelloContext)
         {
-            _fixedRateShippingGatewayProvider = (FixedRateShippingGatewayProvider)MerchelloContext.Gateways.Shipping.GetProviderByKey(Constants.ProviderKeys.Shipping.FixedRateShippingProviderKey);
+            //_fixedRateShippingGatewayProvider = (FixedRateShippingGatewayProvider)MerchelloContext.Gateways.Shipping.GetProviderByKey(Constants.ProviderKeys.Shipping.FixedRateShippingProviderKey);
         }
 
         /// <summary>
@@ -62,7 +63,12 @@
         [HttpPost, HttpGet]
         public ShipFixedRateTableDisplay GetShipFixedRateTable(ShipMethodDisplay method)
         {
-            var fixedMethod = (IFixedRateShippingGatewayMethod)_fixedRateShippingGatewayProvider.GetShippingGatewayMethod(method.Key, method.ShipCountryKey);
+            var storeId = ((ServiceContext)MerchelloContext.Services).ShipMethodService.GetByKey(method.Key)?.StoreId ?? 0;
+            //TODOMS validate access
+
+            var fixedRateShippingGatewayProvider = (FixedRateShippingGatewayProvider)MerchelloContext.Gateways.Shipping.GetProviderByKey(Constants.ProviderKeys.Shipping.FixedRateShippingProviderKey, storeId);
+
+            var fixedMethod = (IFixedRateShippingGatewayMethod)fixedRateShippingGatewayProvider.GetShippingGatewayMethod(method.Key, method.ShipCountryKey);
 
             if (fixedMethod == null) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
 
@@ -87,11 +93,16 @@
         [HttpPost]
         public ShipFixedRateTableDisplay PutShipFixedRateTable(ShipFixedRateTableDisplay rateTable)
         {
-            var fixedMethod = (IFixedRateShippingGatewayMethod)_fixedRateShippingGatewayProvider.GetShippingGatewayMethod(rateTable.ShipMethodKey, rateTable.ShipCountryKey);
+            var storeId = ((ServiceContext)MerchelloContext.Services).ShipMethodService.GetByKey(rateTable.ShipMethodKey)?.StoreId ?? 0;
+            //TODOMS validate access
+
+            var fixedRateShippingGatewayProvider = (FixedRateShippingGatewayProvider)MerchelloContext.Gateways.Shipping.GetProviderByKey(Constants.ProviderKeys.Shipping.FixedRateShippingProviderKey, storeId);
+
+            var fixedMethod = (IFixedRateShippingGatewayMethod)fixedRateShippingGatewayProvider.GetShippingGatewayMethod(rateTable.ShipMethodKey, rateTable.ShipCountryKey);
 
             fixedMethod = rateTable.ToFixedRateShipMethod(fixedMethod);
 
-            _fixedRateShippingGatewayProvider.SaveShippingGatewayMethod(fixedMethod);
+            fixedRateShippingGatewayProvider.SaveShippingGatewayMethod(fixedMethod);
 
             return fixedMethod.RateTable.ToShipFixedRateTableDisplay();
         }

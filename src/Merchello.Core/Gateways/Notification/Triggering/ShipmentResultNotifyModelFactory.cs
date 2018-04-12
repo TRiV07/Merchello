@@ -73,7 +73,8 @@
             var notifyModel = new ShipmentResultNotifyModel()
                                   {
                                       Shipment = shipment,
-                                      Contacts = contacts == null ? new string[] { } : contacts.ToArray()
+                                      Contacts = contacts == null ? new string[] { } : contacts.ToArray(),
+                                      StoreId = shipment.StoreId
                                     };
 
             var item = shipment.Items.FirstOrDefault(x => !x.ContainerKey.Equals(Guid.Empty));

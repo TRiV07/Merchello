@@ -53,7 +53,7 @@
                 }
 
                 // send the message
-                NotificationContext.Send(message, formatter);
+                NotificationContext.Send(value.StoreId, message, formatter);
             }
         }
     }

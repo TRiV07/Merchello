@@ -20,7 +20,7 @@
         /// <summary>
         /// Gets the <see cref="ITaxationByProductMethod"/>.
         /// </summary>
-        ITaxationByProductMethod ProductPricingTaxMethod { get; }
+        ITaxationByProductMethod ProductPricingTaxMethod(int storeId);
 
         /// <summary>
         /// Calculates taxes for the <see cref="IInvoice"/>
@@ -72,7 +72,7 @@
         /// <returns>
         /// The <see cref="ITaxMethod"/>.
         /// </returns>
-        ITaxMethod GetTaxMethodForTaxAddress(IAddress taxAddress);
+        ITaxMethod GetTaxMethodForTaxAddress(int storeId, IAddress taxAddress);
 
         /// <summary>
         /// Gets the tax method for country code.
@@ -83,6 +83,6 @@
         /// <returns>
         /// The <see cref="ITaxMethod"/>.
         /// </returns>
-        ITaxMethod GetTaxMethodForCountryCode(string countryCode);
+        ITaxMethod GetTaxMethodForCountryCode(int storeId, string countryCode);
     }
 }

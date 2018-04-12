@@ -55,7 +55,7 @@
                 }
 
                 // send the message
-                NotificationContext.Send(message, formatter);
+                NotificationContext.Send(value.Shipment.StoreId, message, formatter);
             }
         }
     }

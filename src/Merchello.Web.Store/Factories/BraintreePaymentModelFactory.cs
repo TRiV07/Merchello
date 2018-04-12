@@ -19,23 +19,23 @@
     public class BraintreePaymentModelFactory<TPaymentModel> : CheckoutPaymentModelFactory<TPaymentModel>
         where TPaymentModel : BraintreePaymentModel, new()
     {
-        /// <summary>
-        /// The <see cref="IBraintreeApiService"/>.
-        /// </summary>
-        private readonly IBraintreeApiService _braintreeApiService;
+        ///// <summary>
+        ///// The <see cref="IBraintreeApiService"/>.
+        ///// </summary>
+        //private readonly IBraintreeApiService _braintreeApiService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BraintreePaymentModelFactory{TPaymentModel}"/> class.
         /// </summary>
         public BraintreePaymentModelFactory()
         {
-            //// D143E0F6-98BB-4E0A-8B8C-CE9AD91B0969 is the Guid from the BraintreeProvider Activation Attribute
-            //// [GatewayProviderActivation("D143E0F6-98BB-4E0A-8B8C-CE9AD91B0969", "BrainTree Payment Provider", "BrainTree Payment Provider")]
-            var provider = (BraintreePaymentGatewayProvider)MerchelloContext.Current.Gateways.Payment.GetProviderByKey(Merchello.Providers.Constants.Braintree.GatewayProviderSettingsKey);
+            ////// D143E0F6-98BB-4E0A-8B8C-CE9AD91B0969 is the Guid from the BraintreeProvider Activation Attribute
+            ////// [GatewayProviderActivation("D143E0F6-98BB-4E0A-8B8C-CE9AD91B0969", "BrainTree Payment Provider", "BrainTree Payment Provider")]
+            //var provider = (BraintreePaymentGatewayProvider)MerchelloContext.Current.Gateways.Payment.GetProviderByKey(Merchello.Providers.Constants.Braintree.GatewayProviderSettingsKey);
 
-            //// GetBraintreeProviderSettings() is an extension method with the provider
-            //// Note: We don't need to make this Lazy since all of the services are internally lazy loaded so the instantiation hit should be minimal
-            this._braintreeApiService = new BraintreeApiService(provider.ExtendedData.GetBrainTreeProviderSettings());
+            ////// GetBraintreeProviderSettings() is an extension method with the provider
+            ////// Note: We don't need to make this Lazy since all of the services are internally lazy loaded so the instantiation hit should be minimal
+            //this._braintreeApiService = new BraintreeApiService(provider.ExtendedData.GetBrainTreeProviderSettings());
         }
 
         /// <summary>
@@ -96,9 +96,13 @@
         /// </returns>
         protected string GetBraintreeToken(ICustomerBase customer)
         {
+            var provider = (BraintreePaymentGatewayProvider)MerchelloContext.Current.Gateways.Payment.GetProviderByKey(Merchello.Providers.Constants.Braintree.GatewayProviderSettingsKey, customer.StoreId);
+
+            var braintreeApiService = new BraintreeApiService(provider.ExtendedData.GetBrainTreeProviderSettings());
+
             var token = customer.IsAnonymous ?
-                this._braintreeApiService.Customer.GenerateClientRequestToken() :
-                this._braintreeApiService.Customer.GenerateClientRequestToken((ICustomer)customer);
+                braintreeApiService.Customer.GenerateClientRequestToken() :
+                braintreeApiService.Customer.GenerateClientRequestToken((ICustomer)customer);
 
             return token;
         }

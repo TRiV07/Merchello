@@ -7,7 +7,7 @@ namespace Merchello.Core.Persistence.Factories
     {
         public IPaymentMethod BuildEntity(PaymentMethodDto dto)
         {
-            var paymentMethod = new PaymentMethod(dto.ProviderKey)
+            var paymentMethod = new PaymentMethod(dto.ProviderKey, dto.StoreId)
                 {
                     Key = dto.Key,
                     Name = dto.Name,
@@ -27,6 +27,7 @@ namespace Merchello.Core.Persistence.Factories
             return new PaymentMethodDto()
                 {
                     Key = entity.Key,
+                    StoreId = entity.StoreId,
                     ProviderKey = entity.ProviderKey,
                     Name = entity.Name,
                     Description = entity.Description,

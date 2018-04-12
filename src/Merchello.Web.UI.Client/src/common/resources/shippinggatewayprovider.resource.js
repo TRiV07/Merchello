@@ -50,12 +50,13 @@ angular.module('merchello.resources')
                         'Failed to retreive shipping gateway providers');
                 },
 
-                getAllShipGatewayProviders: function () {
+                getAllShipGatewayProviders: function (storeId) {
                     var url = Umbraco.Sys.ServerVariables['merchelloUrls']['merchelloShippingGatewayApiBaseUrl'] + 'GetAllShipGatewayProviders';
                     return umbRequestHelper.resourcePromise(
                         $http({
                             url: url,
-                            method: "GET"
+                            method: "GET",
+                            params: { storeId: storeId }
                         }),
                         'Failed to retreive shipping gateway providers');
                 },
@@ -66,7 +67,7 @@ angular.module('merchello.resources')
                         $http({
                             url: url,
                             method: "GET",
-                            params: { id: shipProvider.key }
+                            params: { id: shipProvider.key, storeId: shipProvider.storeId }
                         }),
                         'Failed to retreive shipping methods');
                 },
@@ -77,7 +78,7 @@ angular.module('merchello.resources')
                         $http({
                             url: url,
                             method: "GET",
-                            params: { id: shipProvider.key, shipCountryId: shipCountry.key }
+                            params: { id: shipProvider.key, storeId: shipProvider.storeId, shipCountryId: shipCountry.key }
                         }),
                         'Failed to retreive shipping methods');
                 },
@@ -88,7 +89,7 @@ angular.module('merchello.resources')
                         $http({
                             url: url,
                             method: "GET",
-                            params: { id: shipProvider.key }
+                            params: { id: shipProvider.key, storeId: shipProvider.storeId }
                         }),
                         'Failed to retreive shipping gateway provider resources');
                 },

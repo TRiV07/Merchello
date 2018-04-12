@@ -56,9 +56,9 @@
         /// <exception cref="NullReferenceException">
         /// Throws a null reference exception if the PayPalGatewayProvider has not been activated
         /// </exception>
-        public static PayPalProviderSettings GetPayPalProviderSettings()
+        public static PayPalProviderSettings GetPayPalProviderSettings(int storeId)
         {
-            var provider = (PayPalPaymentGatewayProvider)MerchelloContext.Current.Gateways.Payment.GetProviderByKey(Constants.PayPal.GatewayProviderSettingsKey);
+            var provider = (PayPalPaymentGatewayProvider)MerchelloContext.Current.Gateways.Payment.GetProviderByKey(Constants.PayPal.GatewayProviderSettingsKey, storeId);
 
             if (provider != null) return provider.ExtendedData.GetPayPalProviderSettings();
 

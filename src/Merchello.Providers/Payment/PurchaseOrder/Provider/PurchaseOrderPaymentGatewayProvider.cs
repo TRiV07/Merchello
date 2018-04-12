@@ -78,7 +78,7 @@
         {
             var paymentCode = gatewayResource.ServiceCode + "-" + Guid.NewGuid();
 
-            var attempt = GatewayProviderService.CreatePaymentMethodWithKey(GatewayProviderSettings.Key, name, description, paymentCode);
+            var attempt = GatewayProviderService.CreatePaymentMethodWithKey(GatewayProviderSettings.Key, GatewayProviderSettings.StoreId, name, description, paymentCode);
 
             if (attempt.Success)
             {

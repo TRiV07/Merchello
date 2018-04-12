@@ -9,22 +9,24 @@
 
                 return {
 
-                    getGatewayResources: function (key) {
+                    getGatewayResources: function (key, storeId) {
                         var url = Umbraco.Sys.ServerVariables['merchelloUrls']['merchelloNotificationApiBaseUrl'] + 'GetGatewayResources';
                         return umbRequestHelper.resourcePromise(
                             $http({
-                                url: url + "?id=" + key,
-                                method: "GET"
+                                url: url,
+                                method: "GET",
+                                params: { id: key, storeId: storeId }
                             }),
                             'Failed to save data for Notification');
                     },
 
-                    getAllGatewayProviders: function () {
+                    getAllGatewayProviders: function (storeId) {
                         var url = Umbraco.Sys.ServerVariables['merchelloUrls']['merchelloNotificationApiBaseUrl'] + 'GetAllGatewayProviders';
                         return umbRequestHelper.resourcePromise(
                             $http({
                                 url: url,
-                                method: "GET"
+                                method: "GET",
+                                params: { storeId: storeId }
                             }),
                             'Failed to retreive data for all gateway providers');
                     },
@@ -39,12 +41,13 @@
                             'Failed to retreive data for all gateway providers');
                     },
 
-                    getNotificationProviderNotificationMethods: function (id) {
+                    getNotificationProviderNotificationMethods: function (id, storeId) {
                         var url = Umbraco.Sys.ServerVariables['merchelloUrls']['merchelloNotificationApiBaseUrl'] + 'GetNotificationProviderNotificationMethods';
                         return umbRequestHelper.resourcePromise(
                             $http({
-                                url: url + "?id=" + id,
-                                method: "GET"
+                                url: url,
+                                method: "GET",
+                                params: { id: id, storeId: storeId }
                             }),
                             'Failed to save data for Notification');
                     },

@@ -52,7 +52,7 @@ namespace Merchello.Core.Services
         /// <returns>
         /// The <see cref="IEnumerable{ITaxMethod}"/>.
         /// </returns>
-        IEnumerable<ITaxMethod> GetAll(); 
+        IEnumerable<ITaxMethod> GetAll(int storeId); 
         
         /// <summary>
         /// Gets a <see cref="ITaxMethod"/> based on a provider and country code
@@ -60,7 +60,7 @@ namespace Merchello.Core.Services
         /// <param name="providerKey">The unique 'key' of the <see cref="IGatewayProviderSettings"/></param>
         /// <param name="countryCode">The country code of the <see cref="ITaxMethod"/></param>
         /// <returns><see cref="ITaxMethod"/></returns>
-        ITaxMethod GetTaxMethodByCountryCode(Guid providerKey, string countryCode);
+        ITaxMethod GetTaxMethodByCountryCode(Guid providerKey, int storeId, string countryCode);
 
         /// <summary>
         /// Get tax method for product pricing.
@@ -71,21 +71,21 @@ namespace Merchello.Core.Services
         /// <remarks>
         /// There can be only one =)
         /// </remarks>
-        ITaxMethod GetTaxMethodForProductPricing();
+        ITaxMethod GetTaxMethodForProductPricing(int storeId);
 
         /// <summary>
         /// Gets a <see cref="ITaxMethod"/> based on a provider and country code
         /// </summary>
         /// <param name="countryCode">The country code of the <see cref="ITaxMethod"/></param>
         /// <returns><see cref="ITaxMethod"/></returns>
-        IEnumerable<ITaxMethod> GetTaxMethodsByCountryCode(string countryCode);
+        IEnumerable<ITaxMethod> GetTaxMethodsByCountryCode(int storeId, string countryCode);
 
         /// <summary>
         /// Gets a collection of <see cref="ITaxMethod"/> for a given TaxationGatewayProvider
         /// </summary>
         /// <param name="providerKey">The unique 'key' of the TaxationGatewayProvider</param>
         /// <returns>A collection of <see cref="ITaxMethod"/></returns>
-        IEnumerable<ITaxMethod> GetTaxMethodsByProviderKey(Guid providerKey);
+        IEnumerable<ITaxMethod> GetTaxMethodsByProviderKey(Guid providerKey, int storeId);
         
 
     }

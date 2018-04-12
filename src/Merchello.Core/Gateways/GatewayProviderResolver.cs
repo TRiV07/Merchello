@@ -12,6 +12,7 @@
     using Merchello.Core.Gateways.Taxation;
     using Merchello.Core.Logging;
     using Merchello.Core.Models;
+    using Merchello.Core.MultiStore;
     using Merchello.Core.ObjectResolution;
     using Merchello.Core.Services;
 
@@ -32,7 +33,7 @@
         /// <summary>
         /// The activated gateway provider cache.
         /// </summary>
-        private readonly ConcurrentDictionary<Guid, GatewayProviderBase> _activatedGatewayProviderCache = new ConcurrentDictionary<Guid, GatewayProviderBase>();
+        private readonly ConcurrentDictionary<Tuple<Guid, int>, GatewayProviderBase> _activatedGatewayProviderCache = new ConcurrentDictionary<Tuple<Guid, int>, GatewayProviderBase>();
 
         /// <summary>
         /// The gateway provider service.
@@ -75,7 +76,12 @@
         {
             get
             {
-                if (_activatedGatewayProviderCache.Count == InstanceTypes.Count())
+                //TOCHECKMS
+                var storesIds = ApplicationContext.Current.Services.DomainService != null
+                    ? ApplicationContext.Current.Services.DomainService.GetRootIds()
+                    : _gatewayProviderService.GetAllStoresIds();
+
+                if (_activatedGatewayProviderCache.Count == InstanceTypes.Count() * storesIds.Count())
                     return _activatedGatewayProviderCache.Values;
 
                 var allResolved = new List<GatewayProviderBase>();
@@ -86,15 +92,18 @@
                 {
                     allResolved.AddRange(_activatedGatewayProviderCache.Values);
 
-                    var inactive = (from it in InstanceTypes
-                                    let key = it.GetCustomAttribute<GatewayProviderActivationAttribute>(false).Key
-                                    where !_activatedGatewayProviderCache.ContainsKey(key)
-                                    select it).ToList();
+                    foreach(var id in storesIds)
+                    {
+                        var inactive = (from it in InstanceTypes
+                                        let key = it.GetCustomAttribute<GatewayProviderActivationAttribute>(false).Key
+                                        where !_activatedGatewayProviderCache.ContainsKey(new Tuple<Guid, int>(key, id))
+                                        select it).ToList();
 
-                    allResolved.AddRange(
-                        inactive.Select(
-                            type => factory.BuildEntity(type, GetGatewayProviderType(type)))
-                            .Select(CreateInstance).Where(attempt => attempt.Success).Select(x => x.Result));
+                        allResolved.AddRange(
+                            inactive.Select(
+                                type => factory.BuildEntity(type, GetGatewayProviderType(type), id))
+                                .Select(CreateInstance).Where(attempt => attempt.Success).Select(x => x.Result));
+                    }
                 }
 
                 return allResolved;
@@ -104,9 +113,9 @@
         /// <summary>
         /// Gets a collection of all activated PaymentGatewayProviders
         /// </summary>
-        internal IEnumerable<PaymentGatewayProviderBase> PaymentGatewayProviders
+        internal IEnumerable<PaymentGatewayProviderBase> PaymentGatewayProviders(int storeId)
         {
-            get { return GetActivatedProviders<PaymentGatewayProviderBase>() as IEnumerable<PaymentGatewayProviderBase>; }
+            return GetActivatedProviders<PaymentGatewayProviderBase>(storeId) as IEnumerable<PaymentGatewayProviderBase>;
         }
 
         /// <summary>
@@ -116,12 +125,12 @@
         /// <param name="gatewayProviderKey">The Gateway Provider Key</param>
         /// <param name="activatedOnly">Search only activated providers</param>
         /// <returns>An instantiated GatewayProvider</returns>
-        public T GetProviderByKey<T>(Guid gatewayProviderKey, bool activatedOnly = true) where T : GatewayProviderBase
+        public T GetProviderByKey<T>(Guid gatewayProviderKey, int storeId, bool activatedOnly = true) where T : GatewayProviderBase
         {
             if (activatedOnly)
-                return GetActivatedProviders<T>().FirstOrDefault(x => x.Key == gatewayProviderKey) as T;
+                return GetActivatedProviders<T>(storeId).FirstOrDefault(x => x.Key == gatewayProviderKey && x.StoreId == storeId) as T;
 
-            return Values.FirstOrDefault(x => x.Key == gatewayProviderKey) as T;
+            return Values.FirstOrDefault(x => x.Key == gatewayProviderKey && x.StoreId == storeId) as T;
 
         }
 
@@ -131,9 +140,9 @@
         /// <returns>
         /// The collection of GatewayProviderBase.
         /// </returns>
-        public IEnumerable<GatewayProviderBase> GetActivatedProviders()
+        public IEnumerable<GatewayProviderBase> GetActivatedProviders(int storeId)
         {
-            return _activatedGatewayProviderCache.Values;
+            return _activatedGatewayProviderCache.Where(x => x.Key.Item2 == storeId).Select(x => x.Value);
         }
 
         /// <summary>
@@ -142,9 +151,9 @@
         /// <returns>
         /// The collection of gateway providers.
         /// </returns>
-        public IEnumerable<GatewayProviderBase> GetAllProviders()
+        public IEnumerable<GatewayProviderBase> GetAllProviders(int storeId)
         {
-            return Values;
+            return Values.Where(x => x.StoreId == storeId);
         }
 
         /// <summary>
@@ -152,9 +161,13 @@
         /// </summary>
         /// <typeparam name="T">The type of GatewayProvider</typeparam>
         /// <returns>The collection of gateway providers</returns>
-        public IEnumerable<GatewayProviderBase> GetAllProviders<T>() where T : GatewayProviderBase
+        public IEnumerable<GatewayProviderBase> GetAllProviders<T>(int storeId) where T : GatewayProviderBase
         {
-            return (from value in Values let t = value.GetType() where typeof(T).IsAssignableFrom(t) select value as T).ToList();
+            return (from value in Values
+                    let t = value.GetType()
+                    where typeof(T).IsAssignableFrom(t)
+                    && value.StoreId == storeId
+select value as T).ToList();
         }
 
 
@@ -167,9 +180,13 @@
         /// <returns>
         /// The collection of gateway providers.
         /// </returns>
-        public IEnumerable<GatewayProviderBase> GetActivatedProviders<T>() where T : GatewayProviderBase
+        public IEnumerable<GatewayProviderBase> GetActivatedProviders<T>(int storeId) where T : GatewayProviderBase
         {
-            return (from value in _activatedGatewayProviderCache.Values let t = value.GetType() where typeof(T).IsAssignableFrom(t) select value as T).ToList();
+            return (from value in _activatedGatewayProviderCache.Values
+                    let t = value.GetType()
+                    where typeof(T).IsAssignableFrom(t)
+                    && value.StoreId == storeId
+                    select value as T).ToList();
         }
 
         /// <summary>
@@ -216,7 +233,7 @@
         private void BuildActivatedGatewayProviderCache()
         {
             // this will cache the list of all providers that have been "Activated"
-            var allActivated = _gatewayProviderService.GetAllGatewayProviders().ToArray();
+            var allActivated = _gatewayProviderService.GetAllGatewayProviders(Core.Constants.MultiStore.DefaultId).ToArray();
             foreach (var provider in allActivated)
             {
                 var attempt = CreateInstance(provider);
@@ -238,7 +255,7 @@
         /// </param>
         private void AddOrUpdateCache(GatewayProviderBase provider)
         {
-            _activatedGatewayProviderCache.AddOrUpdate(provider.Key, provider, (x, y) => provider);
+            _activatedGatewayProviderCache.AddOrUpdate(new Tuple<Guid, int>(provider.Key, provider.StoreId), provider, (x, y) => provider);
         }
 
 

@@ -88,7 +88,7 @@
         {
             get {
                 return _paymentMethods ??
-                       (_paymentMethods = GatewayProviderService.GetPaymentMethodsByProviderKey(GatewayProviderSettings.Key));
+                       (_paymentMethods = GatewayProviderService.GetPaymentMethodsByProviderKey(GatewayProviderSettings.Key, GatewayProviderSettings.StoreId));
             }
             protected set { _paymentMethods = value; }
         }

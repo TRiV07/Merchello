@@ -55,11 +55,11 @@
         /// <returns>
         /// A collection of <see cref="GatewayResourceDisplay"/>.
         /// </returns>
-        public IEnumerable<GatewayResourceDisplay> GetGatewayResources(Guid id)
+        public IEnumerable<GatewayResourceDisplay> GetGatewayResources(Guid id, int storeId)
         {
             try
             {
-                var provider = _paymentContext.GetProviderByKey(id);
+                var provider = _paymentContext.GetProviderByKey(id, storeId);
 
                 var resources = provider.ListResourcesOffered();
 
@@ -80,9 +80,9 @@
         /// <returns>
         /// A collection of all payment <see cref="GatewayProviderDisplay"/>
         /// </returns>
-        public IEnumerable<GatewayProviderDisplay> GetAllGatewayProviders()
+        public IEnumerable<GatewayProviderDisplay> GetAllGatewayProviders(int storeId)
         {
-            var providers = _paymentContext.GetAllActivatedProviders();
+            var providers = _paymentContext.GetAllActivatedProviders(storeId);
 
             if (providers == null)
             {
@@ -103,9 +103,9 @@
         /// <returns>
         /// A collection of <see cref="PaymentMethodDisplay"/>
         /// </returns>
-        public IEnumerable<PaymentMethodDisplay> GetPaymentProviderPaymentMethods(Guid id)
+        public IEnumerable<PaymentMethodDisplay> GetPaymentProviderPaymentMethods(Guid id, int storeId)
         {
-            var provider = _paymentContext.GetProviderByKey(id);
+            var provider = _paymentContext.GetProviderByKey(id, storeId);
             if (provider == null) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
 
             foreach (var method in provider.PaymentMethods)
@@ -122,9 +122,9 @@
         /// The <see cref="IEnumerable{PaymentMethodDisplay}"/>.
         /// </returns>
         [HttpGet]
-        public IEnumerable<PaymentMethodDisplay> GetAvailablePaymentMethods()
+        public IEnumerable<PaymentMethodDisplay> GetAvailablePaymentMethods(int storeId)
         {
-            var methods = _paymentContext.GetPaymentGatewayMethods().Select(x => x.ToPaymentMethodDisplay());
+            var methods = _paymentContext.GetPaymentGatewayMethods(storeId).Select(x => x.ToPaymentMethodDisplay());
             return methods.Where(x => x.IncludeInPaymentSelection).OrderBy(x => x.Name);
         }
 
@@ -138,11 +138,11 @@
         /// The <see cref="PaymentMethodDisplay"/>.
         /// </returns>
         [HttpGet]
-        public PaymentMethodDisplay GetPaymentMethodByKey(Guid? key)
+        public PaymentMethodDisplay GetPaymentMethodByKey(Guid? key, int storeId)
         {
             if (key != null)
             {
-                var method = _paymentContext.GetPaymentGatewayMethods().FirstOrDefault(x => x.PaymentMethod.Key == key.Value);
+                var method = _paymentContext.GetPaymentGatewayMethods(storeId).FirstOrDefault(x => x.PaymentMethod.Key == key.Value);
                 return method != null ? method.ToPaymentMethodDisplay() : null;
             }
             return null;
@@ -160,13 +160,14 @@
         /// The <see cref="HttpResponseMessage"/>.
         /// </returns>
         [AcceptVerbs("POST")]
+        //TODOMS Check sending storeId
         public HttpResponseMessage AddPaymentMethod(PaymentMethodDisplay method)
         {
             var response = Request.CreateResponse(HttpStatusCode.OK);
 
             try
             {
-                var provider = _paymentContext.GetProviderByKey(method.ProviderKey);
+                var provider = _paymentContext.GetProviderByKey(method.ProviderKey, method.StoreId);
 
                 var gatewayResource =
                     provider.ListResourcesOffered().FirstOrDefault(x => x.ServiceCode == method.PaymentCode);
@@ -196,13 +197,14 @@
         /// The <see cref="HttpResponseMessage"/>.
         /// </returns>
         [AcceptVerbs("POST", "PUT")]
+        //TODOMS Check sending storeId
         public HttpResponseMessage PutPaymentMethod(PaymentMethodDisplay method)
         {
             var response = Request.CreateResponse(HttpStatusCode.OK);
 
             try
             {
-                var provider = _paymentContext.GetProviderByKey(method.ProviderKey);
+                var provider = _paymentContext.GetProviderByKey(method.ProviderKey, method.StoreId);
 
                 var paymentMethod = provider.PaymentMethods.FirstOrDefault(x => x.Key == method.Key);
 
@@ -230,9 +232,9 @@
         /// The <see cref="HttpResponseMessage"/>.
         /// </returns>
         [AcceptVerbs("GET", "DELETE")]
-        public HttpResponseMessage DeletePaymentMethod(Guid id)
+        public HttpResponseMessage DeletePaymentMethod(Guid id, int storeId)
         {
-            var paymentProvider = MerchelloContext.Gateways.Payment.GetProviderByMethodKey(id);
+            var paymentProvider = MerchelloContext.Gateways.Payment.GetProviderByMethodKey(id, storeId);
             if (paymentProvider == null) return Request.CreateResponse(HttpStatusCode.NotFound);
 
             var methodToDelete = paymentProvider.GetPaymentGatewayMethodByKey(id);

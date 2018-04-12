@@ -57,7 +57,8 @@ namespace Merchello.Core.Models.MonitorModels
                     Shipment = shipment,
                     ShipMethod = shipMethod,
                     CurrencySymbol = currencySymbol,
-                    ApproveOrderCreation = paymentResult.ApproveOrderCreation
+                    ApproveOrderCreation = paymentResult.ApproveOrderCreation,
+                    StoreId = paymentResult.Invoice.StoreId
                 };
         }
 
@@ -92,7 +93,8 @@ namespace Merchello.Core.Models.MonitorModels
             {
                 Shipment = shipmentResult.Shipment,
                 Invoice = shipmentResult.Invoice,
-                Contacts = contacts.ToArray()
+                Contacts = contacts.ToArray(),
+                StoreId = shipmentResult.Shipment.StoreId
             };
         }       
     }

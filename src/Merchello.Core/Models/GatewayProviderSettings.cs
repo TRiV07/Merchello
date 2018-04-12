@@ -28,6 +28,11 @@
         private string _name;
 
         /// <summary>
+        /// The domain root structure ID.
+        /// </summary>
+        private int _storeId;
+
+        /// <summary>
         /// The description.
         /// </summary>
         private string _description;
@@ -61,6 +66,21 @@
             set
             {
                 SetPropertyValueAndDetectChanges(value, ref _name, _ps.Value.NameSelector);
+            }
+        }
+
+        /// <inheritdoc/>
+        [DataMember]
+        public int StoreId
+        {
+            get
+            {
+                return _storeId;
+            }
+
+            set
+            {
+                SetPropertyValueAndDetectChanges(value, ref _storeId, _ps.Value.StoreIdSelector);
             }
         }
 
@@ -198,6 +218,11 @@
             /// The encrypt extended data selector.
             /// </summary>
             public readonly PropertyInfo EncryptExtendedDataSelector = ExpressionHelper.GetPropertyInfo<GatewayProviderSettings, bool>(x => x.EncryptExtendedData);
+
+            /// <summary>
+            /// The domain root structure ID selector.
+            /// </summary>
+            public readonly PropertyInfo StoreIdSelector = ExpressionHelper.GetPropertyInfo<GatewayProviderSettings, int>(x => x.StoreId);
 
         }
     }

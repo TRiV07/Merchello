@@ -17,7 +17,7 @@ namespace Merchello.Core.Persistence.Factories
                 provinces.Add(p);
             }
 
-            var shipMethod = new ShipMethod(dto.ProviderKey, dto.ShipCountryKey)
+            var shipMethod = new ShipMethod(dto.ProviderKey, dto.StoreId, dto.ShipCountryKey)
             {
                 Key = dto.Key,
                 Name = dto.Name,              
@@ -42,6 +42,7 @@ namespace Merchello.Core.Persistence.Factories
                 Key = entity.Key,
                 Name = entity.Name,
                 ProviderKey = entity.ProviderKey,
+                StoreId = entity.StoreId,
                 ShipCountryKey = entity.ShipCountryKey,
                 Surcharge = entity.Surcharge,
                 ServiceCode = entity.ServiceCode,

@@ -351,9 +351,9 @@
         /// <returns>
         /// The <see cref="IGatewayProviderRepository"/>.
         /// </returns>
-        internal virtual IGatewayProviderRepository CreateGatewayProviderRepository(IDatabaseUnitOfWork uow)
+        internal virtual IGatewayProviderRepository CreateGatewayProviderRepository(IDatabaseUnitOfWork uow, int storeId)
         {
-            return new GatewayProviderRepository(uow, _logger, _sqlSyntax);
+            return new GatewayProviderRepository(uow, storeId, _logger, _sqlSyntax);
         }
 
         /// <summary>
@@ -379,9 +379,9 @@
         /// <returns>
         /// The <see cref="INotificationMethodRepository"/>.
         /// </returns>
-        internal virtual INotificationMethodRepository CreateNotificationMethodRepository(IDatabaseUnitOfWork uow)
+        internal virtual INotificationMethodRepository CreateNotificationMethodRepository(IDatabaseUnitOfWork uow, int storeId)
         {
-            return new NotificationMethodRepository(uow, _logger, _sqlSyntax);
+            return new NotificationMethodRepository(uow, storeId, _logger, _sqlSyntax);
         }
 
         /// <summary>
@@ -477,9 +477,9 @@
         /// <returns>
         /// The <see cref="IPaymentMethodRepository"/>.
         /// </returns>
-        internal virtual IPaymentMethodRepository CreatePaymentMethodRepository(IDatabaseUnitOfWork uow)
+        internal virtual IPaymentMethodRepository CreatePaymentMethodRepository(IDatabaseUnitOfWork uow, int storeId)
         {
-            return new PaymentMethodRepository(uow, _logger, _sqlSyntax);
+            return new PaymentMethodRepository(uow, storeId, _logger, _sqlSyntax);
         }
 
         /// <summary>
@@ -559,9 +559,9 @@
         /// <returns>
         /// The <see cref="IShipMethodRepository"/>.
         /// </returns>
-        internal virtual IShipMethodRepository CreateShipMethodRepository(IDatabaseUnitOfWork uow)
+        internal virtual IShipMethodRepository CreateShipMethodRepository(IDatabaseUnitOfWork uow, int storeId)
         {
-            return new ShipMethodRepository(uow, _logger, _sqlSyntax);
+            return new ShipMethodRepository(uow, storeId, _logger, _sqlSyntax);
         }
 
         /// <summary>
@@ -629,9 +629,9 @@
         /// <returns>
         /// The <see cref="ITaxMethodRepository"/>.
         /// </returns>
-        internal virtual ITaxMethodRepository CreateTaxMethodRepository(IDatabaseUnitOfWork uow)
+        internal virtual ITaxMethodRepository CreateTaxMethodRepository(IDatabaseUnitOfWork uow, int storeId)
         {
-            return new TaxMethodRepository(uow, _logger, _sqlSyntax);
+            return new TaxMethodRepository(uow, storeId, _logger, _sqlSyntax);
         }
 
         /// <summary>

@@ -169,7 +169,7 @@
                 if (record == null || record.HasIdentity) continue;
 
                 // we have to include inactive providers here since this is the process of activating the provider
-                var provider = MerchelloContext.Current.Gateways.Payment.GetProviderByKey(record.Key, false);
+                var provider = MerchelloContext.Current.Gateways.Payment.GetProviderByKey(record.Key, record.StoreId, false);
                 if (provider == null) continue;
                 
                 var attempt = ProviderSettingsResolver.Current.ResolveByType(provider.GetType());

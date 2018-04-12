@@ -34,7 +34,8 @@
         protected BraintreeWebhooksControllerBase(UmbracoContext umbracoContext)
             : base(umbracoContext)
         {
-            this.BraintreeApiService = new BraintreeApiService(BraintreeApiHelper.GetBraintreeProviderSettings());
+            //TODOMS
+            this.BraintreeApiService = new BraintreeApiService(BraintreeApiHelper.GetBraintreeProviderSettings(0));
         }
 
         /// <summary>

@@ -63,7 +63,7 @@
         public override IPaymentMethod GetPaymentMethod()
         {
             var paymentMethodKey = this.Context.Customer.ExtendedData.GetPaymentMethodKey();
-            var paymentMethod = this.Context.Gateways.Payment.GetPaymentGatewayMethodByKey(paymentMethodKey);
+            var paymentMethod = this.Context.Gateways.Payment.GetPaymentGatewayMethodByKey(paymentMethodKey, this.Context.Customer.StoreId);
             return paymentMethodKey.Equals(Guid.Empty) || paymentMethod == null ? null : paymentMethod.PaymentMethod;
         }
 
@@ -110,7 +110,7 @@
         /// <returns>The <see cref="IPaymentResult"/></returns>
         public override IPaymentResult AuthorizePayment(Guid paymentMethodKey, ProcessorArgumentCollection args)
         {
-            var paymentMethod = this.Context.Gateways.Payment.GetPaymentGatewayMethods().FirstOrDefault(x => x.PaymentMethod.Key.Equals(paymentMethodKey));
+            var paymentMethod = this.Context.Gateways.Payment.GetPaymentGatewayMethods(this.Context.Customer.StoreId).FirstOrDefault(x => x.PaymentMethod.Key.Equals(paymentMethodKey));
 
             return this.AuthorizePayment(paymentMethod, args);
         }
@@ -169,7 +169,7 @@
         /// <returns>A <see cref="IPaymentResult"/></returns>
         public override IPaymentResult AuthorizeCapturePayment(Guid paymentMethodKey, ProcessorArgumentCollection args)
         {
-            var paymentMethod = this.Context.Gateways.Payment.GetPaymentGatewayMethods().FirstOrDefault(x => x.PaymentMethod.Key.Equals(paymentMethodKey));
+            var paymentMethod = this.Context.Gateways.Payment.GetPaymentGatewayMethods(this.Context.Customer.StoreId).FirstOrDefault(x => x.PaymentMethod.Key.Equals(paymentMethodKey));
 
             return this.AuthorizeCapturePayment(paymentMethod, args);
         }

@@ -44,7 +44,7 @@
         {
             get
             {
-                return _taxMethods ?? GatewayProviderService.GetTaxMethodsByProviderKey(GatewayProviderSettings.Key);
+                return _taxMethods ?? GatewayProviderService.GetTaxMethodsByProviderKey(GatewayProviderSettings.Key, GatewayProviderSettings.StoreId);
             }
 
             internal set

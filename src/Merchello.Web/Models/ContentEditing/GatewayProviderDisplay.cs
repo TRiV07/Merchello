@@ -18,6 +18,8 @@
         /// </summary>
         public Guid Key { get; set; }
 
+        public int StoreId { get; set; }
+
         /// <summary>
         /// Gets or sets the provider type field key.
         /// </summary>

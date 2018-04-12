@@ -99,7 +99,7 @@
                 throw error;
             }
 
-            var attempt = this.GatewayProviderService.CreatePaymentMethodWithKey(this.GatewayProviderSettings.Key, name, description, available.ServiceCode);
+            var attempt = this.GatewayProviderService.CreatePaymentMethodWithKey(this.GatewayProviderSettings.Key, this.StoreId, name, description, available.ServiceCode);
 
             if (attempt.Success)
             {

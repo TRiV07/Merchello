@@ -23,10 +23,12 @@
     [PluginController("Merchello")]
     public class BraintreeApiController : UmbracoApiController
     {
-        /// <summary>
-        /// The <see cref="IBraintreeApiService"/>.
-        /// </summary>
-        private readonly IBraintreeApiService _braintreeApiService;
+        ///// <summary>
+        ///// The <see cref="IBraintreeApiService"/>.
+        ///// </summary>
+        //private readonly IBraintreeApiService _braintreeApiService;
+
+        private readonly IMerchelloContext _merchelloContext;
 
         /// <summary>
         /// The customer service.
@@ -49,21 +51,22 @@
         /// </param>
         public BraintreeApiController(IMerchelloContext merchelloContext)
         {
-            if (merchelloContext == null) throw new ArgumentNullException("merchelloContext");
-            var provider = (BraintreePaymentGatewayProvider)merchelloContext.Gateways.Payment.GetProviderByKey(Constants.Braintree.GatewayProviderSettingsKey);
-
-            if (provider  == null)
-            {
-                var ex = new NullReferenceException("The BraintreePaymentGatewayProvider could not be resolved.  The provider must be activiated");
-                LogHelper.Error<BraintreeApiController>("BraintreePaymentGatewayProvider not activated.", ex);
-                throw ex;
-            }
-
             this._customerService = merchelloContext.Services.CustomerService;
+            this._merchelloContext = merchelloContext;
 
-            var settings = provider.ExtendedData.GetBrainTreeProviderSettings();
+            //if (merchelloContext == null) throw new ArgumentNullException("merchelloContext");
+            //var provider = (BraintreePaymentGatewayProvider)merchelloContext.Gateways.Payment.GetProviderByKey(Constants.Braintree.GatewayProviderSettingsKey);
 
-            this._braintreeApiService = new BraintreeApiService(merchelloContext, settings);
+            //if (provider  == null)
+            //{
+            //    var ex = new NullReferenceException("The BraintreePaymentGatewayProvider could not be resolved.  The provider must be activiated");
+            //    LogHelper.Error<BraintreeApiController>("BraintreePaymentGatewayProvider not activated.", ex);
+            //    throw ex;
+            //}
+
+            //var settings = provider.ExtendedData.GetBrainTreeProviderSettings();
+
+            //this._braintreeApiService = new BraintreeApiService(merchelloContext, settings);
         }
 
         /// <summary>
@@ -78,16 +81,25 @@
         [HttpGet]
         public string GetClientRequestToken(Guid customerKey)
         {
-            if (customerKey == Guid.Empty)
-            {
-                return this._braintreeApiService.Customer.GenerateClientRequestToken();
-            } 
-
             var customer = this._customerService.GetAnyByKey(customerKey);
 
+            if (_merchelloContext == null) throw new ArgumentNullException("merchelloContext");
+            var provider = (BraintreePaymentGatewayProvider)_merchelloContext.Gateways.Payment.GetProviderByKey(Constants.Braintree.GatewayProviderSettingsKey, customer.StoreId);
+
+            if (provider == null)
+            {
+                var ex = new NullReferenceException("The BraintreePaymentGatewayProvider could not be resolved.  The provider must be activiated");
+                LogHelper.Error<BraintreeApiController>("BraintreePaymentGatewayProvider not activated.", ex);
+                throw ex;
+            }
+
+            var settings = provider.ExtendedData.GetBrainTreeProviderSettings();
+
+            var braintreeApiService = new BraintreeApiService(_merchelloContext, settings);
+
             return customer.IsAnonymous
-                       ? this._braintreeApiService.Customer.GenerateClientRequestToken()
-                       : this._braintreeApiService.Customer.GenerateClientRequestToken((ICustomer)customer);
+                       ? braintreeApiService.Customer.GenerateClientRequestToken()
+                       : braintreeApiService.Customer.GenerateClientRequestToken((ICustomer)customer);
         }
 
         /// <summary>
@@ -99,7 +111,8 @@
         [HttpGet]
         public string GetClientRequestToken()
         {
-            return this._braintreeApiService.Customer.GenerateClientRequestToken();
+            //return this._braintreeApiService.Customer.GenerateClientRequestToken();
+            throw new NotImplementedException();
         }
 
     }

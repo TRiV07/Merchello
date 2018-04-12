@@ -18,11 +18,18 @@
     using Umbraco.Core.Persistence.Querying;
     using Umbraco.Core.Persistence.SqlSyntax;
 
+    using MS = Merchello.Core.Constants.MultiStore;
+
     /// <summary>
     /// Represents the PaymentMethodRepository
     /// </summary>
     internal class PaymentMethodRepository : MerchelloPetaPocoRepositoryBase<IPaymentMethod>, IPaymentMethodRepository
     {
+        /// <summary>
+        /// The domain root structure ID.
+        /// </summary>
+        private readonly int _storeId;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="PaymentMethodRepository"/> class.
         /// </summary>
@@ -38,9 +45,10 @@
         /// <param name="sqlSyntax">
         /// The SQL syntax.
         /// </param>
-        public PaymentMethodRepository(IDatabaseUnitOfWork work, ILogger logger, ISqlSyntaxProvider sqlSyntax)
+        public PaymentMethodRepository(IDatabaseUnitOfWork work, int storeId, ILogger logger, ISqlSyntaxProvider sqlSyntax)
             : base(work, logger, sqlSyntax)
         {
+            _storeId = storeId;
         }
 
         /// <summary>
@@ -89,6 +97,8 @@
                 {
                     dtos.AddRange(Database.Fetch<PaymentMethodDto>(GetBaseQuery(false).WhereIn<PaymentMethodDto>(x => x.Key, keyList, SqlSyntax)));
                 }
+
+                dtos = keys.Select(k => dtos.FirstOrDefault(x => x.Key == k)).ToList();
             }
             else
             {
@@ -137,6 +147,11 @@
             var sql = new Sql();
             sql.Select(isCount ? "COUNT(*)" : "*")
                 .From<PaymentMethodDto>(SqlSyntax);
+
+            if (_storeId != MS.DefaultId)
+            {
+                sql.Where<PaymentMethodDto>(x => x.StoreId == _storeId, SqlSyntax);
+            }
 
             return sql;
         }

@@ -31,6 +31,11 @@
         private readonly Guid _providerKey;
 
         /// <summary>
+        /// The domain root structure ID.
+        /// </summary>
+        private int _storeId;
+
+        /// <summary>
         /// The ship country key.
         /// </summary>
         private readonly Guid _shipCountryKey;
@@ -64,8 +69,8 @@
         /// <param name="shipCountryKey">
         /// The ship country key.
         /// </param>
-        internal ShipMethod(Guid providerKey, Guid shipCountryKey)
-            : this(providerKey, shipCountryKey, new ProvinceCollection<IShipProvince>())
+        internal ShipMethod(Guid providerKey, int storeId, Guid shipCountryKey)
+            : this(providerKey, storeId, shipCountryKey, new ProvinceCollection<IShipProvince>())
         {
         }
 
@@ -81,13 +86,14 @@
         /// <param name="shipProvinces">
         /// The ship provinces.
         /// </param>
-        internal ShipMethod(Guid providerKey, Guid shipCountryKey, ProvinceCollection<IShipProvince> shipProvinces)
+        internal ShipMethod(Guid providerKey, int storeId, Guid shipCountryKey, ProvinceCollection<IShipProvince> shipProvinces)
         {
             Ensure.ParameterCondition(Guid.Empty != providerKey, "providerKey");
             Ensure.ParameterCondition(Guid.Empty != shipCountryKey, "shipCountryKey");
             Ensure.ParameterNotNull(shipProvinces, "provinces");
 
             _providerKey = providerKey;
+            _storeId = storeId;
             _shipCountryKey = shipCountryKey;
             _shipProvinces = shipProvinces;
         }
@@ -115,7 +121,17 @@
             get
             {
                 return _providerKey;
-            }           
+            }
+        }
+
+        /// <inheritdoc/>
+        [DataMember]
+        public int StoreId
+        {
+            get
+            {
+                return _storeId;
+            }
         }
 
         /// <inheritdoc/>

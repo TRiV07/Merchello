@@ -9,6 +9,8 @@ using Merchello.Core.Persistence.UnitOfWork;
 using Umbraco.Core;
 using Umbraco.Core.Events;
 
+using MMS = Merchello.Core.Constants.MultiStore;
+
 namespace Merchello.Core.Services
 {
     using Merchello.Core.Events;
@@ -104,12 +106,12 @@ namespace Merchello.Core.Services
         /// <param name="serviceCode">The notification service code</param>
         /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events</param>
         /// <returns>An Attempt{<see cref="INotificationMethod"/>}</returns>
-        public Attempt<INotificationMethod> CreateNotificationMethodWithKey(Guid providerKey, string name, string serviceCode, bool raiseEvents = true)
+        public Attempt<INotificationMethod> CreateNotificationMethodWithKey(Guid providerKey, int storeId, string name, string serviceCode, bool raiseEvents = true)
         {
             Mandate.ParameterNotNullOrEmpty(name, "name");
             Mandate.ParameterNotNullOrEmpty(serviceCode, "serviceCode");
 
-            var notificationMethod = new NotificationMethod(providerKey)
+            var notificationMethod = new NotificationMethod(providerKey, storeId)
             {
                 Name = name, 
                 ServiceCode = serviceCode
@@ -125,7 +127,7 @@ namespace Merchello.Core.Services
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreateNotificationMethodRepository(uow))
+                using (var repository = RepositoryFactory.CreateNotificationMethodRepository(uow, storeId))
                 {
                     repository.AddOrUpdate(notificationMethod);
                     uow.Commit();
@@ -154,7 +156,7 @@ namespace Merchello.Core.Services
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreateNotificationMethodRepository(uow))
+                using (var repository = RepositoryFactory.CreateNotificationMethodRepository(uow, notificationMethod.StoreId))
                 {
                     repository.AddOrUpdate(notificationMethod);
                     uow.Commit();
@@ -177,7 +179,7 @@ namespace Merchello.Core.Services
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreateNotificationMethodRepository(uow))
+                using (var repository = RepositoryFactory.CreateNotificationMethodRepository(uow, MMS.DefaultId))
                 {
                     foreach (var notificationMethod in notificationMethodsArray)
                     {
@@ -207,7 +209,7 @@ namespace Merchello.Core.Services
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreateNotificationMethodRepository(uow))
+                using (var repository = RepositoryFactory.CreateNotificationMethodRepository(uow, notificationMethod.StoreId))
                 {
                     repository.Delete(notificationMethod);
                     uow.Commit();
@@ -232,7 +234,7 @@ namespace Merchello.Core.Services
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreateNotificationMethodRepository(uow))
+                using (var repository = RepositoryFactory.CreateNotificationMethodRepository(uow, MMS.DefaultId))
                 {
                     foreach (var notificationMethod in notificationMethodsArray)
                     {
@@ -253,7 +255,7 @@ namespace Merchello.Core.Services
         /// <returns>The <see cref="INotificationMethod"/></returns>
         public INotificationMethod GetByKey(Guid key)
         {
-            using (var repository = RepositoryFactory.CreateNotificationMethodRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateNotificationMethodRepository(UowProvider.GetUnitOfWork(), MMS.DefaultId))
             {
                 return repository.Get(key);
             }
@@ -264,9 +266,9 @@ namespace Merchello.Core.Services
         /// </summary>
         /// <param name="providerKey">The <see cref="IGatewayProviderSettings"/> key</param>
         /// <returns>A collection of all <see cref="INotificationMethod"/> associated with a provider</returns>
-        public IEnumerable<INotificationMethod> GetNotifcationMethodsByProviderKey(Guid providerKey)
+        public IEnumerable<INotificationMethod> GetNotifcationMethodsByProviderKey(Guid providerKey, int storeId)
         {
-            using(var repository = RepositoryFactory.CreateNotificationMethodRepository(UowProvider.GetUnitOfWork()))
+            using(var repository = RepositoryFactory.CreateNotificationMethodRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 var query = Query<INotificationMethod>.Builder.Where(x => x.ProviderKey == providerKey);
 
@@ -278,9 +280,9 @@ namespace Merchello.Core.Services
         /// Gets a collection of all notification methods.  
         /// </summary>
         /// <remarks>Primarily used for testing</remarks>
-        internal IEnumerable<INotificationMethod> GetAll()
+        internal IEnumerable<INotificationMethod> GetAll(int storeId)
         {
-            using (var repository = RepositoryFactory.CreateNotificationMethodRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateNotificationMethodRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 return repository.GetAll();
             }

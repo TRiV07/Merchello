@@ -9,7 +9,7 @@
     /// <summary>
     /// Defines a Gateway Provider
     /// </summary>
-    public interface IGatewayProviderSettings : IHasExtendedData, IEntity
+    public interface IGatewayProviderSettings : IHasDomainRoot, IHasExtendedData, IEntity
     {
         /// <summary>
         /// Gets or sets the type field key for the provider

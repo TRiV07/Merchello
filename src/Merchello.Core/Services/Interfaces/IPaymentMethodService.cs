@@ -50,19 +50,19 @@ namespace Merchello.Core.Services
         /// </summary>
         /// <param name="providerKey">The unique 'key' of the PaymentGatewayProvider</param>
         /// <returns>A collection of <see cref="IPaymentMethod"/></returns>
-        IEnumerable<IPaymentMethod> GetPaymentMethodsByProviderKey(Guid providerKey);
+        IEnumerable<IPaymentMethod> GetPaymentMethodsByProviderKey(Guid providerKey, int storeId);
 
         /// <summary>
         /// Returns a <see cref="IPaymentMethod"/> given is't paymentCode 
         /// </summary>
         /// <param name="providerKey">The unique 'key' of the PaymentGatewayProvider</param>
         /// <param name="paymentCode">The paymentCode</param>
-        IPaymentMethod GetPaymentMethodByPaymentCode(Guid providerKey, string paymentCode);
+        IPaymentMethod GetPaymentMethodByPaymentCode(Guid providerKey, int storeId, string paymentCode);
 
         /// <summary>
         /// Gets a collection of all <see cref="IPaymentMethod"/>
         /// </summary>
-        IEnumerable<IPaymentMethod> GetAll();
+        IEnumerable<IPaymentMethod> GetAll(int storeId);
 
 
     }

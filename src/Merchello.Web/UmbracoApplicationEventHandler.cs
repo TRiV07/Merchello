@@ -384,7 +384,7 @@
             if (setting.Value == "Product") return;
             
             var taxMethodService = ((ServiceContext)MerchelloContext.Current.Services).TaxMethodService;
-            var methods = taxMethodService.GetAll().ToArray();
+            var methods = taxMethodService.GetAll(Core.Constants.MultiStore.DefaultId).ToArray();
             foreach (var method in methods)
             {
                 method.ProductTaxMethod = false;

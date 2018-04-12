@@ -19,11 +19,18 @@
     using Umbraco.Core.Persistence.Querying;
     using Umbraco.Core.Persistence.SqlSyntax;
 
+    using MS = Merchello.Core.Constants.MultiStore;
+
     /// <summary>
     /// The ship method repository.
     /// </summary>
     internal class ShipMethodRepository : MerchelloPetaPocoRepositoryBase<IShipMethod>, IShipMethodRepository
     {
+        /// <summary>
+        /// The domain root structure ID.
+        /// </summary>
+        private readonly int _storeId;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ShipMethodRepository"/> class.
         /// </summary>
@@ -38,10 +45,12 @@
         /// </param>
         public ShipMethodRepository(
             IDatabaseUnitOfWork work,
+            int storeId,
             ILogger logger,
             ISqlSyntaxProvider sqlSyntax)
             : base(work, logger, sqlSyntax)
-        {            
+        {
+            _storeId = storeId;
         }
 
         /// <summary>
@@ -90,6 +99,8 @@
                 {
                     dtos.AddRange(Database.Fetch<ShipMethodDto>(GetBaseQuery(false).WhereIn<ShipMethodDto>(x => x.Key, keyList, SqlSyntax)));
                 }
+
+                dtos = keys.Select(k => dtos.FirstOrDefault(x => x.Key == k)).ToList();
             }
             else
             {
@@ -137,6 +148,11 @@
             var sql = new Sql();
             sql.Select(isCount ? "COUNT(*)" : "*")
                 .From<ShipMethodDto>(SqlSyntax);
+
+            if (_storeId != MS.DefaultId)
+            {
+                sql.Where<ShipMethodDto>(x => x.StoreId == _storeId, SqlSyntax);
+            }
 
             return sql;
         }

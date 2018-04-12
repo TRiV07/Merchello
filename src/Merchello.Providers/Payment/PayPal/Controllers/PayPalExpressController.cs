@@ -235,8 +235,8 @@
         /// </summary>
         private void Initialize()
         {
-            
-            var provider = GatewayContext.Payment.GetProviderByKey(Constants.PayPal.GatewayProviderSettingsKey) as PayPalPaymentGatewayProvider;
+            //TOCHECKMS
+            var provider = GatewayContext.Payment.GetProviderByKey(Constants.PayPal.GatewayProviderSettingsKey, CustomerContext.CurrentCustomer.StoreId) as PayPalPaymentGatewayProvider;
             if (provider == null)
             {
                 var nullRef =

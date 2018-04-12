@@ -16,7 +16,7 @@
 
         #region GatewayProvider
 
-      
+
         /// <summary>
         /// Saves a single instance of a <see cref="IGatewayProviderSettings"/>
         /// </summary>
@@ -37,27 +37,29 @@
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        IGatewayProviderSettings GetGatewayProviderByKey(Guid key);
+        IGatewayProviderSettings GetGatewayProviderByKey(Guid key, int storeId);
 
         /// <summary>
         /// Gets a collection of <see cref="IGatewayProviderSettings"/> by its type (Shipping, Taxation, Payment)
         /// </summary>
         /// <param name="gatewayProviderType"></param>
         /// <returns></returns>
-        IEnumerable<IGatewayProviderSettings> GetGatewayProvidersByType(GatewayProviderType gatewayProviderType);
+        IEnumerable<IGatewayProviderSettings> GetGatewayProvidersByType(GatewayProviderType gatewayProviderType, int storeId);
 
         /// <summary>
         /// Gets a collection of <see cref="IGatewayProviderSettings"/> by ship country
         /// </summary>
         /// <param name="shipCountry"></param>
         /// <returns></returns>
-        IEnumerable<IGatewayProviderSettings> GetGatewayProvidersByShipCountry(IShipCountry shipCountry); 
+        IEnumerable<IGatewayProviderSettings> GetGatewayProvidersByShipCountry(IShipCountry shipCountry);
+
+        IEnumerable<int> GetAllStoresIds();
 
         /// <summary>
         /// Gets a collection containing all <see cref="IGatewayProviderSettings"/>
         /// </summary>
         /// <returns></returns>
-        IEnumerable<IGatewayProviderSettings> GetAllGatewayProviders(); 
+        IEnumerable<IGatewayProviderSettings> GetAllGatewayProviders(int storeId);
 
         #endregion
 
@@ -75,7 +77,7 @@
         /// </summary>
         /// <param name="invoiceKey">The invoice key</param>
         /// <returns>A collection of <see cref="IAppliedPayment"/></returns>
-        IEnumerable<IAppliedPayment> GetAppliedPaymentsByInvoiceKey(Guid invoiceKey); 
+        IEnumerable<IAppliedPayment> GetAppliedPaymentsByInvoiceKey(Guid invoiceKey);
 
         /// <summary>
         /// Saves a single <see cref="IAppliedPayment"/>
@@ -106,7 +108,7 @@
         /// <param name="description">The description of the payment method</param>
         /// <param name="paymentCode">The unique 'payment code' associated with the payment method.  (Eg. visa, mc)</param>
         /// <returns><see cref="Attempt"/> indicating whether or not the creation of the <see cref="IPaymentMethod"/> with respective success or fail</returns>
-        Attempt<IPaymentMethod> CreatePaymentMethodWithKey(Guid providerKey, string name, string description, string paymentCode);
+        Attempt<IPaymentMethod> CreatePaymentMethodWithKey(Guid providerKey, int storeId, string name, string description, string paymentCode);
 
         /// <summary>
         /// Saves a single <see cref="IPaymentMethod"/>
@@ -125,7 +127,7 @@
         /// </summary>
         /// <param name="providerKey">The unique 'key' of the PaymentGatewayProvider</param>
         /// <returns>A collection of <see cref="IPaymentMethod"/></returns>
-        IEnumerable<IPaymentMethod> GetPaymentMethodsByProviderKey(Guid providerKey);
+        IEnumerable<IPaymentMethod> GetPaymentMethodsByProviderKey(Guid providerKey, int storeId);
 
         #endregion
 
@@ -184,7 +186,7 @@
         /// <param name="name">The name of the notification (used in back office)</param>
         /// <param name="serviceCode">The notification service code</param>        
         /// <returns>An Attempt{<see cref="INotificationMethod"/>}</returns>
-        Attempt<INotificationMethod> CreateNotificationMethodWithKey(Guid providerKey, string name, string serviceCode);
+        Attempt<INotificationMethod> CreateNotificationMethodWithKey(Guid providerKey, int storeId, string name, string serviceCode);
 
         /// <summary>
         /// Saves a <see cref="INotificationMethod"/>
@@ -227,15 +229,15 @@
         /// </summary>
         /// <param name="providerKey">The unique 'key' of the NotificationGatewayProvider</param>
         /// <returns>A collection of <see cref="INotificationMethod"/></returns>
-        IEnumerable<INotificationMethod> GetNotificationMethodsByProviderKey(Guid providerKey);
+        IEnumerable<INotificationMethod> GetNotificationMethodsByProviderKey(Guid providerKey, int storeId);
 
         /// <summary>
         /// Gets a collection of <see cref="INotificationMessage"/> associated with a <see cref="INotificationMethod"/>
         /// </summary>
         /// <param name="notificationMethodKey">The key (Guid) of the <see cref="INotificationMethod"/></param>
         /// <returns>A collection of <see cref="INotificationMessage"/></returns>
-        IEnumerable<INotificationMessage> GetNotificationMessagesByMethodKey(Guid notificationMethodKey); 
-        
+        IEnumerable<INotificationMessage> GetNotificationMessagesByMethodKey(Guid notificationMethodKey);
+
         /// <summary>
         /// Gets a <see cref="INotificationMethod"/> by it's unique key(Guid)
         /// </summary>
@@ -263,7 +265,7 @@
         /// <param name="shipCountry">The <see cref="IShipCountry"/> this ship method is to be associated with</param>
         /// <param name="name">The required name of the <see cref="IShipMethod"/></param>
         /// <param name="serviceCode">The ShipMethods service code</param>
-        Attempt<IShipMethod> CreateShipMethodWithKey(Guid providerKey, IShipCountry shipCountry, string name, string serviceCode);
+        Attempt<IShipMethod> CreateShipMethodWithKey(Guid providerKey, int storeId, IShipCountry shipCountry, string name, string serviceCode);
 
         /// <summary>
         /// Saves a single <see cref="IShipMethod"/>
@@ -293,7 +295,7 @@
         /// Gets a list of all <see cref="IShipMethod"/> objects given a <see cref="IGatewayProviderSettings"/> key
         /// </summary>
         /// <returns>A collection of <see cref="IShipMethod"/></returns>
-        IEnumerable<IShipMethod> GetShipMethodsByShipCountryKey(Guid providerKey);
+        IEnumerable<IShipMethod> GetShipMethodsByShipCountryKey(Guid providerKey, int storeId);
 
         /// <summary>
         /// Gets a <see cref="IShipMethod"/> by it's unique key
@@ -308,7 +310,7 @@
         /// <returns>
         /// The <see cref="IEnumerable{IShipMethod}"/>s.
         /// </returns>
-        IEnumerable<IShipMethod> GetAllShipMethods();
+        IEnumerable<IShipMethod> GetAllShipMethods(int storeId);
 
         #endregion
 
@@ -362,9 +364,10 @@
         /// Returns a collection of all <see cref="IShipCountry"/>
         /// </summary>
         /// <returns>A collection of all <see cref="IShipCountry"/></returns>
+        /// TODOMS separate it by stores
         IEnumerable<IShipCountry> GetAllShipCountries();
 
-            #endregion
+        #endregion
 
         #region Statuses
 
@@ -391,7 +394,7 @@
         /// <param name="countryCode">The two character ISO country code</param>
         /// <param name="percentageTaxRate">The tax rate in percentage for the country</param>
         /// <returns><see cref="Attempt"/> indicating whether or not the creation of the <see cref="ITaxMethod"/> with respective success or fail</returns>
-        Attempt<ITaxMethod> CreateTaxMethodWithKey(Guid providerKey, string countryCode, decimal percentageTaxRate);
+        Attempt<ITaxMethod> CreateTaxMethodWithKey(Guid providerKey, int storeId, string countryCode, decimal percentageTaxRate);
 
         /// <summary>
         /// Gets a <see cref="ITaxMethod"/> based on a provider and country code
@@ -399,7 +402,7 @@
         /// <param name="providerKey">The unique 'key' of the <see cref="IGatewayProviderSettings"/></param>
         /// <param name="countryCode">The country code of the <see cref="ITaxMethod"/></param>
         /// <returns>A collection <see cref="ITaxMethod"/></returns>
-        ITaxMethod GetTaxMethodByCountryCode(Guid providerKey, string countryCode);
+        ITaxMethod GetTaxMethodByCountryCode(Guid providerKey, int storeId, string countryCode);
 
         /// <summary>
         /// Get tax method for product pricing.
@@ -410,14 +413,14 @@
         /// <remarks>
         /// There can be only one =)
         /// </remarks>
-        ITaxMethod GetTaxMethodForProductPricing();
+        ITaxMethod GetTaxMethodForProductPricing(int storeId);
 
         /// <summary>
         /// Gets a collection of <see cref="ITaxMethod"/> based on a provider and country code
         /// </summary>
         /// <param name="countryCode">The country code of the <see cref="ITaxMethod"/></param>
         /// <returns><see cref="ITaxMethod"/></returns>
-        IEnumerable<ITaxMethod> GetTaxMethodsByCountryCode(string countryCode);
+        IEnumerable<ITaxMethod> GetTaxMethodsByCountryCode(int storeId, string countryCode);
 
         /// <summary>
         /// Saves a single <see cref="ITaxMethod"/>
@@ -436,7 +439,7 @@
         /// </summary>
         /// <param name="providerKey">The unique 'key' of the TaxationGatewayProvider</param>
         /// <returns>A collection of <see cref="ITaxMethod"/></returns>
-        IEnumerable<ITaxMethod> GetTaxMethodsByProviderKey(Guid providerKey);
+        IEnumerable<ITaxMethod> GetTaxMethodsByProviderKey(Guid providerKey, int storeId);
 
         #endregion
 

@@ -38,7 +38,7 @@
                 });
 
                 $scope.tabs = merchelloTabsFactory.createGatewayProviderTabs();
-                $scope.tabs.insertTab('messageEditor', 'merchelloTabs_message', '#/merchello/merchello/notification.messageeditor/' + key, 2);
+                $scope.tabs.insertTab('messageEditor', 'merchelloTabs_message', '#/merchello/merchello/notification.messageeditor/' + key + '/store/' + $routeParams.storeId, 2);
                 $scope.tabs.setActive('messageEditor');
 
                 $scope.loaded = true;
@@ -71,7 +71,7 @@
         function notificationsMessageDeleteDialogConfirm(dialogData) {
             var promiseNotificationMethod = notificationGatewayProviderResource.deleteNotificationMessage(dialogData.notificationMessage.key);
             promiseNotificationMethod.then(function () {
-                $location.url('merchello/merchello/notificationproviders/manage', true);
+                $location.url('merchello/merchello/notificationproviders/manage' + '/store/' + $routeParams.storeId, true);
             }, function (reason) {
                 notificationsService.error("Notification Method Deletion Failed", reason.message);
             });

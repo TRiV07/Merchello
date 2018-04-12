@@ -274,7 +274,7 @@
         public IPaymentMethod GetPaymentMethod()
         {
             var paymentMethodKey = _customer.ExtendedData.GetPaymentMethodKey();
-            var paymentMethod = _merchelloContext.Gateways.Payment.GetPaymentGatewayMethodByKey(paymentMethodKey);
+            var paymentMethod = _merchelloContext.Gateways.Payment.GetPaymentGatewayMethodByKey(paymentMethodKey, Customer.StoreId);
             return paymentMethodKey.Equals(Guid.Empty) || paymentMethod == null ? null : paymentMethod.PaymentMethod;
         }
 
@@ -373,7 +373,7 @@
         /// <returns>A collection of <see cref="IPaymentGatewayMethod"/>s</returns>
         public IEnumerable<IPaymentGatewayMethod> GetPaymentGatewayMethods()
         {
-            return _merchelloContext.Gateways.Payment.GetPaymentGatewayMethods();
+            return _merchelloContext.Gateways.Payment.GetPaymentGatewayMethods(Customer.StoreId);
         }
 
         /// <summary>
@@ -418,7 +418,7 @@
         /// <returns>The <see cref="IPaymentResult"/></returns>
         public virtual IPaymentResult AuthorizePayment(Guid paymentMethodKey, ProcessorArgumentCollection args)
         {
-            var paymentMethod = _merchelloContext.Gateways.Payment.GetPaymentGatewayMethods().FirstOrDefault(x => x.PaymentMethod.Key.Equals(paymentMethodKey));
+            var paymentMethod = _merchelloContext.Gateways.Payment.GetPaymentGatewayMethods(Customer.StoreId).FirstOrDefault(x => x.PaymentMethod.Key.Equals(paymentMethodKey));
 
             return AuthorizePayment(paymentMethod, args);
         }
@@ -475,7 +475,7 @@
         /// <returns>A <see cref="IPaymentResult"/></returns>
         public virtual IPaymentResult AuthorizeCapturePayment(Guid paymentMethodKey, ProcessorArgumentCollection args)
         {
-            var paymentMethod = _merchelloContext.Gateways.Payment.GetPaymentGatewayMethods().FirstOrDefault(x => x.PaymentMethod.Key.Equals(paymentMethodKey));
+            var paymentMethod = _merchelloContext.Gateways.Payment.GetPaymentGatewayMethods(Customer.StoreId).FirstOrDefault(x => x.PaymentMethod.Key.Equals(paymentMethodKey));
 
             return AuthorizeCapturePayment(paymentMethod, args);
         }

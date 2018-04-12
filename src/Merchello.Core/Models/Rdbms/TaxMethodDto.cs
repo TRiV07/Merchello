@@ -1,5 +1,6 @@
 ﻿namespace Merchello.Core.Models.Rdbms
 {
+    using Merchello.Core.Models.EntityBase;
     using System;
 
     using Umbraco.Core.Persistence;
@@ -11,7 +12,7 @@
     [TableName("merchTaxMethod")]
     [PrimaryKey("pk", autoIncrement = false)]
     [ExplicitColumns]
-    internal class TaxMethodDto
+    internal class TaxMethodDto : IHasDomainRoot
     {
         /// <summary>
         /// Gets or sets the key.
@@ -25,8 +26,12 @@
         /// Gets or sets the provider key.
         /// </summary>
         [Column("providerKey")]
-        [ForeignKey(typeof(GatewayProviderSettingsDto), Name = "FK_merchTaxMethod_merchGatewayProviderSettings", Column = "pk")]
+        //[ForeignKey(typeof(GatewayProviderSettingsDto), Name = "FK_merchTaxMethod_merchGatewayProviderSettings", Column = "pk")]
         public Guid ProviderKey { get; set; }
+
+        [Column("storeId")]
+        [Constraint(Default = Constants.MultiStore.DefaultId)]
+        public int StoreId { get; set; }
 
         /// <summary>
         /// Gets or sets the name.

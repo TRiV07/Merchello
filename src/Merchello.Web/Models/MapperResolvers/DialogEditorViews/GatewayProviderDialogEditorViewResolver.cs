@@ -25,7 +25,7 @@
         protected override DialogEditorViewDisplay ResolveCore(IGatewayProviderSettings source)
         {
             // Check for custom attribute
-            var provider = GatewayProviderResolver.Current.GetAllProviders().FirstOrDefault(x => x.Key == source.Key);
+            var provider = GatewayProviderResolver.Current.GetAllProviders(source.StoreId).FirstOrDefault(x => x.Key == source.Key);
 
             if (provider == null) return null;
 

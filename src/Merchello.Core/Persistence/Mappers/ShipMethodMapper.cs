@@ -23,6 +23,7 @@ namespace Merchello.Core.Persistence.Mappers
             CacheMap<ShipMethod, ShipMethodDto>(src => src.Key, dto => dto.Key);
             CacheMap<ShipMethod, ShipMethodDto>(src => src.Name, dto => dto.Name);
             CacheMap<ShipMethod, ShipMethodDto>(src => src.ProviderKey, dto => dto.ProviderKey);
+            CacheMap<ShipMethod, ShipMethodDto>(src => src.StoreId, dto => dto.StoreId);
             CacheMap<ShipMethod, ShipMethodDto>(src => src.ShipCountryKey, dto => dto.ShipCountryKey);
             CacheMap<ShipMethod, ShipMethodDto>(src => src.Surcharge, dto => dto.Surcharge);
             CacheMap<ShipMethod, ShipMethodDto>(src => src.ServiceCode, dto => dto.ServiceCode);

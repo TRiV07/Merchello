@@ -16,7 +16,7 @@
                 provinces.Add(p);
             }
 
-            var countryTaxRate = new TaxMethod(dto.ProviderKey, dto.CountryCode)
+            var countryTaxRate = new TaxMethod(dto.ProviderKey, dto.StoreId, dto.CountryCode)
             {
                 Key = dto.Key,
                 Name = dto.Name,
@@ -41,6 +41,7 @@
                     Name = entity.Name,
                     CountryCode = entity.CountryCode,
                     ProviderKey = entity.ProviderKey,
+                    StoreId = entity.StoreId,
                     PercentageTaxRate = entity.PercentageTaxRate,
                     ProvinceData = provinceData,
                     ProductTaxMethod = entity.ProductTaxMethod,

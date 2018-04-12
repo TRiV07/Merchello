@@ -16,6 +16,8 @@
     using Umbraco.Core.Events;
     using Umbraco.Core.Logging;
 
+    using MS = Merchello.Core.Constants.MultiStore;
+
     /// <summary>
     /// Defines the ShipMethodService
     /// </summary>
@@ -152,7 +154,7 @@
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreateShipMethodRepository(uow))
+                using (var repository = RepositoryFactory.CreateShipMethodRepository(uow, shipMethod.StoreId))
                 {
                     repository.AddOrUpdate(shipMethod);
                     uow.Commit();
@@ -175,7 +177,7 @@
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreateShipMethodRepository(uow))
+                using (var repository = RepositoryFactory.CreateShipMethodRepository(uow, MS.DefaultId))
                 {
                     foreach (var shipMethod in shipMethodsArray)
                     {
@@ -205,7 +207,7 @@
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreateShipMethodRepository(uow))
+                using (var repository = RepositoryFactory.CreateShipMethodRepository(uow, shipMethod.StoreId))
                 {
                     repository.Delete(shipMethod);
                     uow.Commit();
@@ -230,7 +232,7 @@
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreateShipMethodRepository(uow))
+                using (var repository = RepositoryFactory.CreateShipMethodRepository(uow, MS.DefaultId))
                 {
                     foreach (var method in methods)
                     {
@@ -252,7 +254,7 @@
         /// <returns>The <see cref="IShipMethod"/></returns>
         public IShipMethod GetByKey(Guid key)
         {
-            using (var repository = RepositoryFactory.CreateShipMethodRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateShipMethodRepository(UowProvider.GetUnitOfWork(), MS.DefaultId))
             {
                 return repository.Get(key);
             }
@@ -272,7 +274,7 @@
         /// </returns>
         public IEnumerable<IShipMethod> GetShipMethodsByProviderKey(Guid providerKey, Guid shipCountryKey)
         {
-            using (var repository = RepositoryFactory.CreateShipMethodRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateShipMethodRepository(UowProvider.GetUnitOfWork(), MS.DefaultId))
             {
                 var query =
                     Query<IShipMethod>.Builder.Where(
@@ -291,9 +293,9 @@
         /// <returns>
         /// A collection of <see cref="IShipMethod"/>
         /// </returns>
-        public IEnumerable<IShipMethod> GetShipMethodsByProviderKey(Guid providerKey)
+        public IEnumerable<IShipMethod> GetShipMethodsByProviderKey(Guid providerKey, int storeId)
         {
-            using (var repository = RepositoryFactory.CreateShipMethodRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateShipMethodRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 var query =
                     Query<IShipMethod>.Builder.Where(
@@ -309,9 +311,9 @@
         /// <returns>
         /// The <see cref="IEnumerable{IShipMethod}"/>.
         /// </returns>
-        public IEnumerable<IShipMethod> GetAll()
+        public IEnumerable<IShipMethod> GetAll(int storeId)
         {
-            using (var repository = RepositoryFactory.CreateShipMethodRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateShipMethodRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 return repository.GetAll();
             }
@@ -339,7 +341,7 @@
         /// <returns>
         /// The <see cref="Attempt"/>.
         /// </returns>
-        internal Attempt<IShipMethod> CreateShipMethodWithKey(Guid providerKey, IShipCountry shipCountry, string name, string serviceCode, bool raiseEvents = true)
+        internal Attempt<IShipMethod> CreateShipMethodWithKey(Guid providerKey, int storeId, IShipCountry shipCountry, string name, string serviceCode, bool raiseEvents = true)
         {
             Mandate.ParameterCondition(providerKey != Guid.Empty, "providerKey");
             Mandate.ParameterNotNull(shipCountry, "shipCountry");
@@ -349,7 +351,7 @@
             if (ShipMethodExists(providerKey, shipCountry.Key, serviceCode))
                 return Attempt<IShipMethod>.Fail(new ConstraintException("A Shipmethod already exists for this ShipCountry with this ServiceCode"));
 
-            var shipMethod = new ShipMethod(providerKey, shipCountry.Key)
+            var shipMethod = new ShipMethod(providerKey, storeId, shipCountry.Key)
             {
                 Name = name,
                 ServiceCode = serviceCode,
@@ -366,7 +368,7 @@
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreateShipMethodRepository(uow))
+                using (var repository = RepositoryFactory.CreateShipMethodRepository(uow, storeId))
                 {
                     repository.AddOrUpdate(shipMethod);
                     uow.Commit();
@@ -395,7 +397,7 @@
         /// </returns>
         private bool ShipMethodExists(Guid providerKey, Guid shipCountryKey, string serviceCode)
         {
-            using (var repository = RepositoryFactory.CreateShipMethodRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateShipMethodRepository(UowProvider.GetUnitOfWork(), MS.DefaultId))
             {
                 var query =
                    Query<IShipMethod>.Builder.Where(

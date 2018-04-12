@@ -195,8 +195,8 @@ angular.module('merchello').controller('Merchello.Backoffice.InvoicePaymentsCont
                     if (key === 'removed') {
                         var empty = paymentMethodDisplayBuilder.createDefault();
                         $scope.paymentMethods.push(empty);
-                    }   
-                        var promise = paymentGatewayProviderResource.getPaymentMethodByKey(key);
+                    }
+                    var promise = paymentGatewayProviderResource.getPaymentMethodByKey(key, $routeParams.storeId);
                         promise.then(function(method) {
                             $scope.paymentMethods.push(method);
                             if ($scope.paymentMethods.length === keys.length) {

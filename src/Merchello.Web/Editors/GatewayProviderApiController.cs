@@ -83,9 +83,9 @@
         /// The <see cref="GatewayProviderDisplay"/>.
         /// </returns>
         [HttpGet]
-        public GatewayProviderDisplay GetGatewayProvider(Guid id)
+        public GatewayProviderDisplay GetGatewayProvider(Guid id, int storeId)
         {
-            var provider = _gatewayProviderService.GetGatewayProviderByKey(id) as Core.Models.GatewayProviderSettings;
+            var provider = _gatewayProviderService.GetGatewayProviderByKey(id, storeId) as Core.Models.GatewayProviderSettings;
             if (provider == null)
             {
                 throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
@@ -104,9 +104,9 @@
         /// The collection of <see cref="GatewayProviderDisplay"/>.
         /// </returns>
         [HttpGet]
-        public IEnumerable<GatewayProviderDisplay> GetResolvedNotificationGatewayProviders()
+        public IEnumerable<GatewayProviderDisplay> GetResolvedNotificationGatewayProviders(int storeId)
         {
-            return _gatewayContext.Notification.GetAllProviders().Select(x => x.GatewayProviderSettings.ToGatewayProviderDisplay());
+            return _gatewayContext.Notification.GetAllProviders(storeId).Select(x => x.GatewayProviderSettings.ToGatewayProviderDisplay());
         }
 
         /// <summary>
@@ -118,9 +118,9 @@
         /// The collection of <see cref="GatewayProviderDisplay"/>.
         /// </returns>
         [HttpGet]
-        public IEnumerable<GatewayProviderDisplay> GetResolvedPaymentGatewayProviders()
+        public IEnumerable<GatewayProviderDisplay> GetResolvedPaymentGatewayProviders(int storeId)
         {
-            return _gatewayContext.Payment.GetAllProviders().Select(x => x.GatewayProviderSettings.ToGatewayProviderDisplay());
+            return _gatewayContext.Payment.GetAllProviders(storeId).Select(x => x.GatewayProviderSettings.ToGatewayProviderDisplay());
         }
 
         /// <summary>
@@ -132,9 +132,9 @@
         /// The collection of <see cref="GatewayProviderDisplay"/>.
         /// </returns>
         [HttpGet]
-        public IEnumerable<GatewayProviderDisplay> GetResolvedShippingGatewayProviders()
+        public IEnumerable<GatewayProviderDisplay> GetResolvedShippingGatewayProviders(int storeId)
         {
-            return _gatewayContext.Shipping.GetAllProviders().Select(x => x.GatewayProviderSettings.ToGatewayProviderDisplay());
+            return _gatewayContext.Shipping.GetAllProviders(storeId).Select(x => x.GatewayProviderSettings.ToGatewayProviderDisplay());
         }
 
 
@@ -147,9 +147,9 @@
         /// The collection of <see cref="GatewayProviderDisplay"/>.
         /// </returns>
         [HttpGet]
-        public IEnumerable<GatewayProviderDisplay> GetResolvedTaxationGatewayProviders()
+        public IEnumerable<GatewayProviderDisplay> GetResolvedTaxationGatewayProviders(int storeId)
         {
-            return _gatewayContext.Taxation.GetAllProviders().Select(x => x.GatewayProviderSettings.ToGatewayProviderDisplay());
+            return _gatewayContext.Taxation.GetAllProviders(storeId).Select(x => x.GatewayProviderSettings.ToGatewayProviderDisplay());
         }
 
 
@@ -165,6 +165,7 @@
         /// The <see cref="HttpResponseMessage"/>.
         /// </returns>
         [AcceptVerbs("POST")]
+        //TODOMS Check sending storeId
         public HttpResponseMessage ActivateGatewayProvider(GatewayProviderDisplay gatewayProvider)
         {
             var response = Request.CreateResponse(HttpStatusCode.OK);
@@ -203,6 +204,7 @@
         /// The <see cref="HttpResponseMessage"/>.
         /// </returns>
         [AcceptVerbs("POST")]
+        //TODOMS Check sending storeId
         public HttpResponseMessage DeactivateGatewayProvider(GatewayProviderDisplay gatewayProvider)
         {
             var response = Request.CreateResponse(HttpStatusCode.OK);
@@ -242,13 +244,14 @@
         /// The <see cref="HttpResponseMessage"/>.
         /// </returns>
         [AcceptVerbs("POST", "PUT")]
+        //TODOMS Check sending storeId
         public HttpResponseMessage PutGatewayProvider(GatewayProviderDisplay gatewayProviderDisplay)
         {
             var response = Request.CreateResponse(HttpStatusCode.OK);
 
             try
             {
-                var provider = _gatewayProviderService.GetGatewayProviderByKey(gatewayProviderDisplay.Key);
+                var provider = _gatewayProviderService.GetGatewayProviderByKey(gatewayProviderDisplay.Key, gatewayProviderDisplay.StoreId);
                 _gatewayProviderService.Save(gatewayProviderDisplay.ToGatewayProvider(provider));
                 GatewayProviderResolver.Current.RefreshCache();
             }
@@ -320,19 +323,19 @@
             switch (gatewayProviderType)
             {
                 case GatewayProviderType.Notification:
-                    provider = _gatewayContext.Notification.GetProviderByKey(gatewayProvider.Key, false);
+                    provider = _gatewayContext.Notification.GetProviderByKey(gatewayProvider.Key, gatewayProvider.StoreId, false);
                     break;
 
                 case GatewayProviderType.Payment:
-                    provider = _gatewayContext.Payment.GetProviderByKey(gatewayProvider.Key, false);
+                    provider = _gatewayContext.Payment.GetProviderByKey(gatewayProvider.Key, gatewayProvider.StoreId, false);
                     break;
 
                 case GatewayProviderType.Shipping:
-                    provider = _gatewayContext.Shipping.GetProviderByKey(gatewayProvider.Key, false);
+                    provider = _gatewayContext.Shipping.GetProviderByKey(gatewayProvider.Key, gatewayProvider.StoreId, false);
                     break;
 
                 case GatewayProviderType.Taxation:
-                    provider = _gatewayContext.Taxation.GetProviderByKey(gatewayProvider.Key, false);
+                    provider = _gatewayContext.Taxation.GetProviderByKey(gatewayProvider.Key, gatewayProvider.StoreId, false);
                     break;
             }
 

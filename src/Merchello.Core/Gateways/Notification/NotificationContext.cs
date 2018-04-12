@@ -34,9 +34,9 @@
         /// </summary>
         /// <param name="gatewayMethodKey">The unique key (GUID) of the <see cref="IGatewayMethod"/></param>
         /// <returns>An instantiated GatewayProvider</returns>
-        public override NotificationGatewayProviderBase GetProviderByMethodKey(Guid gatewayMethodKey)
+        public override NotificationGatewayProviderBase GetProviderByMethodKey(Guid gatewayMethodKey, int storeId)
         {
-            return GetAllActivatedProviders()
+            return GetAllActivatedProviders(storeId)
                 .FirstOrDefault(x => ((NotificationGatewayProviderBase)x)
                     .NotificationMethods.Any(y => y.Key == gatewayMethodKey)) as NotificationGatewayProviderBase;
         }
@@ -55,9 +55,9 @@
         /// Sends a <see cref="INotificationMessage"/>
         /// </summary>
         /// <param name="message">The <see cref="INotificationMessage"/> to be sent</param>
-        public void Send(INotificationMessage message)
+        public void Send(int storeId, INotificationMessage message)
         {
-            this.Send(message, new DefaultFormatter());
+            this.Send(storeId, message, new DefaultFormatter());
         }
 
         /// <summary>
@@ -65,9 +65,9 @@
         /// </summary>
         /// <param name="message">The <see cref="INotificationMessage"/> to be sent</param>
         /// <param name="formatter">The <see cref="IFormatter"/> to use when formatting the message</param>
-        public void Send(INotificationMessage message, IFormatter formatter)
+        public void Send(int storeId, INotificationMessage message, IFormatter formatter)
         {
-            Send(message, formatter, null);
+            Send(storeId, message, formatter, null);
         }
 
 
@@ -83,9 +83,9 @@
         /// <param name="attachments">
         /// The attachments.
         /// </param>
-        public void Send(INotificationMessage message, IFormatter formatter, IEnumerable<Attachment> attachments)
+        public void Send(int storeId, INotificationMessage message, IFormatter formatter, IEnumerable<Attachment> attachments)
         {
-            var activeProviders = GetAllActivatedProviders();
+            var activeProviders = GetAllActivatedProviders(storeId);
 
             var provider = activeProviders.FirstOrDefault(x => ((NotificationGatewayProviderBase)x).NotificationMethods.Any(y => y.Key == message.MethodKey)) as NotificationGatewayProviderBase;
 

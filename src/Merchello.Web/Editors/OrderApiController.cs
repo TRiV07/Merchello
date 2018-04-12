@@ -285,9 +285,9 @@
         /// <param name="model"></param>
         /// <returns></returns>
         [AcceptVerbs("GET")]
-        public IEnumerable<IPaymentGatewayMethod> GetPaymentMethods(BackofficeAddItemModel model)
+        public IEnumerable<IPaymentGatewayMethod> GetPaymentMethods(int storeId)
         {
-            return MerchelloContext.Gateways.Payment.GetPaymentGatewayMethods();
+            return MerchelloContext.Gateways.Payment.GetPaymentGatewayMethods(storeId);
         }
 
         //[HttpPost]
