@@ -12,6 +12,7 @@
     using Merchello.Core.Services;
     using Merchello.Web.Models.ContentEditing;
     using Merchello.Web.WebApi;
+    using Merchello.Web.WebApi.Filters;
     using Merchello.Web.Workflow;
 
     using Umbraco.Web;
@@ -285,6 +286,7 @@
         /// <param name="model"></param>
         /// <returns></returns>
         [AcceptVerbs("GET")]
+        [EnsureUserPermissionForStore("storeId")]
         public IEnumerable<IPaymentGatewayMethod> GetPaymentMethods(int storeId)
         {
             return MerchelloContext.Gateways.Payment.GetPaymentGatewayMethods(storeId);

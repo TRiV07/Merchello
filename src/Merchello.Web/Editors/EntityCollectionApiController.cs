@@ -21,7 +21,7 @@
     using Merchello.Web.Models.Querying;
     using Merchello.Web.Search;
     using Merchello.Web.WebApi;
-
+    using Merchello.Web.WebApi.Filters;
     using Umbraco.Core;
     using Umbraco.Core.Logging;
     using Umbraco.Web;
@@ -132,6 +132,7 @@
         {
             var collection = _entityCollectionService.GetByKey(key);
             if (collection == null) throw new NullReferenceException("EntityCollection does not exist");
+            ValidateStoreAccess(collection.StoreId);
 
             return collection.ToEntityCollectionDisplay();
         }
@@ -143,6 +144,7 @@
         /// The <see cref="IEnumerable"/>.
         /// </returns>
         [HttpGet]
+        [EnsureUserPermissionForStore("storeId")]
         public IEnumerable<EntityCollectionProviderDisplay> GetDefaultEntityCollectionProviders(int storeId)
         {
             var providers = _staticProviderAtts.Select(x => x.ToEntityCollectionProviderDisplay(storeId));
@@ -159,6 +161,7 @@
         /// The <see cref="IEnumerable"/>.
         /// </returns>
         [HttpGet]
+        [EnsureUserPermissionForStore("storeId")]
         public IEnumerable<EntityCollectionProviderDisplay> GetEntityFilterGroupProviders(EntityType entityType, int storeId)
         {
             if (entityType != EntityType.Product) throw new NotImplementedException("Only Product types have been implemented");
@@ -178,6 +181,7 @@
         /// The <see cref="EntityCollectionProviderDisplay"/>.
         /// </returns>
         [HttpGet]
+        [EnsureUserPermissionForStore("storeId")]
         public EntityCollectionProviderDisplay GetEntityFilterGroupFilterProvider(Guid key, int storeId)
         {
             var att = 
@@ -195,6 +199,7 @@
         /// The <see cref="IEnumerable"/>.
         /// </returns>
         [HttpGet]
+        [EnsureUserPermissionForStore("storeId")]
         public IEnumerable<EntityCollectionProviderDisplay> GetEntityCollectionProviders(int storeId)
         {
             return _resolver.GetProviderAttributes().Select(x => x.ToEntityCollectionProviderDisplay(storeId));
@@ -210,6 +215,7 @@
         /// The <see cref="IEnumerable{EntityCollectionDisplay}"/>.
         /// </returns>
         [HttpGet]
+        [EnsureUserPermissionForStore("storeId")]
         public IEnumerable<EntityCollectionDisplay> GetRootEntityCollections(EntityType entityType, int storeId)
         {
             var collections = _entityCollectionService.GetRootLevelEntityCollections(entityType, storeId);
@@ -228,6 +234,10 @@
         [HttpGet]
         public IEnumerable<EntityCollectionDisplay> GetChildEntityCollections(Guid parentKey)
         {
+            var collection = _entityCollectionService.GetByKey(parentKey);
+            if (collection == null) throw new NullReferenceException("EntityCollection does not exist");
+            ValidateStoreAccess(collection.StoreId);
+
             var collections = _entityCollectionService.GetChildren(parentKey);
             return collections.Select(x => x.ToEntityCollectionDisplay()).OrderBy(x => x.SortOrder);
         }
@@ -242,6 +252,7 @@
         /// The <see cref="IEnumerable"/>.
         /// </returns>
         [HttpGet]
+        [EnsureUserPermissionForStore("storeId")]
         public IEnumerable<EntityCollectionDisplay> GetEntityCollections(Guid entityTfKey, int storeId)
         {
             var collections = _entityCollectionService.GetByEntityTfKey(entityTfKey, storeId);
@@ -258,6 +269,7 @@
         /// The <see cref="IEnumerable"/>.
         /// </returns>
         [HttpGet]
+        [EnsureUserPermissionForStore("storeId")]
         public IEnumerable<EntityFilterGroupDisplay> GetEntityFilterGroups(EntityType entityType, int storeId)
         {
             if (entityType != EntityType.Product) throw new NotImplementedException();
@@ -423,6 +435,7 @@
         /// Throws a null reference exception if either the collection key or entity type is not found in query parameters
         /// </exception>
         [HttpPost]
+        [EnsureUserPermissionForStore("query.StoreId")]
         public QueryResultDisplay PostGetEntitiesNotInCollection(QueryDisplay query)
         {
             var collectionKey = query.Parameters.FirstOrDefault(x => x.FieldName == "collectionKey");
@@ -639,6 +652,7 @@
         /// The <see cref="EntityCollectionDisplay"/>.
         /// </returns>
         [HttpPost]
+        [EnsureUserPermissionForStore("storeId")]
         public EntityCollectionDisplay PostAddEntityCollection(int storeId, EntityCollectionDisplay collection)
         {
             var ec = _entityCollectionService.CreateEntityCollection(
@@ -673,6 +687,7 @@
         {
             var currentVersion = ((EntityCollectionService)_entityCollectionService).GetEntityFilterGroupByKey(collection.Key);
             if (currentVersion == null) throw new NullReferenceException("Collection was not found");
+            ValidateStoreAccess(currentVersion.StoreId);
 
             // update the root (filter) collection
             var filter = (IEntityCollection)currentVersion;
@@ -743,6 +758,7 @@
         {
             var destination = _entityCollectionService.GetByKey(collection.Key);
             if (destination == null) throw new NullReferenceException("Collection was not found");
+            ValidateStoreAccess(destination.StoreId);
 
             destination = collection.ToEntityCollection(destination);
             _entityCollectionService.Save(destination);
@@ -799,6 +815,7 @@
             {
                 return Request.CreateResponse(HttpStatusCode.NotFound);
             }
+            ValidateStoreAccess(collectionToDelete.StoreId);
 
             _entityCollectionService.Delete(collectionToDelete);
 

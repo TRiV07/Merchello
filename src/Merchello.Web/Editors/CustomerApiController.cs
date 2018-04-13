@@ -16,6 +16,7 @@
     using Merchello.Web.Models.ContentEditing;
     using Merchello.Web.Models.Querying;
     using Merchello.Web.WebApi;
+    using Merchello.Web.WebApi.Filters;
     using Merchello.Web.Workflow;
 
     using Umbraco.Core;
@@ -154,6 +155,7 @@
         {
             //return _merchello.Query.Customer.GetByKey(id);        
             var customer = _customerService.GetByKey(id);
+            ValidateStoreAccess(customer.StoreId);
             return AutoMapper.Mapper.Map<CustomerDisplay>(customer);
         }
 
@@ -218,6 +220,7 @@
         /// The collection of customers..
         /// </returns>
         [HttpPost]
+        [EnsureUserPermissionForStore("query.StoreId")]
         public QueryResultDisplay SearchCustomers(QueryDisplay query)
         {
             var term = query.Parameters.FirstOrDefault(x => x.FieldName == "term");
@@ -250,6 +253,7 @@
         /// The <see cref="QueryResultDisplay"/>.
         /// </returns>
         [HttpPost]
+        [EnsureUserPermissionForStore("query.StoreId")]
         public QueryResultDisplay SearchByDateRange(QueryDisplay query)
         {
             var lastActivityDateStart = query.Parameters.FirstOrDefault(x => x.FieldName == "lastActivityDateStart");
@@ -289,8 +293,10 @@
         /// The <see cref="CustomerDisplay"/>.
         /// </returns>
         [HttpPost]
+        [EnsureUserPermissionForStore("storeId")]
         public CustomerDisplay AddCustomer(int storeId, CustomerDisplay customer)
         {
+            customer.StoreId = storeId;
             var newCustomer = _customerService.CreateCustomer(
                 string.IsNullOrEmpty(customer.LoginName) ? customer.Email : customer.LoginName,
                 storeId,
@@ -316,8 +322,10 @@
         /// The <see cref="CustomerDisplay"/>.
         /// </returns>
         [HttpPost]
+        [EnsureUserPermissionForStore("storeId")]
         public IAnonymousCustomer AddAnonymousCustomer(int storeId, CustomerDisplay customer)
-        {            
+        {
+            customer.StoreId = storeId;
             var newCustomer = _customerService.CreateAnonymousCustomerWithKey(storeId);
             
             newCustomer.LastActivityDate = DateTime.Today;
@@ -338,6 +346,7 @@
         /// The <see cref="CustomerDisplay"/>.
         /// </returns>
         [HttpPost, HttpPut]
+        [EnsureUserPermissionForStore("customer.StoreId")]
         public CustomerDisplay PutCustomer(CustomerDisplay customer)
         {
             RemoveDeletedAddresses(customer);
@@ -372,6 +381,7 @@
             {
                 return Request.CreateResponse(HttpStatusCode.NotFound);
             }
+            ValidateStoreAccess(customer.StoreId);
 
             _customerService.Delete(customer);
 
@@ -386,6 +396,7 @@
         /// </param>
         private void RemoveDeletedAddresses(CustomerDisplay customer)
         {
+            ValidateStoreAccess(_customerService.GetByKey(customer.Key)?.StoreId ?? 0);
             var existing = _customerAddressService.GetByCustomerKey(customer.Key);
 
             var existingAddresses = existing as ICustomerAddress[] ?? existing.ToArray();
@@ -405,6 +416,7 @@
         /// </param>
         private void SaveNewAddresses(CustomerDisplay customer)
         {
+            ValidateStoreAccess(_customerService.GetByKey(customer.Key)?.StoreId ?? 0);
             foreach (var address in customer.Addresses.Where(x => x.Key == Guid.Empty))
             {
                 var customerAddress = address.ToCustomerAddress(new CustomerAddress(customer.Key));

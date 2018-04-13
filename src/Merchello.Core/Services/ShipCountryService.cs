@@ -303,11 +303,11 @@
         }
 
         // used for testing
-        internal IEnumerable<IShipCountry> GetAllShipCountries()
+        internal IEnumerable<IShipCountry> GetAllShipCountries(int storeId)
         {
             using (var repository = RepositoryFactory.CreateShipCountryRepository(UowProvider.GetUnitOfWork(), _storeSettingService))
             {
-                return repository.GetAll();
+                return repository.GetAll(storeId);
             }
         }
 

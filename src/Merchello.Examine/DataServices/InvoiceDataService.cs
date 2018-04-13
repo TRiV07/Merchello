@@ -49,7 +49,6 @@
         /// </returns>
         public IEnumerable<IInvoice> GetAll()
         {
-            //TODOMS
             return MerchelloContext.HasCurrent
                        ? ((InvoiceService)MerchelloContext.Current.Services.InvoiceService).GetAll()
                        : new InvoiceService(Logger.CreateWithDefaultLog4NetConfiguration()).GetAll();

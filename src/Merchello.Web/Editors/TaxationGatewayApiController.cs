@@ -13,7 +13,7 @@
     using Merchello.Core.Services;
     using Merchello.Web.Models.ContentEditing;
     using Merchello.Web.WebApi;
-
+    using Merchello.Web.WebApi.Filters;
     using Umbraco.Web.Mvc;
 
     /// <summary>
@@ -58,6 +58,7 @@
         /// <returns>
         /// The collection of <see cref="GatewayResourceDisplay"/>.
         /// </returns>
+        [EnsureUserPermissionForStore("storeId")]
         public IEnumerable<GatewayResourceDisplay> GetGatewayResources(Guid id, int storeId)
         {
             try
@@ -83,6 +84,7 @@
         /// <returns>
         /// The collection of <see cref="GatewayProviderDisplay"/>.
         /// </returns>
+        [EnsureUserPermissionForStore("storeId")]
         public IEnumerable<TaxationGatewayProviderDisplay> GetAllGatewayProviders(int storeId)
         {
             var providers = _taxationContext.GetAllActivatedProviders(storeId);
@@ -105,6 +107,7 @@
         /// <returns>
         /// The collection of <see cref="TaxMethodDisplay"/>.
         /// </returns>
+        [EnsureUserPermissionForStore("storeId")]
         public IEnumerable<TaxMethodDisplay> GetTaxationProviderTaxMethods(Guid id, int storeId)
         {
             var provider = _taxationContext.GetProviderByKey(id, storeId);
@@ -129,7 +132,7 @@
         /// The <see cref="HttpResponseMessage"/>.
         /// </returns>
         [AcceptVerbs("POST")]
-        //TODOMS Check sending storeId
+        [EnsureUserPermissionForStore("method.StoreId")]
         public HttpResponseMessage AddTaxMethod(TaxMethodDisplay method)
         {
             var response = Request.CreateResponse(HttpStatusCode.OK);
@@ -167,7 +170,7 @@
         /// The <see cref="HttpResponseMessage"/>.
         /// </returns>
         [AcceptVerbs("POST", "PUT")]
-        //TODOMS Check sending storeId
+        [EnsureUserPermissionForStore("method.StoreId")]
         public HttpResponseMessage PutTaxMethod(TaxMethodDisplay method)
         {
             var response = Request.CreateResponse(HttpStatusCode.OK);
@@ -215,6 +218,7 @@
             var methodToDelete = taxMethodService.GetByKey(id);
 
             if (methodToDelete == null) return Request.CreateResponse(HttpStatusCode.NotFound);
+            ValidateStoreAccess(methodToDelete.StoreId);
 
             taxMethodService.Delete(methodToDelete);
 

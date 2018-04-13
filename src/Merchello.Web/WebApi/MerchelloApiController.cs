@@ -1,13 +1,18 @@
 ﻿namespace Merchello.Web.WebApi
 {
     using System;
+    using System.Linq;
+    using System.Web.Http;
     using Merchello.Core;
     using Umbraco.Core;
+    using Umbraco.Core.Models;
     using Umbraco.Core.Models.Membership;
     using Umbraco.Core.Security;
     using Umbraco.Web;
     using Umbraco.Web.Editors;
-    
+    using Umbraco.Web.WebApi;
+    using UConstants = Umbraco.Core.Constants;
+
 
     /// <summary>
     /// The base Merchello back office API controller.
@@ -86,6 +91,23 @@
                     }
                 }
                 return _currentUser;
+            }
+        }
+
+        public void ValidateStoreAccess(int storeId)
+        {
+            if (CurrentUser == null)
+            {
+                //not logged in
+                throw new HttpResponseException(Request.CreateUserNoAccessResponse());
+            }
+
+            var startNodeIds = UmbracoContext.Current.Security.CurrentUser.CalculateContentStartNodeIds(ApplicationContext.Current.Services.EntityService);
+            var hasAccessToRoot = startNodeIds.Contains(UConstants.System.Root);
+
+            if (!startNodeIds.Contains(storeId) && !hasAccessToRoot)
+            {
+                throw new HttpResponseException(Request.CreateUserNoAccessResponse());
             }
         }
     }

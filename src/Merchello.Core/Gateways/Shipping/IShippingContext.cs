@@ -22,7 +22,7 @@
         /// Returns a list of all countries that can be assigned to a shipment
         /// </summary>
         /// <returns>A collection of all <see cref="ICountry"/> that have been identified as allowable shipping destinations</returns>
-        IEnumerable<ICountry> GetAllowedShipmentDestinationCountries();
+        IEnumerable<ICountry> GetAllowedShipmentDestinationCountries(int storeId);
 
         /// <summary>
         /// Gets a collection of <see cref="ShippingGatewayProviderBase"/> by ship country

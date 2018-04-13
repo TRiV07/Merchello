@@ -77,9 +77,9 @@
         /// Returns a list of all countries that can be assigned to a shipment
         /// </summary>
         /// <returns>A collection of <see cref="ICountry"/></returns>
-        public IEnumerable<ICountry> GetAllowedShipmentDestinationCountries()
+        public IEnumerable<ICountry> GetAllowedShipmentDestinationCountries(int storeId)
         {
-            var shipCountries = GatewayProviderService.GetAllShipCountries().ToArray();
+            var shipCountries = GatewayProviderService.GetAllShipCountries(storeId).ToArray();
 
             var elseCountries = shipCountries.Where(x => x.CountryCode == "ELSE").ToArray();
             if (elseCountries.Any())
@@ -97,7 +97,10 @@
                 }    
             }
 
-            var countries = GatewayProviderService.GetAllShipCountries().Where(x => x.CountryCode != "ELSE").Select(x => _storeSettingService.GetCountryByCode(x.CountryCode)).Where(x => x != null);
+            var countries = GatewayProviderService.GetAllShipCountries(storeId)
+                .Where(x => x.CountryCode != "ELSE")
+                .Select(x => _storeSettingService.GetCountryByCode(x.CountryCode))
+                .Where(x => x != null);
 
             return countries.Distinct();
         }

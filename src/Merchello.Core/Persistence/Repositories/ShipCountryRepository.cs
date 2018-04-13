@@ -53,6 +53,22 @@
             _storeSettingService = storeSettingService;
         }
 
+        public IEnumerable<IShipCountry> GetAll(int storeId)
+        {
+            var sql = new Sql();
+            sql.Select("[merchShipCountry].[pk]")
+                .From<ShipCountryDto>(SqlSyntax)
+                .InnerJoin<WarehouseCatalogDto>(SqlSyntax)
+                .On<ShipCountryDto, WarehouseCatalogDto>(SqlSyntax, left => left.CatalogKey, right => right.Key)
+                .InnerJoin<WarehouseDto>(SqlSyntax)
+                .On<WarehouseCatalogDto, WarehouseDto>(SqlSyntax, left => left.WarehouseKey, right => right.Key)
+                .Where<WarehouseDto>(x => x.StoreId == storeId, SqlSyntax);
+
+            var keys = Database.Fetch<Guid>(sql).ToArray();
+
+            return GetAll(keys);
+        }
+
         /// <summary>
         /// Determines if a catalog exists for a ship country.
         /// </summary>
@@ -70,7 +86,7 @@
             var sql = new Sql();
             sql.Select("*")
                 .From<ShipCountryDto>(SqlSyntax)
-                .Where<ShipCountryDto>(x => x.CatalogKey == catalogKey && x.CountryCode == countryCode);
+                .Where<ShipCountryDto>(x => x.CatalogKey == catalogKey && x.CountryCode == countryCode, SqlSyntax);
 
             return Database.Fetch<ShipCountryDto>(sql).Any();
         }

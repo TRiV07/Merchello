@@ -43,14 +43,6 @@
         private readonly IMerchelloContext _merchelloContext;
 
         /// <summary>
-        /// A value indicating whether or not shipping charges are taxable.
-        /// </summary>
-        /// <remarks>
-        /// Determined by the global back office setting.
-        /// </remarks>
-        private Lazy<bool> _shippingTaxable;
-
-        /// <summary>
         /// The offer code temp data.
         /// </summary>
         private Lazy<List<string>> _offerCodeTempData;
@@ -808,9 +800,12 @@
         /// <param name="shipmentRateQuote">The <see cref="IShipmentRateQuote"/> to be added as a <see cref="ILineItem"/></param>
         private void AddShipmentRateQuoteLineItem(IShipmentRateQuote shipmentRateQuote)
         {
+            var storeSettingsService = _merchelloContext.Services.StoreSettingService;
+            var shippingTaxSetting = storeSettingsService.GetByKey(Core.Constants.StoreSetting.GlobalShippingIsTaxableKey, shipmentRateQuote.Shipment.StoreId);
+            var shippingTaxable = new Lazy<bool>(() => Convert.ToBoolean(shippingTaxSetting.Value));
+
             var lineItem = shipmentRateQuote.AsLineItemOf<ItemCacheLineItem>();
-            //TODOMS
-            if (_shippingTaxable.Value) lineItem.ExtendedData.SetValue(Core.Constants.ExtendedDataKeys.Taxable, true.ToString());
+            if (shippingTaxable.Value) lineItem.ExtendedData.SetValue(Core.Constants.ExtendedDataKeys.Taxable, true.ToString());
             _itemCache.AddItem(lineItem);
         }
 
@@ -819,10 +814,6 @@
         /// </summary>
         private void Initialize()
         {
-            var storeSettingsService = _merchelloContext.Services.StoreSettingService;
-            //TODOMS
-            var shippingTaxSetting = storeSettingsService.GetByKey(Core.Constants.StoreSetting.GlobalShippingIsTaxableKey, -1);
-            _shippingTaxable = new Lazy<bool>(() => Convert.ToBoolean(shippingTaxSetting.Value));
             this._offerCodeTempData = new Lazy<List<string>>(this.BuildOfferCodeList);
         }
 

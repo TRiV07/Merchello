@@ -65,7 +65,7 @@
             // opt to swap the order of the address collection to alleviate the need for this check, but
             // there are also cases, where items may not need to be shipped and the billing address is required
             // to create the invoice.
-            if (model.UseForShipping && EnsureBillingAddressIsValidAsShippingAddress(model))
+            if (model.UseForShipping && EnsureBillingAddressIsValidAsShippingAddress(CurrentCustomer.StoreId, model))
             {
                 // we use the billing address factory here since we know the model FastTrackBillingAddressModel
                 // and only want Merchello's IAddress

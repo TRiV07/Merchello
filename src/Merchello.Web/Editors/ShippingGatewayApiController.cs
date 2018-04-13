@@ -14,6 +14,7 @@
     using Core.Gateways.Shipping;
     using Core.Models;
     using Core.Services;
+    using Merchello.Web.WebApi.Filters;
     using Models.ContentEditing;    
     using Umbraco.Web.Mvc;
     using WebApi;
@@ -179,6 +180,7 @@
         /// <returns>
         /// The collection of all <see cref="GatewayProviderDisplay"/>.
         /// </returns>
+        [EnsureUserPermissionForStore("storeId")]
         public IEnumerable<ShippingGatewayProviderDisplay> GetAllShipGatewayProviders(int storeId)
         {
             var providers = MerchelloContext.Gateways.Shipping.GetAllActivatedProviders(storeId).ToArray();
@@ -197,6 +199,7 @@
         /// <returns>
         /// The collection of <see cref="GatewayResourceDisplay"/>.
         /// </returns>
+        [EnsureUserPermissionForStore("storeId")]
         public IEnumerable<GatewayResourceDisplay> GetAllShipGatewayResourcesForProvider(Guid id, int storeId)
         {
             var provider = MerchelloContext.Gateways.Shipping.GetProviderByKey(id, storeId);
@@ -255,6 +258,7 @@
         /// <returns>
         /// The collection of <see cref="ShipMethodDisplay"/>.
         /// </returns>
+        [EnsureUserPermissionForStore("storeId")]
         public IEnumerable<ShipMethodDisplay> GetShippingProviderShipMethods(Guid id, int storeId)
         {
             var provider = _shippingContext.GetProviderByKey(id, storeId);
@@ -283,6 +287,7 @@
         /// <returns>
         /// The collection of <see cref="ShipMethodDisplay"/>.
         /// </returns>
+        [EnsureUserPermissionForStore("storeId")]
         public IEnumerable<ShippingGatewayMethodDisplay> GetShippingGatewayMethodsByCountry(Guid id, int storeId, Guid shipCountryId)
         {
             var provider = _shippingContext.GetProviderByKey(id, storeId);
@@ -320,7 +325,7 @@
         /// The <see cref="HttpResponseMessage"/>.
         /// </returns>
         [AcceptVerbs("POST")]
-        //TODOMS Check sending storeId
+        [EnsureUserPermissionForStore("method.StoreId")]
         public ShipMethodDisplay AddShipMethod(ShipMethodDisplay method)
         {
             ////var response = Request.CreateResponse(HttpStatusCode.OK);
@@ -356,7 +361,7 @@
         /// The <see cref="ShipMethodDisplay"/>.
         /// </returns>
         [AcceptVerbs("POST", "PUT")]
-        //TODOMS Check sending storeId
+        [EnsureUserPermissionForStore("method.StoreId")]
         public ShipMethodDisplay PutShipMethod(ShipMethodDisplay method)
         {            
             var provider = _shippingContext.GetProviderByKey(method.ProviderKey, method.StoreId);
@@ -390,6 +395,7 @@
             var methodToDelete = shippingMethodService.GetByKey(method.Key);
 
             if (methodToDelete == null) return Request.CreateResponse(HttpStatusCode.NotFound);
+            ValidateStoreAccess(methodToDelete.StoreId);
 
             shippingMethodService.Delete(methodToDelete);
 

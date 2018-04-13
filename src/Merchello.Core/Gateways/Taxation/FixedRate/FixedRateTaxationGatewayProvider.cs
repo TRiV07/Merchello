@@ -110,10 +110,13 @@
         /// <returns>A collection of <see cref="IGatewayResource"/></returns>
         public override IEnumerable<IGatewayResource> ListResourcesOffered()
         {
-            var wh = MerchelloContext.Current.Services.WarehouseService.GetDefaultWarehouse(StoreId);
-            var catalog = MerchelloContext.Current.Services.WarehouseService.GetWarhouseCatalogByWarehouseKey(wh.Key).FirstOrDefault();
-            var countryCodes = (MerchelloContext.Current.Services as ServiceContext).ShipCountryService
-                .GetShipCountriesByCatalogKey(catalog.Key)
+            //var wh = MerchelloContext.Current.Services.WarehouseService.GetDefaultWarehouse(StoreId);
+            //var catalog = MerchelloContext.Current.Services.WarehouseService.GetWarhouseCatalogByWarehouseKey(wh.Key).FirstOrDefault();
+            //var countryCodes = (MerchelloContext.Current.Services as ServiceContext).ShipCountryService
+            //    .GetShipCountriesByCatalogKey(catalog.Key)
+            //    .Select(x => x.CountryCode).Distinct();
+
+            var countryCodes = GatewayProviderService.GetAllShipCountries(StoreId)
                 .Select(x => x.CountryCode).Distinct();
 
             var resources =

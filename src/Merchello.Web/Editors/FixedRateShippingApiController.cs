@@ -64,7 +64,7 @@
         public ShipFixedRateTableDisplay GetShipFixedRateTable(ShipMethodDisplay method)
         {
             var storeId = ((ServiceContext)MerchelloContext.Services).ShipMethodService.GetByKey(method.Key)?.StoreId ?? 0;
-            //TODOMS validate access
+            ValidateStoreAccess(storeId);
 
             var fixedRateShippingGatewayProvider = (FixedRateShippingGatewayProvider)MerchelloContext.Gateways.Shipping.GetProviderByKey(Constants.ProviderKeys.Shipping.FixedRateShippingProviderKey, storeId);
 
@@ -94,7 +94,7 @@
         public ShipFixedRateTableDisplay PutShipFixedRateTable(ShipFixedRateTableDisplay rateTable)
         {
             var storeId = ((ServiceContext)MerchelloContext.Services).ShipMethodService.GetByKey(rateTable.ShipMethodKey)?.StoreId ?? 0;
-            //TODOMS validate access
+            ValidateStoreAccess(storeId);
 
             var fixedRateShippingGatewayProvider = (FixedRateShippingGatewayProvider)MerchelloContext.Gateways.Shipping.GetProviderByKey(Constants.ProviderKeys.Shipping.FixedRateShippingProviderKey, storeId);
 

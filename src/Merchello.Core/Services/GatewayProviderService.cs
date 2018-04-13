@@ -838,10 +838,9 @@
         /// Returns a collection of all <see cref="IShipCountry"/>
         /// </summary>
         /// <returns>A collection of all <see cref="IShipCountry"/></returns>
-        /// TODOMS separate it by stores
-        public IEnumerable<IShipCountry> GetAllShipCountries()
+        public IEnumerable<IShipCountry> GetAllShipCountries(int storeId)
         {
-            return ((ShipCountryService) _shipCountryService).GetAllShipCountries();
+            return ((ShipCountryService) _shipCountryService).GetAllShipCountries(storeId);
         }
 
 

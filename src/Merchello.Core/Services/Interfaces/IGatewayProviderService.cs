@@ -364,8 +364,7 @@
         /// Returns a collection of all <see cref="IShipCountry"/>
         /// </summary>
         /// <returns>A collection of all <see cref="IShipCountry"/></returns>
-        /// TODOMS separate it by stores
-        IEnumerable<IShipCountry> GetAllShipCountries();
+        IEnumerable<IShipCountry> GetAllShipCountries(int storeId);
 
         #endregion
 

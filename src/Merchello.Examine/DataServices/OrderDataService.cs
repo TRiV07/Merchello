@@ -49,7 +49,6 @@
         /// </returns>
         public IEnumerable<IOrder> GetAll()
         {
-            //TODOMS
             return MerchelloContext.HasCurrent
                        ? ((OrderService)MerchelloContext.Current.Services.OrderService).GetAll()
                        : new OrderService(Logger.CreateWithDefaultLog4NetConfiguration()).GetAll();

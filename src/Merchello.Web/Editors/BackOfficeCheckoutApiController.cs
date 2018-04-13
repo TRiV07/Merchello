@@ -16,6 +16,7 @@
     using Merchello.Web.Models.Payments;
     using Merchello.Web.Models.Ui;
     using Merchello.Web.WebApi;
+    using Merchello.Web.WebApi.Filters;
     using Merchello.Web.Workflow;
     using Merchello.Web.Workflow.CustomerItemCache;
 
@@ -71,6 +72,7 @@
         /// The <see cref="IEnumerable{PaymentMethodDisplay}"/>.
         /// </returns>
         [HttpGet]
+        [EnsureUserPermissionForStore("storeId")]
         public IEnumerable<PaymentMethodDisplay> GetPaymentMethods(int storeId)
         {
             var paymentMethods = MerchelloContext.Gateways.Payment.GetPaymentGatewayMethods(storeId);

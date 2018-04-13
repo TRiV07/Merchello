@@ -14,7 +14,7 @@
     using Merchello.Core.Services;
     using Merchello.Web.Models.ContentEditing;
     using Merchello.Web.WebApi;
-
+    using Merchello.Web.WebApi.Filters;
     using Umbraco.Web;
     using Umbraco.Web.Mvc;
 
@@ -83,6 +83,7 @@
         /// The <see cref="GatewayProviderDisplay"/>.
         /// </returns>
         [HttpGet]
+        [EnsureUserPermissionForStore("storeId")]
         public GatewayProviderDisplay GetGatewayProvider(Guid id, int storeId)
         {
             var provider = _gatewayProviderService.GetGatewayProviderByKey(id, storeId) as Core.Models.GatewayProviderSettings;
@@ -104,6 +105,7 @@
         /// The collection of <see cref="GatewayProviderDisplay"/>.
         /// </returns>
         [HttpGet]
+        [EnsureUserPermissionForStore("storeId")]
         public IEnumerable<GatewayProviderDisplay> GetResolvedNotificationGatewayProviders(int storeId)
         {
             return _gatewayContext.Notification.GetAllProviders(storeId).Select(x => x.GatewayProviderSettings.ToGatewayProviderDisplay());
@@ -118,6 +120,7 @@
         /// The collection of <see cref="GatewayProviderDisplay"/>.
         /// </returns>
         [HttpGet]
+        [EnsureUserPermissionForStore("storeId")]
         public IEnumerable<GatewayProviderDisplay> GetResolvedPaymentGatewayProviders(int storeId)
         {
             return _gatewayContext.Payment.GetAllProviders(storeId).Select(x => x.GatewayProviderSettings.ToGatewayProviderDisplay());
@@ -132,6 +135,7 @@
         /// The collection of <see cref="GatewayProviderDisplay"/>.
         /// </returns>
         [HttpGet]
+        [EnsureUserPermissionForStore("storeId")]
         public IEnumerable<GatewayProviderDisplay> GetResolvedShippingGatewayProviders(int storeId)
         {
             return _gatewayContext.Shipping.GetAllProviders(storeId).Select(x => x.GatewayProviderSettings.ToGatewayProviderDisplay());
@@ -147,6 +151,7 @@
         /// The collection of <see cref="GatewayProviderDisplay"/>.
         /// </returns>
         [HttpGet]
+        [EnsureUserPermissionForStore("storeId")]
         public IEnumerable<GatewayProviderDisplay> GetResolvedTaxationGatewayProviders(int storeId)
         {
             return _gatewayContext.Taxation.GetAllProviders(storeId).Select(x => x.GatewayProviderSettings.ToGatewayProviderDisplay());
@@ -165,7 +170,7 @@
         /// The <see cref="HttpResponseMessage"/>.
         /// </returns>
         [AcceptVerbs("POST")]
-        //TODOMS Check sending storeId
+        [EnsureUserPermissionForStore("gatewayProvider.StoreId")]
         public HttpResponseMessage ActivateGatewayProvider(GatewayProviderDisplay gatewayProvider)
         {
             var response = Request.CreateResponse(HttpStatusCode.OK);
@@ -204,7 +209,7 @@
         /// The <see cref="HttpResponseMessage"/>.
         /// </returns>
         [AcceptVerbs("POST")]
-        //TODOMS Check sending storeId
+        [EnsureUserPermissionForStore("gatewayProvider.StoreId")]
         public HttpResponseMessage DeactivateGatewayProvider(GatewayProviderDisplay gatewayProvider)
         {
             var response = Request.CreateResponse(HttpStatusCode.OK);
@@ -244,7 +249,7 @@
         /// The <see cref="HttpResponseMessage"/>.
         /// </returns>
         [AcceptVerbs("POST", "PUT")]
-        //TODOMS Check sending storeId
+        [EnsureUserPermissionForStore("gatewayProviderDisplay.StoreId")]
         public HttpResponseMessage PutGatewayProvider(GatewayProviderDisplay gatewayProviderDisplay)
         {
             var response = Request.CreateResponse(HttpStatusCode.OK);

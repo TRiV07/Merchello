@@ -375,9 +375,9 @@
         /// <returns>
         /// A value indicating whether or not the billing address is valid for use for a shipping address.
         /// </returns>
-        protected virtual bool EnsureBillingAddressIsValidAsShippingAddress(TBillingAddress model)
+        protected virtual bool EnsureBillingAddressIsValidAsShippingAddress(int storeId, TBillingAddress model)
         {
-            var validCountries = GatewayContext.Shipping.GetAllowedShipmentDestinationCountries();
+            var validCountries = GatewayContext.Shipping.GetAllowedShipmentDestinationCountries(storeId);
             return validCountries.Any(x => x.CountryCode == model.CountryCode);
         }
     }

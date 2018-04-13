@@ -15,6 +15,7 @@
     using Merchello.Web.Models.Payments;
     using Merchello.Web.Models.SaleHistory;
     using Merchello.Web.WebApi;
+    using Merchello.Web.WebApi.Filters;
     using Merchello.Web.Workflow;
     using Merchello.Web.Workflow.Payment;
 
@@ -135,6 +136,7 @@
         /// The <see cref="PaymentMethodDisplay"/>.
         /// </returns>
         [HttpGet]
+        [EnsureUserPermissionForStore("storeId")]
         public PaymentMethodDisplay GetPaymentMethod(Guid id, int storeId)
         {
             var paymentMethod = MerchelloContext.Gateways.Payment.GetPaymentGatewayMethodByKey(id, storeId);

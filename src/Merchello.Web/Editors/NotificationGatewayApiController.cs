@@ -16,7 +16,7 @@
     using Merchello.Core.Gateways.Notification.Monitors;
     using Merchello.Core.Observation;
     using Merchello.Web.Models.ContentEditing.Templates;
-
+    using Merchello.Web.WebApi.Filters;
     using Models.ContentEditing;
 
     using Umbraco.Web.Mvc;
@@ -70,6 +70,7 @@
         /// A collection for <see cref="GatewayResourceDisplay"/>
         /// </returns>
         [AcceptVerbs("GET")]
+        [EnsureUserPermissionForStore("storeId")]
         public IEnumerable<GatewayResourceDisplay> GetGatewayResources(Guid id, int storeId)
         {
             try
@@ -94,6 +95,7 @@
         /// <returns>
         /// A collection for <see cref="GatewayResourceDisplay"/>
         /// </returns>
+        [EnsureUserPermissionForStore("storeId")]
         public IEnumerable<GatewayProviderDisplay> GetAllGatewayProviders(int storeId)
         {
             var providers = _notificationContext.GetAllActivatedProviders(storeId);
@@ -113,7 +115,6 @@
         /// <returns>
         /// A collection of <see cref="NotificationMonitorDisplay"/>
         /// </returns>
-        /// TODOMS separate
         public IEnumerable<NotificationMonitorDisplay> GetAllNotificationMonitors()
         {
             var monitors = MonitorResolver.Current.GetAllMonitors();
@@ -144,6 +145,7 @@
         /// <param name="id">The key (guid) of the NotificationGatewayProvider</param>
         /// <returns>A collection of <see cref="NotificationMethodDisplay"/></returns>
         [AcceptVerbs("GET")]
+        [EnsureUserPermissionForStore("storeId")]
         public IEnumerable<NotificationMethodDisplay> GetNotificationProviderNotificationMethods(Guid id, int storeId)
         {
             // limit only to active providers
@@ -166,6 +168,7 @@
         /// The <see cref="HttpResponseMessage"/>.
         /// </returns>
         [AcceptVerbs("POST")]
+        [EnsureUserPermissionForStore("method.StoreId")]
         public HttpResponseMessage AddNotificationMethod(NotificationMethodDisplay method)
         {
             var response = Request.CreateResponse(HttpStatusCode.OK);
@@ -173,7 +176,6 @@
             try
             {
                 var storeId = method.StoreId;
-                //TODOMS validate access
 
                 var provider = _notificationContext.GetProviderByKey(method.ProviderKey, storeId);
 
@@ -222,7 +224,7 @@
             try
             {
                 var storeId = ((ServiceContext)MerchelloContext.Services).NotificationMethodService.GetByKey(method.Key)?.StoreId ?? 0;
-                //TODOMS validate access
+                ValidateStoreAccess(storeId);
 
                 var provider = _notificationContext.GetProviderByKey(method.ProviderKey, storeId);
 
@@ -259,7 +261,7 @@
             try
             {
                 var storeId = ((ServiceContext)MerchelloContext.Services).NotificationMethodService.GetByKey(id)?.StoreId ?? 0;
-                //TODOMS validate access
+                ValidateStoreAccess(storeId);
 
                 var provider = _notificationContext.GetProviderByMethodKey(id, storeId);
                 var method = provider.GetNotificationGatewayMethodByKey(id);
@@ -315,7 +317,7 @@
             try
             {
                 var storeId = ((ServiceContext)MerchelloContext.Services).NotificationMethodService.GetByKey(message.MethodKey)?.StoreId ?? 0;
-                //TODOMS validate access
+                ValidateStoreAccess(storeId);
 
                 var provider = _notificationContext.GetProviderByMethodKey(message.MethodKey, storeId);
                 
@@ -357,7 +359,7 @@
             try
             {
                 var storeId = ((ServiceContext)MerchelloContext.Services).NotificationMethodService.GetByKey(message.MethodKey)?.StoreId ?? 0;
-                //TODOMS validate access
+                ValidateStoreAccess(storeId);
 
                 var provider = _notificationContext.GetProviderByMethodKey(message.MethodKey, storeId);
 
@@ -401,7 +403,7 @@
 
             var messageToDelete = notificationMessageService.GetByKey(id);
             var method = notificationMethodService.GetByKey(messageToDelete.MethodKey);
-            //TODOMS validate access to store
+            ValidateStoreAccess(method.StoreId);
 
             if (messageToDelete == null) return Request.CreateResponse(HttpStatusCode.NotFound);
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Merchello.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
 
@@ -10,5 +11,6 @@ namespace Merchello.Core.Persistence.Repositories
     internal interface IShipCountryRepository : IRepositoryQueryable<Guid, IShipCountry>
     {
         bool Exists(Guid catalogKey, string countryCode);
+        IEnumerable<IShipCountry> GetAll(int storeId);
     }
 }

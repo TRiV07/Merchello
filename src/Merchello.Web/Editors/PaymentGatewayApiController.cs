@@ -14,6 +14,7 @@
     using Models.Payments;
     using WebApi;
     using Umbraco.Web.Mvc;
+    using Merchello.Web.WebApi.Filters;
 
     /// <summary>
     /// Represents the PaymentGatewayApiController
@@ -55,6 +56,7 @@
         /// <returns>
         /// A collection of <see cref="GatewayResourceDisplay"/>.
         /// </returns>
+        [EnsureUserPermissionForStore("storeId")]
         public IEnumerable<GatewayResourceDisplay> GetGatewayResources(Guid id, int storeId)
         {
             try
@@ -80,6 +82,7 @@
         /// <returns>
         /// A collection of all payment <see cref="GatewayProviderDisplay"/>
         /// </returns>
+        [EnsureUserPermissionForStore("storeId")]
         public IEnumerable<GatewayProviderDisplay> GetAllGatewayProviders(int storeId)
         {
             var providers = _paymentContext.GetAllActivatedProviders(storeId);
@@ -103,6 +106,7 @@
         /// <returns>
         /// A collection of <see cref="PaymentMethodDisplay"/>
         /// </returns>
+        [EnsureUserPermissionForStore("storeId")]
         public IEnumerable<PaymentMethodDisplay> GetPaymentProviderPaymentMethods(Guid id, int storeId)
         {
             var provider = _paymentContext.GetProviderByKey(id, storeId);
@@ -122,6 +126,7 @@
         /// The <see cref="IEnumerable{PaymentMethodDisplay}"/>.
         /// </returns>
         [HttpGet]
+        [EnsureUserPermissionForStore("storeId")]
         public IEnumerable<PaymentMethodDisplay> GetAvailablePaymentMethods(int storeId)
         {
             var methods = _paymentContext.GetPaymentGatewayMethods(storeId).Select(x => x.ToPaymentMethodDisplay());
@@ -138,6 +143,7 @@
         /// The <see cref="PaymentMethodDisplay"/>.
         /// </returns>
         [HttpGet]
+        [EnsureUserPermissionForStore("storeId")]
         public PaymentMethodDisplay GetPaymentMethodByKey(Guid? key, int storeId)
         {
             if (key != null)
@@ -160,7 +166,7 @@
         /// The <see cref="HttpResponseMessage"/>.
         /// </returns>
         [AcceptVerbs("POST")]
-        //TODOMS Check sending storeId
+        [EnsureUserPermissionForStore("method.StoreId")]
         public HttpResponseMessage AddPaymentMethod(PaymentMethodDisplay method)
         {
             var response = Request.CreateResponse(HttpStatusCode.OK);
@@ -197,7 +203,7 @@
         /// The <see cref="HttpResponseMessage"/>.
         /// </returns>
         [AcceptVerbs("POST", "PUT")]
-        //TODOMS Check sending storeId
+        [EnsureUserPermissionForStore("method.StoreId")]
         public HttpResponseMessage PutPaymentMethod(PaymentMethodDisplay method)
         {
             var response = Request.CreateResponse(HttpStatusCode.OK);
@@ -232,6 +238,7 @@
         /// The <see cref="HttpResponseMessage"/>.
         /// </returns>
         [AcceptVerbs("GET", "DELETE")]
+        [EnsureUserPermissionForStore("storeId")]
         public HttpResponseMessage DeletePaymentMethod(Guid id, int storeId)
         {
             var paymentProvider = MerchelloContext.Gateways.Payment.GetProviderByMethodKey(id, storeId);
