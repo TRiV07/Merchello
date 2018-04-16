@@ -149,8 +149,8 @@
             var hasSearchTerm = term != null && !string.IsNullOrEmpty(term.Value);
 
             var page = hasSearchTerm ? 
-                _offerSettingsService.GetPage(term.Value, query.CurrentPage + 1, query.ItemsPerPage, query.SortBy, query.SortDirection) : 
-                _offerSettingsService.GetPage(query.CurrentPage + 1, query.ItemsPerPage, query.SortBy, query.SortDirection);
+                _offerSettingsService.GetPage(term.Value, query.CurrentPage + 1, query.ItemsPerPage, query.StoreId, query.SortBy, query.SortDirection) : 
+                _offerSettingsService.GetPage(query.CurrentPage + 1, query.ItemsPerPage, query.StoreId, query.SortBy, query.SortDirection);
 
             return this.GetQueryResultDisplay(page);
         }
@@ -162,9 +162,9 @@
         /// The <see cref="IEnumerable{OfferSettingsDisplay}"/>.
         /// </returns>
         [HttpGet]
-        public IEnumerable<OfferSettingsDisplay> GetAllOfferSettings()
+        public IEnumerable<OfferSettingsDisplay> GetAllOfferSettings(int storeId)
         {
-            var offers = _offerSettingsService.GetAllActive(false);
+            var offers = _offerSettingsService.GetAllActive(storeId, false);
             return offers.Select(x => x.ToOfferSettingsDisplay());
         }
 
@@ -183,6 +183,7 @@
             var offerSettings = _offerSettingsService.CreateOfferSettings(
                 settings.Name,
                 settings.OfferCode,
+                settings.StoreId,
                 settings.OfferProviderKey, 
                 settings.ComponentDefinitions.AsOfferComponentDefinitionCollection());
 
@@ -256,10 +257,10 @@
         /// A valid indicating whether or not the offer code is unique.
         /// </returns>
         [HttpGet]
-        public bool OfferCodeIsUnique(string offerCode = "")
+        public bool OfferCodeIsUnique(int storeId, string offerCode = "")
         {
             if (string.IsNullOrEmpty(offerCode)) return false;
-            return _offerSettingsService.OfferCodeIsUnique(offerCode);
+            return _offerSettingsService.OfferCodeIsUnique(offerCode, storeId);
         }
 
         /// <summary>

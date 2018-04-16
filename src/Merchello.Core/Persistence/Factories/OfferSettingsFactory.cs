@@ -35,7 +35,7 @@
                 definitionCollection.Add(new OfferComponentDefinition(config));
             }
 
-            var settings = new OfferSettings(dto.Name, dto.OfferCode, dto.OfferProviderKey, definitionCollection)
+            var settings = new OfferSettings(dto.Name, dto.OfferCode, dto.StoreId, dto.OfferProviderKey, definitionCollection)
                 {
                     Key = dto.Key,
                     Active = dto.Active,
@@ -68,6 +68,7 @@
                            Key = entity.Key,
                            Name = entity.Name,
                            OfferCode = entity.OfferCode,
+                           StoreId = entity.StoreId,
                            OfferProviderKey = entity.OfferProviderKey,
                            OfferStartsDate = entity.OfferStartsDate.ConverDateTimeMinValueToNull(),
                            OfferEndsDate = entity.OfferEndsDate.ConvertDateTimeMaxValueToNull(),

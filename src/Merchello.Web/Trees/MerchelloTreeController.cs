@@ -206,7 +206,8 @@
             {
                 menu.Items.Add<NewOfferSettingsAction>(
                     _textService.Localize("merchelloMarketing/newOffer", _culture),
-                    false)
+                        hasSeparator: false,
+                        additionalData: new Dictionary<string, object>() { { "dialogData", new { storeId = splitId.StoreId } } })
                     .LaunchDialogView(
                         DialogsPath + "marketing.newofferproviderselection.html",
                         _textService.Localize("merchelloMarketing/newOffer", _culture));
@@ -251,7 +252,7 @@
                         false,
                         new Dictionary<string, object>()
                             {
-                                { "dialogData", new { entityType = splitId.CollectionId, collectionKey = splitId.CollectionKey } }
+                                { "dialogData", new { entityType = splitId.CollectionId, collectionKey = splitId.CollectionKey, storeId = splitId.StoreId } }
                             })
                         .LaunchDialogView(DialogsPath + "delete.staticcollection.html", _textService.Localize("actions/delete", _culture));
                 }

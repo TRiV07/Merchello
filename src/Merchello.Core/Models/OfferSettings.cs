@@ -33,6 +33,11 @@
         private string _offerCode;
 
         /// <summary>
+        /// The domain root structure ID.
+        /// </summary>
+        private int _storeId;
+
+        /// <summary>
         /// The offer provider key.
         /// </summary>
         private Guid _offerProviderKey;
@@ -72,8 +77,8 @@
         /// <param name="offerProviderKey">
         /// The offer Provider Key.
         /// </param>
-        public OfferSettings(string name, string offerCode, Guid offerProviderKey)
-            : this(name, offerCode, offerProviderKey, new OfferComponentDefinitionCollection())
+        public OfferSettings(string name, string offerCode, int storeId, Guid offerProviderKey)
+            : this(name, offerCode, storeId, offerProviderKey, new OfferComponentDefinitionCollection())
         {            
         }
 
@@ -92,7 +97,7 @@
         /// <param name="componentDefinitions">
         /// The <see cref="OfferComponentDefinitionCollection"/>.
         /// </param>
-        internal OfferSettings(string name, string offerCode, Guid offerProviderKey, OfferComponentDefinitionCollection componentDefinitions)
+        internal OfferSettings(string name, string offerCode, int storeId, Guid offerProviderKey, OfferComponentDefinitionCollection componentDefinitions)
         {
             Ensure.ParameterNotNullOrEmpty(name, "name");
             Ensure.ParameterNotNullOrEmpty(offerCode, "offerCode");
@@ -100,6 +105,7 @@
             Ensure.ParameterNotNull(componentDefinitions, "ComponentDefinitions");
             _name = name;
             _offerCode = offerCode;
+            _storeId = storeId;
             _offerProviderKey = offerProviderKey;
             _offerStartsDate = DateTime.MinValue;
             _offerEndsDate = DateTime.MaxValue;
@@ -134,7 +140,22 @@
             set
             {
                 SetPropertyValueAndDetectChanges(value, ref _offerCode, _ps.Value.OfferCodeSelector);
-            }            
+            }
+        }
+
+        /// <inheritdoc/>
+        [DataMember]
+        public int StoreId
+        {
+            get
+            {
+                return _storeId;
+            }
+
+            set
+            {
+                SetPropertyValueAndDetectChanges(value, ref _storeId, _ps.Value.StoreIdSelector);
+            }
         }
 
         /// <inheritdoc/>
@@ -287,6 +308,11 @@
             /// The component configurations changed selector.
             /// </summary>
             public readonly PropertyInfo ComponentDefinitionsChangedSelector = ExpressionHelper.GetPropertyInfo<OfferSettings, OfferComponentDefinitionCollection>(x => x.ComponentDefinitions);
+
+            /// <summary>
+            /// The domain root structure ID selector.
+            /// </summary>
+            public readonly PropertyInfo StoreIdSelector = ExpressionHelper.GetPropertyInfo<OfferSettings, int>(x => x.StoreId);
         }
     }
 }

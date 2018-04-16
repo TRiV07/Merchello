@@ -7,8 +7,8 @@
  * The controller to configure the discount for a coupon line item reward
  */
 angular.module('merchello').controller('Merchello.Marketing.Dialogs.OfferRewardCouponDiscountPriceController',
-    ['$scope', 'settingsResource', 'invoiceHelper',
-        function($scope, settingsResource, invoiceHelper) {
+    ['$scope', '$routeParams', 'notificationsService', 'settingsResource', 'invoiceHelper',
+        function ($scope, $routeParams, notificationsService, settingsResource, invoiceHelper) {
             $scope.loaded = false;
             $scope.adjustmentType = 'flat';
             $scope.currencySymbol = '';
@@ -30,7 +30,7 @@ angular.module('merchello').controller('Merchello.Marketing.Dialogs.OfferRewardC
              * Load the settings from the settings service to get the currency symbol
              */
             function loadSettings() {
-                var currencySymbolPromise = settingsResource.getCurrencySymbol();
+                var currencySymbolPromise = settingsResource.getCurrencySymbol($routeParams.storeId);
                 currencySymbolPromise.then(function (currencySymbol) {
                     $scope.currencySymbol = currencySymbol;
                     if ($scope.dialogData.component.isConfigured()) {
@@ -53,7 +53,7 @@ angular.module('merchello').controller('Merchello.Marketing.Dialogs.OfferRewardC
 
             function save() {
                 if ($scope.priceAdjustForm.$valid) {
-                    $scope.dialogData.setValue('amount', Math.abs(invoiceHelper.round($scope.amount*1, 2)));
+                    $scope.dialogData.setValue('amount', Math.abs(invoiceHelper.round($scope.amount * 1, 2)));
                     $scope.dialogData.setValue('adjustmentType', $scope.adjustmentType);
                     $scope.submit($scope.dialogData);
                 }

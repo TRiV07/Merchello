@@ -121,6 +121,14 @@
             }
         }
 
+        public virtual int StoreId
+        {
+            get
+            {
+                return Settings.StoreId;
+            }
+        }
+
         /// <summary>
         /// Gets or sets the offer starts date.
         /// </summary>

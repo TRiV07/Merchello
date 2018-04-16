@@ -134,7 +134,7 @@
         {
             if (string.IsNullOrEmpty(offerCode)) return Attempt<TOffer>.Fail(new OfferRedemptionException("Offer code was not provided"));
 
-            var settings = _offerSettingsService.GetByOfferCode(offerCode);
+            var settings = _offerSettingsService.GetByOfferCode(offerCode, customer.StoreId);
 
             if (settings == null) return Attempt<TOffer>.Fail(new OfferRedemptionException("Offer not found by offer code."));
 

@@ -1,4 +1,4 @@
-angular.module('merchello.directives').directive('uniqueOfferCode', function() {
+angular.module('merchello.directives').directive('uniqueOfferCode', function () {
     return {
         restrict: 'E',
         replace: true,
@@ -8,15 +8,15 @@ angular.module('merchello.directives').directive('uniqueOfferCode', function() {
             offerForm: '='
         },
         templateUrl: '/App_Plugins/Merchello/Backoffice/Merchello/Directives/offer.uniqueoffercode.tpl.html',
-        controller: function($scope, eventsService, marketingResource) {
+        controller: function ($scope, $routeParams, eventsService, marketingResource) {
 
             $scope.loaded = false;
             $scope.checking = false;
             $scope.isUnique = true;
 
             var eventOfferSavingName = 'merchello.offercoupon.saving';
-            var input = angular.element( document.querySelector( '#offerCode' ) );
-            var container = angular.element( document.querySelector("#unique-offer-check") );
+            var input = angular.element(document.querySelector('#offerCode'));
+            var container = angular.element(document.querySelector("#unique-offer-check"));
 
             var currentCode = '';
 
@@ -27,7 +27,7 @@ angular.module('merchello.directives').directive('uniqueOfferCode', function() {
                     var code = event.which;
                     // alpha , numbers, ! and backspace
 
-                    if ((code >47 && code <58) || (code >64 && code <91) || (code >96 && code <123) || code === 33 || code == 8) {
+                    if ((code > 47 && code < 58) || (code > 64 && code < 91) || (code > 96 && code < 123) || code === 33 || code == 8) {
                         $scope.$apply(function () {
                             if ($scope.offerCode !== '') {
                                 checkUniqueOfferCode($scope.offerCode);
@@ -39,8 +39,8 @@ angular.module('merchello.directives').directive('uniqueOfferCode', function() {
                         event.preventDefault();
                     }
                 });
-                $scope.$watch('offerCode', function(oc) {
-                    if($scope.offerCode !== undefined) {
+                $scope.$watch('offerCode', function (oc) {
+                    if ($scope.offerCode !== undefined) {
                         if (!$scope.loaded) {
                             $scope.loaded = true;
                             currentCode = $scope.offer.offerCode;
@@ -59,8 +59,8 @@ angular.module('merchello.directives').directive('uniqueOfferCode', function() {
                         $scope.checking = false;
                         return true;
                     }
-                    var checkPromise = marketingResource.checkOfferCodeIsUnique(offerCode);
-                    checkPromise.then(function(result) {
+                    var checkPromise = marketingResource.checkOfferCodeIsUnique(offerCode, $routeParams.storeId);
+                    checkPromise.then(function (result) {
                         $scope.checking = false;
                         $scope.isUnique = result;
                     });
@@ -76,7 +76,7 @@ angular.module('merchello.directives').directive('uniqueOfferCode', function() {
                 }
                 frm.offerCode.$setValidity('offerCode', valid);
             }
-            
+
             // Initialize
             init();
         }

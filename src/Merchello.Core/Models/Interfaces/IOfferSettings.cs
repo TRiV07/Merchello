@@ -7,7 +7,7 @@
     /// <summary>
     /// The DiscountOfferSettings interface.
     /// </summary>
-    public interface IOfferSettings : IEntity
+    public interface IOfferSettings : IEntity, IHasDomainRoot
     {
         /// <summary>
         /// Gets or sets the name.

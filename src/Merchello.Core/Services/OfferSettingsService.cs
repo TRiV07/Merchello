@@ -21,6 +21,8 @@
 
     using RepositoryFactory = Merchello.Core.Persistence.RepositoryFactory;
 
+    using MS = Merchello.Core.Constants.MultiStore;
+
     /// <summary>
     /// Represents the OfferSettingsService.
     /// </summary>
@@ -158,11 +160,12 @@
         /// <returns>
         /// The <see cref="IOfferSettings"/>.
         /// </returns>
-        public IOfferSettings CreateOfferSettings(string name, string offerCode, Guid offerProviderKey, bool raiseEvents = true)
+        public IOfferSettings CreateOfferSettings(string name, string offerCode, int storeId, Guid offerProviderKey, bool raiseEvents = true)
         {
             return CreateOfferSettings(
                 name,
                 offerCode,
+                storeId,
                 offerProviderKey,
                 new OfferComponentDefinitionCollection(),
                 raiseEvents);
@@ -192,6 +195,7 @@
         public IOfferSettings CreateOfferSettings(
             string name,
             string offerCode,
+            int storeId,
             Guid offerProviderKey,
             OfferComponentDefinitionCollection componentDefinitions,
             bool raiseEvents = true)
@@ -201,7 +205,7 @@
             Mandate.ParameterCondition(!Guid.Empty.Equals(offerProviderKey), "offerProviderKey");
             Mandate.ParameterNotNull(componentDefinitions, "componentDefinitions");
 
-            var offerSettings = new OfferSettings(name, offerCode, offerProviderKey, componentDefinitions);
+            var offerSettings = new OfferSettings(name, offerCode, storeId, offerProviderKey, componentDefinitions);
 
             if (raiseEvents)
             if (Creating.IsRaisedEventCancelled(new Events.NewEventArgs<IOfferSettings>(offerSettings), this))
@@ -230,11 +234,12 @@
         /// <returns>
         /// The <see cref="IOfferSettings"/>.
         /// </returns>
-        public IOfferSettings CreateOfferSettingsWithKey(string name, string offerCode, Guid offerProviderKey, bool raiseEvents = true)
+        public IOfferSettings CreateOfferSettingsWithKey(string name, string offerCode, int storeId, Guid offerProviderKey, bool raiseEvents = true)
         {
             return CreateOfferSettingsWithKey(
                 name,
                 offerCode,
+                storeId,
                 offerProviderKey,
                 new OfferComponentDefinitionCollection(),
                 raiseEvents);
@@ -264,17 +269,18 @@
         public IOfferSettings CreateOfferSettingsWithKey(
             string name,
             string offerCode,
+            int storeId,
             Guid offerProviderKey,
             OfferComponentDefinitionCollection componentDefinitions,
             bool raiseEvents = true)
         {
-            var offerSettings = CreateOfferSettings(name, offerCode, offerProviderKey, componentDefinitions, raiseEvents);
+            var offerSettings = CreateOfferSettings(name, offerCode, storeId, offerProviderKey, componentDefinitions, raiseEvents);
             if (((OfferSettings)offerSettings).WasCancelled) return offerSettings;
 
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreateOfferSettingsRepository(uow))
+                using (var repository = RepositoryFactory.CreateOfferSettingsRepository(uow, storeId))
                 {
                     repository.AddOrUpdate(offerSettings);
                     uow.Commit();
@@ -307,7 +313,7 @@
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreateOfferSettingsRepository(uow))
+                using (var repository = RepositoryFactory.CreateOfferSettingsRepository(uow, offerSettings.StoreId))
                 {
                     repository.AddOrUpdate(offerSettings);
                     uow.Commit();
@@ -337,7 +343,7 @@
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreateOfferSettingsRepository(uow))
+                using (var repository = RepositoryFactory.CreateOfferSettingsRepository(uow, MS.DefaultId))
                 {
                     foreach (var setting in settingsArray)
                     {
@@ -370,7 +376,7 @@
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreateOfferSettingsRepository(uow))
+                using (var repository = RepositoryFactory.CreateOfferSettingsRepository(uow, offerSettings.StoreId))
                 {
                     repository.Delete(offerSettings);
                     uow.Commit();
@@ -400,7 +406,7 @@
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreateOfferSettingsRepository(uow))
+                using (var repository = RepositoryFactory.CreateOfferSettingsRepository(uow, MS.DefaultId))
                 {
                     foreach (var setting in settingsArray)
                     {
@@ -426,7 +432,7 @@
         /// </returns>
         public IOfferSettings GetByKey(Guid key)
         {
-            using (var repository = RepositoryFactory.CreateOfferSettingsRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateOfferSettingsRepository(UowProvider.GetUnitOfWork(), MS.DefaultId))
             {
                 return repository.Get(key);
             }
@@ -443,7 +449,7 @@
         /// </returns>
         public IEnumerable<IOfferSettings> GetByKeys(IEnumerable<Guid> keys)
         {
-            using (var repository = RepositoryFactory.CreateOfferSettingsRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateOfferSettingsRepository(UowProvider.GetUnitOfWork(), MS.DefaultId))
             {
                 return repository.GetAll(keys.ToArray());
             }
@@ -467,9 +473,9 @@
         /// <returns>
         /// The <see cref="Page{IOfferSettings}"/>.
         /// </returns>
-        public Page<IOfferSettings> GetPage(long page, long itemsPerPage, string sortBy = "", SortDirection sortDirection = SortDirection.Descending)
+        public Page<IOfferSettings> GetPage(long page, long itemsPerPage, int storeId, string sortBy = "", SortDirection sortDirection = SortDirection.Descending)
         {
-            using (var repository = RepositoryFactory.CreateOfferSettingsRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateOfferSettingsRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                var query = Query<IOfferSettings>.Builder.Where(x => x.Key != Guid.Empty);
 
@@ -482,6 +488,7 @@
             string filterTerm,
             long page,
             long itemsPerPage,
+            int storeId,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Descending,
             bool activeOnly = true)
@@ -501,9 +508,9 @@
         /// <returns>
         /// The <see cref="IEnumerable{IOfferSettings}"/>.
         /// </returns>
-        public IEnumerable<IOfferSettings> GetByOfferProviderKey(Guid offerProviderKey, bool activeOnly = true)
+        public IEnumerable<IOfferSettings> GetByOfferProviderKey(Guid offerProviderKey, int storeId, bool activeOnly = true)
         {
-            using (var repository = RepositoryFactory.CreateOfferSettingsRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateOfferSettingsRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 var query = activeOnly ? 
                     Query<IOfferSettings>.Builder.Where(x => x.OfferProviderKey == offerProviderKey && x.Active) :
@@ -522,9 +529,9 @@
         /// <returns>
         /// The <see cref="IOfferSettings"/>.
         /// </returns>
-        public IOfferSettings GetByOfferCode(string offerCode)
+        public IOfferSettings GetByOfferCode(string offerCode, int storeId)
         {
-            using (var repository = RepositoryFactory.CreateOfferSettingsRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateOfferSettingsRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 var query = Query<IOfferSettings>.Builder.Where(x => x.OfferCode == offerCode);
                 return repository.GetByQuery(query).FirstOrDefault();
@@ -540,9 +547,9 @@
         /// <returns>
         /// The <see cref="IEnumerable{IOfferSettings"/>.
         /// </returns>
-        public IEnumerable<IOfferSettings> GetAllActive(bool excludeExpired = true)
+        public IEnumerable<IOfferSettings> GetAllActive(int storeId, bool excludeExpired = true)
         {
-            using (var repository = RepositoryFactory.CreateOfferSettingsRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateOfferSettingsRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 var query = excludeExpired
                                 ? Query<IOfferSettings>.Builder.Where(x => x.Active && x.OfferEndsDate <= DateTime.Now)
@@ -561,9 +568,9 @@
         /// <returns>
         /// A valid indicating whether or not the offer code is unique.
         /// </returns>
-        public bool OfferCodeIsUnique(string offerCode)
+        public bool OfferCodeIsUnique(string offerCode, int storeId)
         {
-            using (var repository = RepositoryFactory.CreateOfferSettingsRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateOfferSettingsRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 var query = Query<IOfferSettings>.Builder.Where(x => x.OfferCode == offerCode);
                 var result = repository.GetByQuery(query);
@@ -596,10 +603,11 @@
             string filterTerm,
             long page,
             long itemsPerPage,
+            int storeId,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Descending)
         {
-            using (var repository = RepositoryFactory.CreateOfferSettingsRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateOfferSettingsRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 return repository.Search(filterTerm, page, itemsPerPage, this.ValidateSortByField(sortBy), sortDirection);
             }

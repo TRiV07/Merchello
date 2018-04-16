@@ -14,7 +14,7 @@
     /// <summary>
     /// Defines an offer settings service
     /// </summary>
-    public interface IOfferSettingsService : IPageCachedService<IOfferSettings>
+    public interface IOfferSettingsService : IPageCachedMSService<IOfferSettings>
     {
         /// <summary>
         /// Creates a <see cref="IOfferSettings"/> without saving it to the database
@@ -34,7 +34,7 @@
         /// <returns>
         /// The <see cref="IOfferSettings"/>.
         /// </returns>
-        IOfferSettings CreateOfferSettings(string name, string offerCode, Guid offerProviderKey, bool raiseEvents = true);
+        IOfferSettings CreateOfferSettings(string name, string offerCode, int storeId, Guid offerProviderKey, bool raiseEvents = true);
 
         /// <summary>
         /// Creates a <see cref="IOfferSettings"/> without saving it to the database
@@ -57,7 +57,7 @@
         /// <returns>
         /// The <see cref="IOfferSettings"/>.
         /// </returns>
-        IOfferSettings CreateOfferSettings(string name, string offerCode, Guid offerProviderKey, OfferComponentDefinitionCollection componentDefinitions, bool raiseEvents = true);
+        IOfferSettings CreateOfferSettings(string name, string offerCode, int storeId, Guid offerProviderKey, OfferComponentDefinitionCollection componentDefinitions, bool raiseEvents = true);
 
         /// <summary>
         /// Creates a <see cref="IOfferSettings"/> and saves it to the database
@@ -77,7 +77,7 @@
         /// <returns>
         /// The <see cref="IOfferSettings"/>.
         /// </returns>
-        IOfferSettings CreateOfferSettingsWithKey(string name, string offerCode, Guid offerProviderKey, bool raiseEvents = true);
+        IOfferSettings CreateOfferSettingsWithKey(string name, string offerCode, int storeId, Guid offerProviderKey, bool raiseEvents = true);
 
         /// <summary>
         /// Creates a <see cref="IOfferSettings"/> and saves it to the database
@@ -100,7 +100,7 @@
         /// <returns>
         /// The <see cref="IOfferSettings"/>.
         /// </returns>
-        IOfferSettings CreateOfferSettingsWithKey(string name, string offerCode, Guid offerProviderKey, OfferComponentDefinitionCollection componentDefinitions, bool raiseEvents = true);
+        IOfferSettings CreateOfferSettingsWithKey(string name, string offerCode, int storeId, Guid offerProviderKey, OfferComponentDefinitionCollection componentDefinitions, bool raiseEvents = true);
 
         /// <summary>
         /// Saves a single <see cref="IOfferSettings"/>.
@@ -180,7 +180,7 @@
         /// <returns>
         /// The <see cref="IEnumerable{IOfferSettings}"/>.
         /// </returns>
-        IEnumerable<IOfferSettings> GetByOfferProviderKey(Guid offerProviderKey, bool activeOnly = true);
+        IEnumerable<IOfferSettings> GetByOfferProviderKey(Guid offerProviderKey, int storeId, bool activeOnly = true);
         
         /// <summary>
         /// Gets a <see cref="OfferSettings"/> by the offer code value.
@@ -191,7 +191,7 @@
         /// <returns>
         /// The <see cref="IOfferSettings"/>.
         /// </returns>
-        IOfferSettings GetByOfferCode(string offerCode);
+        IOfferSettings GetByOfferCode(string offerCode, int storeId);
 
         /// <summary>
         /// Gets a collection of active <see cref="IOfferSettings"/>.
@@ -202,7 +202,7 @@
         /// <returns>
         /// The <see cref="IEnumerable{IOfferSettings}"/>.
         /// </returns>
-        IEnumerable<IOfferSettings> GetAllActive(bool excludeExpired = true);
+        IEnumerable<IOfferSettings> GetAllActive(int storeId, bool excludeExpired = true);
 
         /// <summary>
         /// Checks if the offer code is unique.
@@ -213,8 +213,8 @@
         /// <returns>
         /// A valid indicating whether or not the offer code is unique.
         /// </returns>
-        bool OfferCodeIsUnique(string offerCode);
+        bool OfferCodeIsUnique(string offerCode, int storeId);
 
-        Page<IOfferSettings> GetPage(string filterTerm, long page, long itemsPerPage, string sortBy = "", SortDirection sortDirection = SortDirection.Descending);
+        Page<IOfferSettings> GetPage(string filterTerm, long page, long itemsPerPage, int storeId, string sortBy = "", SortDirection sortDirection = SortDirection.Descending);
     }
 }

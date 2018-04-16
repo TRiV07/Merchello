@@ -17,11 +17,12 @@ angular.module('merchello').controller('Merchello.Marketing.Dialogs.NewOfferProv
         $scope.setSelection = setSelection;
 
         function init() {
+            $scope.dialogData = $scope.$parent.currentAction.metaData.dialogData;
             loadOfferProviders();
         }
 
         function loadOfferProviders() {
-            var providersPromise = marketingResource.getOfferProviders();
+            var providersPromise = marketingResource.getOfferProviders($scope.dialogData.storeId);
             providersPromise.then(function(providers) {
                 $scope.offerProviders = offerProviderDisplayBuilder.transform(providers);
                 $scope.loaded = true;
@@ -32,7 +33,7 @@ angular.module('merchello').controller('Merchello.Marketing.Dialogs.NewOfferProv
 
         function setSelection(selectedProvider) {
             navigationService.hideNavigation();
-            var view = selectedProvider.backOfficeTree.routePath.replace('{0}', 'create');
+            var view = selectedProvider.backOfficeTree.routePath.replace('{0}', 'create' + '/store/' + $scope.dialogData.storeId);
             $location.url(view, true);
         }
 

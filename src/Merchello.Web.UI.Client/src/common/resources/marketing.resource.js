@@ -5,8 +5,8 @@
  **/
 angular.module('merchello.resources')
     .factory('marketingResource',
-       ['$http', 'umbRequestHelper',
-        function($http, umbRequestHelper) {
+    ['$http', 'umbRequestHelper',
+        function ($http, umbRequestHelper) {
 
             var baseUrl = Umbraco.Sys.ServerVariables['merchelloUrls']['merchelloMarketingApiBaseUrl'];
 
@@ -16,7 +16,7 @@ angular.module('merchello.resources')
 
 
             return {
-                getOfferProviders: function() {
+                getOfferProviders: function () {
                     return umbRequestHelper.resourcePromise(
                         $http({
                             url: baseUrl + 'GetOfferProviders',
@@ -24,7 +24,7 @@ angular.module('merchello.resources')
                         }),
                         'Failed to get offer providers');
                 },
-                getOfferSettings: function(key) {
+                getOfferSettings: function (key) {
                     return umbRequestHelper.resourcePromise(
                         $http({
                             url: baseUrl + 'GetOfferSettings',
@@ -33,36 +33,37 @@ angular.module('merchello.resources')
                         }),
                         'Failed to get offer settings');
                 },
-                searchOffers: function(query) {
+                searchOffers: function (query) {
                     return umbRequestHelper.resourcePromise(
                         $http.post(baseUrl + "SearchOffers",
                             query
                         ),
                         'Failed to search offers');
                 },
-                getAllOfferSettings: function() {
+                getAllOfferSettings: function (storeId) {
                     return umbRequestHelper.resourcePromise(
                         $http({
                             url: baseUrl + 'GetAllOfferSettings',
-                            method: "GET"
+                            method: "GET",
+                            params: { storeId: storeId }
                         }),
                         'Failed to get offer settings');
                 },
-                getAvailableOfferComponents: function(offerProviderKey) {
+                getAvailableOfferComponents: function (offerProviderKey) {
                     return umbRequestHelper.resourcePromise(
                         $http({
                             url: baseUrl + 'GetAvailableOfferComponents',
                             method: "GET",
-                            params: { offerProviderKey: offerProviderKey}
+                            params: { offerProviderKey: offerProviderKey }
                         }),
                         'Failed to get offer components for the provider');
                 },
-                checkOfferCodeIsUnique: function(offerCode) {
+                checkOfferCodeIsUnique: function (offerCode, storeId) {
                     return umbRequestHelper.resourcePromise(
                         $http({
                             url: baseUrl + 'OfferCodeIsUnique',
                             method: "GET",
-                            params: { offerCode: offerCode }
+                            params: { offerCode: offerCode, storeId: storeId }
                         }),
                         'Failed to get offer components for the provider');
                 },
@@ -75,7 +76,7 @@ angular.module('merchello.resources')
                         ),
                         'Failed to create offer');
                 },
-                saveOfferSettings: function(offerSettings) {
+                saveOfferSettings: function (offerSettings) {
                     offerSettings.componentDefinitionExtendedDataToArray();
                     setUtcDates(offerSettings);
                     return umbRequestHelper.resourcePromise(
@@ -84,7 +85,7 @@ angular.module('merchello.resources')
                         ),
                         'Failed to create offer');
                 },
-                deleteOfferSettings: function(offerSettings) {
+                deleteOfferSettings: function (offerSettings) {
                     return umbRequestHelper.resourcePromise(
                         $http({
                             url: baseUrl + 'DeleteOfferSettings',

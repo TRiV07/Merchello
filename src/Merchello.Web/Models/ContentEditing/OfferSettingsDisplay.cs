@@ -27,6 +27,8 @@
         /// </summary>
         public string OfferCode { get; set; }
 
+        public int StoreId { get; set; }
+
         /// <summary>
         /// Gets or sets the offer provider key.
         /// </summary>

@@ -25,7 +25,8 @@
 
             CacheMap<OfferSettings, OfferSettingsDto>(src => src.Key, dto => dto.Key);
             CacheMap<OfferSettings, OfferSettingsDto>(src => src.Name, dto => dto.Name);
-            CacheMap<OfferSettings, OfferSettingsDto>(src => src.OfferCode, dto => dto.OfferCode);            
+            CacheMap<OfferSettings, OfferSettingsDto>(src => src.OfferCode, dto => dto.OfferCode);
+            CacheMap<OfferSettings, OfferSettingsDto>(src => src.StoreId, dto => dto.StoreId);
             CacheMap<OfferSettings, OfferSettingsDto>(src => src.OfferProviderKey, dto => dto.OfferProviderKey);
             CacheMap<OfferSettings, OfferSettingsDto>(src => src.OfferStartsDate, dto => dto.OfferStartsDate);
             CacheMap<OfferSettings, OfferSettingsDto>(src => src.OfferEndsDate, dto => dto.OfferEndsDate);

@@ -525,6 +525,7 @@
     <Compile Include="Persistence\Migrations\UpgradesMS\TargetVersionOneZeroFive\DeleteGatewayProviderSettingsForeignKeys.cs" />
     <Compile Include="Persistence\Migrations\UpgradesMS\TargetVersionOneZeroFive\UpdateData.cs" />
     <Compile Include="Persistence\Migrations\UpgradesMS\TargetVersionOneZeroFive\UpdateGatewayProviderSettingsTable.cs" />
+    <Compile Include="Persistence\Migrations\UpgradesMS\TargetVersionOneZeroSix\UpdateOfferSettingsTable.cs" />
     <Compile Include="Persistence\Migrations\UpgradesMS\TargetVersionOneZeroFour\UpdateShipmentTable.cs" />
     <Compile Include="Persistence\Migrations\UpgradesMS\TargetVersionOneZeroFour\UpdateInvoiceTable.cs" />
     <Compile Include="Persistence\Migrations\UpgradesMS\TargetVersionOneZeroThree\UpdateAnonymousCustomerTable.cs" />

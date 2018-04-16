@@ -1,5 +1,6 @@
 ﻿namespace Merchello.Core.Models.Rdbms
 {
+    using Merchello.Core.Models.EntityBase;
     using System;
 
     using Umbraco.Core.Persistence;
@@ -11,7 +12,7 @@
     [TableName("merchOfferSettings")]
     [PrimaryKey("pk", autoIncrement = false)]
     [ExplicitColumns]
-    public class OfferSettingsDto : IPageableDto
+    public class OfferSettingsDto : IHasDomainRoot, IPageableDto
     {
         /// <summary>
         /// Gets or sets the key.
@@ -20,6 +21,10 @@
         [PrimaryKeyColumn(AutoIncrement = false)]
         [Constraint(Default = "newid()")]
         public Guid Key { get; set; }
+
+        [Column("storeId")]
+        [Constraint(Default = Constants.MultiStore.DefaultId)]
+        public int StoreId { get; set; }
 
         /// <summary>
         /// Gets or sets the name.
@@ -31,7 +36,7 @@
         /// Gets or sets the offer code.
         /// </summary>
         [Column("offerCode")]
-        [IndexAttribute(IndexTypes.UniqueNonClustered, Name = "IX_merchOfferSettingsOfferCode")]
+        [IndexAttribute(IndexTypes.UniqueNonClustered, Name = "IX_merchOfferSettingsOfferCode", ForColumns = "offerCode, storeId")]
         public string OfferCode { get; set; }
 
         /// <summary>

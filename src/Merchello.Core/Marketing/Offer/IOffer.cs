@@ -3,13 +3,13 @@
     using System;
 
     using Merchello.Core.Models;
-
+    using Merchello.Core.Models.EntityBase;
     using Umbraco.Core;
 
     /// <summary>
     /// Marker interface for an offer.
     /// </summary>
-    public interface IOffer
+    public interface IOffer : IHasDomainRoot
     {
         /// <summary>
         /// Gets the key.

@@ -407,9 +407,9 @@
         /// <returns>
         /// The <see cref="IOfferSettingsRepository"/>.
         /// </returns>
-        internal virtual IOfferSettingsRepository CreateOfferSettingsRepository(IDatabaseUnitOfWork uow)
+        internal virtual IOfferSettingsRepository CreateOfferSettingsRepository(IDatabaseUnitOfWork uow, int storeId)
         {
-            return new OfferSettingsRepository(uow, _logger, _sqlSyntax);
+            return new OfferSettingsRepository(uow, storeId, _logger, _sqlSyntax);
         }
 
         /// <summary>

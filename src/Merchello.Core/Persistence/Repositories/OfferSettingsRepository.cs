@@ -22,10 +22,12 @@
     using Umbraco.Core.Persistence.Querying;
     using Umbraco.Core.Persistence.SqlSyntax;
 
+    using MS = Merchello.Core.Constants.MultiStore;
+
     /// <summary>
     /// Represents an offer settings repository.
     /// </summary>
-    internal class OfferSettingsRepository : PagedRepositoryBase<IOfferSettings, OfferSettingsDto>, IOfferSettingsRepository
+    internal class OfferSettingsRepository : PagedMSRepositoryBase<IOfferSettings, OfferSettingsDto>, IOfferSettingsRepository
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="OfferSettingsRepository"/> class.
@@ -39,8 +41,8 @@
         /// <param name="sqlSyntax">
         /// The SQL Syntax.
         /// </param>
-        public OfferSettingsRepository(IDatabaseUnitOfWork work, ILogger logger, ISqlSyntaxProvider sqlSyntax)
-            : base(work, logger, sqlSyntax)
+        public OfferSettingsRepository(IDatabaseUnitOfWork work, int storeId, ILogger logger, ISqlSyntaxProvider sqlSyntax)
+            : base(work, storeId, logger, sqlSyntax)
         {
         }
 
@@ -157,6 +159,9 @@
                 {
                     dtos.AddRange(Database.Fetch<OfferSettingsDto>(GetBaseQuery(false).WhereIn<OfferSettingsDto>(x => x.Key, keyList, SqlSyntax)));
                 }
+
+                // Saving keys order
+                dtos = keys.Select(k => dtos.FirstOrDefault(x => x.Key == k)).ToList();
             }
             else
             {
@@ -206,6 +211,11 @@
             var sql = new Sql();
             sql.Select(isCount ? "COUNT(*)" : "*")
                 .From<OfferSettingsDto>(SqlSyntax);
+
+            if (_storeId != MS.DefaultId)
+            {
+                sql.Where<OfferSettingsDto>(x => x.StoreId == _storeId, SqlSyntax);
+            }
 
             return sql;
         }
@@ -289,6 +299,12 @@
 
             var sql = new Sql();
             sql.Select("*").From<OfferSettingsDto>(SqlSyntax);
+
+            if (_storeId != MS.DefaultId)
+            {
+                sql.Where<OfferSettingsDto>(x => x.StoreId == _storeId, SqlSyntax);
+            }
+
             if (terms.Any())
             {
                 sql.Where("name LIKE @term OR offerCode LIKE @offerCode", new { @term = string.Format("%{0}%", string.Join("% ", terms)).Trim(), offerCode = string.Format("%{0}%", string.Join("% ", terms)).Trim() });
