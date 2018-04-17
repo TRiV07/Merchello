@@ -74,7 +74,7 @@
         /// <returns>
         /// The <see cref="QueryResultDisplay"/>.
         /// </returns>
-        public abstract QueryResultDisplay GetDefaultReportData();
+        public abstract QueryResultDisplay GetDefaultReportData(int storeId);
 
         /// <summary>
         /// Utility method to create the base url.
@@ -93,7 +93,7 @@
             var url = new UrlHelper(new RequestContext(new HttpContextWrapper(HttpContext.Current), new RouteData()));
             return new KeyValuePair<string, object>(
                 routeName,
-                url.GetUmbracoApiServiceBaseUrl<T>(controller => controller.GetDefaultReportData()));
+                url.GetUmbracoApiServiceBaseUrl<T>(controller => controller.GetDefaultReportData(Core.Constants.MultiStore.DefaultId)));//TOCHECKMS
         }
 
 
@@ -103,7 +103,6 @@
         /// </summary>
         private void Initialize()
         {
-            
             _activeCurrencies =
                 new Lazy<IEnumerable<ICurrency>>(
                     () =>

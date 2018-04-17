@@ -1,6 +1,6 @@
 angular.module('merchello.directives').directive('reportWidgeThisWeekVsLast',
-    ['$q', '$log', '$filter', 'assetsService', 'localizationService', 'merchDateHelper',  'settingsResource', 'salesOverTimeResource', 'queryDisplayBuilder',
-        function($q, $log, $filter, assetsService, localizationService, dateHelper, settingsResource, salesOverTimeResource, queryDisplayBuilder) {
+    ['$q', '$routeParams', '$log', '$filter', 'assetsService', 'localizationService', 'merchDateHelper', 'settingsResource', 'salesOverTimeResource', 'queryDisplayBuilder',
+        function ($q, $routeParams, $log, $filter, assetsService, localizationService, dateHelper, settingsResource, salesOverTimeResource, queryDisplayBuilder) {
 
             return {
                 restrict: 'E',
@@ -9,7 +9,7 @@ angular.module('merchello.directives').directive('reportWidgeThisWeekVsLast',
                     ready: '=?'
                 },
                 templateUrl: '/App_Plugins/Merchello/Backoffice/Merchello/Directives/reportwidget.thisweekvslast.tpl.html',
-                link: function(scope, elm, attr) {
+                link: function (scope, elm, attr) {
 
 
                     scope.loaded = false;
@@ -23,7 +23,7 @@ angular.module('merchello.directives').directive('reportWidgeThisWeekVsLast',
 
                     scope.getTotalsColumn = getTotalsColumn;
 
-                    assetsService.loadCss('/App_Plugins/Merchello/lib/charts/angular-chart.min.css').then(function() {
+                    assetsService.loadCss('/App_Plugins/Merchello/lib/charts/angular-chart.min.css').then(function () {
                         init();
                     });
 
@@ -33,8 +33,8 @@ angular.module('merchello.directives').directive('reportWidgeThisWeekVsLast',
 
                         $q.all([
                             dateHelper.getLocalizedDaysOfWeek(),
-                            settingsResource.getAllCombined()
-                        ]).then(function(data) {
+                            settingsResource.getAllCombined($routeParams.storeId)
+                        ]).then(function (data) {
                             scope.weekdays = data[0];
                             scope.settings = data[1];
                             loadReportData();
@@ -50,15 +50,17 @@ angular.module('merchello.directives').directive('reportWidgeThisWeekVsLast',
                         var lastQuery = queryDisplayBuilder.createDefault();
                         var currentQuery = queryDisplayBuilder.createDefault();
                         currentQuery.addInvoiceDateParam(thisWeekEnd, 'end');
+                        currentQuery.storeId = $routeParams.storeId;
                         lastQuery.addInvoiceDateParam(lastWeekEnd, 'end');
+                        lastQuery.storeId = $routeParams.storeId;
 
                         var deferred = $q.defer();
                         $q.all([
                             salesOverTimeResource.getWeeklyResult(currentQuery),
                             salesOverTimeResource.getWeeklyResult(lastQuery)
 
-                        ]).then(function(data) {
-                            scope.resultData = [ data[0].items, data[1].items];
+                        ]).then(function (data) {
+                            scope.resultData = [data[0].items, data[1].items];
                             compileChart();
                         });
 
@@ -72,7 +74,7 @@ angular.module('merchello.directives').directive('reportWidgeThisWeekVsLast',
 
                         if (scope.resultData.length > 0) {
 
-                            _.each(scope.resultData[0], function(days) {
+                            _.each(scope.resultData[0], function (days) {
 
                                 var dt = dateHelper.getGmt0EquivalentDate(new Date(days.startDate));
                                 var dd = dt.getDay();
@@ -83,8 +85,8 @@ angular.module('merchello.directives').directive('reportWidgeThisWeekVsLast',
                             // list the series
                             // we'll have 'This Week' and 'Last Week' for every currency code
                             var seriesTemplate = [];
-                            _.each(scope.resultData[0][0].totals, function(t) {
-                                seriesTemplate.push({label: t.currency.symbol + ' ' + t.currency.currencyCode, currencyCode: t.currency.currencyCode});
+                            _.each(scope.resultData[0][0].totals, function (t) {
+                                seriesTemplate.push({ label: t.currency.symbol + ' ' + t.currency.currencyCode, currencyCode: t.currency.currencyCode });
                             });
 
                             var dataSeriesLength = seriesTemplate.length * 2;
@@ -95,8 +97,8 @@ angular.module('merchello.directives').directive('reportWidgeThisWeekVsLast',
 
 
                             var seriesIndex = 0;
-                            _.each(scope.resultData, function(dataSet) {
-                                for(var j = 0; j < seriesTemplate.length; j++) {
+                            _.each(scope.resultData, function (dataSet) {
+                                for (var j = 0; j < seriesTemplate.length; j++) {
                                     addChartData(dataSet, seriesTemplate[j].currencyCode, seriesIndex);
                                     seriesIndex++;
                                 }
@@ -109,7 +111,7 @@ angular.module('merchello.directives').directive('reportWidgeThisWeekVsLast',
                     }
 
                     function buildSeries(template, prefix) {
-                        _.each(template, function(item) {
+                        _.each(template, function (item) {
                             scope.series.push(prefix + ': ' + item.label);
                             scope.chartData.push([]);
                         });
@@ -117,10 +119,10 @@ angular.module('merchello.directives').directive('reportWidgeThisWeekVsLast',
 
                     function addChartData(dataSeries, currencyCode, chartDataIndex) {
 
-                        _.each(dataSeries, function(item) {
-                           var total = _.find(item.totals, function(tot) {
-                               return tot.currency.currencyCode === currencyCode;
-                           });
+                        _.each(dataSeries, function (item) {
+                            var total = _.find(item.totals, function (tot) {
+                                return tot.currency.currencyCode === currencyCode;
+                            });
                             scope.chartData[chartDataIndex].push(total.value);
                         });
                     }
@@ -129,7 +131,7 @@ angular.module('merchello.directives').directive('reportWidgeThisWeekVsLast',
                         var result = scope.resultData[resultIndex][valueIndex];
 
                         var ret = '';
-                        _.each(result.totals, function(total) {
+                        _.each(result.totals, function (total) {
                             if (ret !== '') ret += '<br />';
                             ret += total.currency.currencyCode + ': ' + $filter('currency')(total.value, total.currency.symbol);
                         });

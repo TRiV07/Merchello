@@ -7,9 +7,9 @@
  * The controller for product list view controller
  */
 angular.module('merchello').controller('Merchello.Backoffice.ProductListController',
-    ['$scope', '$log', '$q', '$routeParams', '$location', '$filter', '$compile', 'localizationService', 'notificationsService', 'settingsResource', 'entityCollectionResource',
+    ['$scope', '$log', '$q', '$routeParams', '$location', '$filter', '$compile', 'userService', 'localizationService', 'notificationsService', 'settingsResource', 'entityCollectionResource',
         'merchelloTabsFactory', 'productResource', 'productDisplayBuilder',
-        function ($scope, $log, $q, $routeParams, $location, $filter, $compile, localizationService, notificationsService, settingsResource, entityCollectionResource,
+        function ($scope, $log, $q, $routeParams, $location, $filter, $compile, userService, localizationService, notificationsService, settingsResource, entityCollectionResource,
             merchelloTabsFactory, productResource, productDisplayBuilder) {
 
             $scope.productDisplayBuilder = productDisplayBuilder;
@@ -66,8 +66,14 @@ angular.module('merchello').controller('Merchello.Backoffice.ProductListControll
              */
             function init() {
                 loadSettings();
-                $scope.tabs = merchelloTabsFactory.createProductListTabs();
-                $scope.tabs.setActive('productlist');
+                userService.getCurrentUser().then(function (user) {
+                    var isMainAdmin = _.find(user.startContentIds, function (id) {
+                        if (id == -1) return id;
+                    }) == -1;
+                    $scope.tabs = merchelloTabsFactory.createProductListTabs(isMainAdmin);
+                    $scope.tabs.setActive('productlist');
+                });
+                
             }
 
 

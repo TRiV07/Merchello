@@ -1,9 +1,9 @@
 
 angular.module('merchello').controller('Merchello.Backoffice.Reports.SalesOverTimeController',
-    ['$scope', '$q', '$log', '$filter', 'assetsService', 'dialogService', 'queryDisplayBuilder',
+    ['$scope', '$q', '$routeParams', '$log', '$filter', 'assetsService', 'dialogService', 'queryDisplayBuilder',
         'settingsResource', 'invoiceHelper', 'merchelloTabsFactory', 'salesOverTimeResource',
-        function($scope, $q, $log, $filter, assetsService, dialogService, queryDisplayBuilder,
-                 settingsResource, invoiceHelper, merchelloTabsFactory, salesOverTimeResource) {
+        function ($scope, $q, $routeParams, $log, $filter, assetsService, dialogService, queryDisplayBuilder,
+            settingsResource, invoiceHelper, merchelloTabsFactory, salesOverTimeResource) {
 
             $scope.loaded = false;
             $scope.preValuesLoaded = false;
@@ -24,7 +24,7 @@ angular.module('merchello').controller('Merchello.Backoffice.Reports.SalesOverTi
             $scope.reverse = reverse;
 
 
-            assetsService.loadCss('/App_Plugins/Merchello/lib/charts/angular-chart.min.css').then(function() {
+            assetsService.loadCss('/App_Plugins/Merchello/lib/charts/angular-chart.min.css').then(function () {
                 init();
             });
 
@@ -43,14 +43,14 @@ angular.module('merchello').controller('Merchello.Backoffice.Reports.SalesOverTi
              * @description - Load the Merchello settings.
              */
             function loadSettings() {
-                settingsResource.getAllCombined().then(function(combined) {
+                settingsResource.getAllCombined($routeParams.storeId).then(function (combined) {
                     $scope.settings = combined.settings;
                     loadDefaultData();
                 });
             };
 
             function loadDefaultData() {
-                salesOverTimeResource.getDefaultReportData().then(function(result) {
+                salesOverTimeResource.getDefaultReportData($routeParams.storeId).then(function (result) {
                     compileChart(result);
                 });
             }
@@ -60,9 +60,10 @@ angular.module('merchello').controller('Merchello.Backoffice.Reports.SalesOverTi
                 var query = queryDisplayBuilder.createDefault();
                 query.addInvoiceDateParam($scope.startDate, 'start');
                 query.addInvoiceDateParam($scope.endDate, 'end');
+                query.storeId = $routeParams.storeId;
 
-                salesOverTimeResource.getCustomReportData(query).then(function(result) {
-                   compileChart(result);
+                salesOverTimeResource.getCustomReportData(query).then(function (result) {
+                    compileChart(result);
                 });
             }
 
@@ -83,15 +84,15 @@ angular.module('merchello').controller('Merchello.Backoffice.Reports.SalesOverTi
                 setDateButtonText();
 
                 if ($scope.reportData.length > 0) {
-                    _.each($scope.reportData[0].totals, function(t) {
+                    _.each($scope.reportData[0].totals, function (t) {
                         $scope.series.push(t.currency.symbol + ' ' + t.currency.currencyCode);
                         $scope.chartData.push([]);
                     })
                 }
 
-                _.each($scope.reportData, function(item) {
+                _.each($scope.reportData, function (item) {
                     var j = 0;
-                    for(var i = 0; i < $scope.series.length; i++) {
+                    for (var i = 0; i < $scope.series.length; i++) {
                         $scope.chartData[j].push(item.totals[i].value.toFixed(2));
                         j++;
                     }
@@ -110,8 +111,8 @@ angular.module('merchello').controller('Merchello.Backoffice.Reports.SalesOverTi
 
             function getColumnValue(data, series) {
 
-                var total = _.find(data.totals, function(t) {
-                   return series.indexOf(t.currency.currencyCode) > -1;
+                var total = _.find(data.totals, function (t) {
+                    return series.indexOf(t.currency.currencyCode) > -1;
                 });
 
                 if (total !== null && total !== undefined) {
@@ -125,7 +126,8 @@ angular.module('merchello').controller('Merchello.Backoffice.Reports.SalesOverTi
             function openDateRangeDialog() {
                 var dialogData = {
                     startDate: $scope.startDate,
-                    endDate: $scope.endDate
+                    endDate: $scope.endDate,
+                    storeId: $routeParams.storeId
                 };
 
                 dialogService.open({
@@ -141,8 +143,8 @@ angular.module('merchello').controller('Merchello.Backoffice.Reports.SalesOverTi
                 if ($scope.reportData.length > 0) {
                     var total = 0;
                     var symbol = '';
-                    _.each($scope.reportData, function(data) {
-                        var itemTotal = _.find(data.totals, function(t) {
+                    _.each($scope.reportData, function (data) {
+                        var itemTotal = _.find(data.totals, function (t) {
                             return series.indexOf(t.currency.currencyCode) > -1;
                         });
 

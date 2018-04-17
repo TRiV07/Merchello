@@ -411,6 +411,7 @@
                   term.Value,
                   query.CurrentPage + 1,
                   query.ItemsPerPage,
+                  query.StoreId,
                   query.SortBy,
                   query.SortDirection)
               :
@@ -418,6 +419,7 @@
                   key,
                   query.CurrentPage + 1,
                   query.ItemsPerPage,
+                  query.StoreId,
                   query.SortBy,
                   query.SortDirection);
         }

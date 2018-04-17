@@ -78,12 +78,13 @@
             Guid collectionKey,
             long page,
             long itemsPerPage,
+            int storeId,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Ascending)
         {
             
             return
-                this.GetQueryResultDisplay(GetCollectionPagedKeys(collectionKey, page, itemsPerPage, sortBy, sortDirection));
+                this.GetQueryResultDisplay(GetCollectionPagedKeys(collectionKey, page, itemsPerPage, storeId, sortBy, sortDirection));
         }
 
         /// <summary>
@@ -115,6 +116,7 @@
             string searchTerm,
             long page,
             long itemsPerPage,
+            int storeId,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Ascending)
         {
@@ -133,6 +135,7 @@
                     "GetFromCollection",
                     page,
                     itemsPerPage,
+                    storeId,
                     sortBy,
                     sortDirection,
                     new Dictionary<string, string>
@@ -149,7 +152,7 @@
                     PagedKeyCache
                     .CachePage(
                         cacheKey,
-                        ((CachedQueryableEntityCollectionProviderBase<TEntity>)provider).GetPagedEntityKeys(args, page, itemsPerPage, Core.Constants.MultiStore.DefaultId, sortBy, sortDirection)));//TOCHECKMS
+                        ((CachedQueryableEntityCollectionProviderBase<TEntity>)provider).GetPagedEntityKeys(args, page, itemsPerPage, storeId, sortBy, sortDirection)));//TOCHECKMS
         }
 
         /// <summary>
@@ -328,6 +331,7 @@
             Guid collectionKey,
             long page,
             long itemsPerPage,
+            int storeId,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Ascending)
         {
@@ -340,6 +344,7 @@
                "GetFromCollection",
                page,
                itemsPerPage,
+               storeId,
                sortBy,
                sortDirection,
                args);
@@ -350,7 +355,7 @@
             var provider = this.GetEntityCollectionProvider(collectionKey);
             return PagedKeyCache.CachePage(
                        cacheKey,
-                       provider.GetPagedEntityKeys(page, itemsPerPage, Core.Constants.MultiStore.DefaultId, sortBy, sortDirection));//TOCHECKMS
+                       provider.GetPagedEntityKeys(page, itemsPerPage, storeId, sortBy, sortDirection));//TOCHECKMS
         } 
 
         /// <summary>

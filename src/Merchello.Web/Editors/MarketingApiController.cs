@@ -14,7 +14,7 @@
     using Merchello.Web.Models.ContentEditing;
     using Merchello.Web.Models.Querying;
     using Merchello.Web.WebApi;
-
+    using Merchello.Web.WebApi.Filters;
     using Umbraco.Core.Persistence;
     using Umbraco.Web;
     using Umbraco.Web.Mvc;
@@ -142,6 +142,7 @@
         /// The <see cref="QueryResultDisplay"/>.
         /// </returns>
         [HttpPost]
+        [EnsureUserPermissionForStore("query.StoreId")]
         public QueryResultDisplay SearchOffers(QueryDisplay query)
         {
             var term = query.Parameters.FirstOrDefault(x => x.FieldName == "term");
@@ -162,6 +163,7 @@
         /// The <see cref="IEnumerable{OfferSettingsDisplay}"/>.
         /// </returns>
         [HttpGet]
+        [EnsureUserPermissionForStore("storeId")]
         public IEnumerable<OfferSettingsDisplay> GetAllOfferSettings(int storeId)
         {
             var offers = _offerSettingsService.GetAllActive(storeId, false);
@@ -178,6 +180,7 @@
         /// The <see cref="OfferSettingsDisplay"/>.
         /// </returns>
         [HttpPost]
+        [EnsureUserPermissionForStore("query.StoreId")]
         public OfferSettingsDisplay PostAddOfferSettings(OfferSettingsDisplay settings)
         {
             var offerSettings = _offerSettingsService.CreateOfferSettings(
@@ -216,6 +219,7 @@
             {
                 throw new NullReferenceException("OfferSettings was not found");
             }
+            ValidateStoreAccess(offerSettings.StoreId);
 
             offerSettings = settings.ToOfferSettings(offerSettings);
 
@@ -243,6 +247,7 @@
             {
                 return Request.CreateResponse(HttpStatusCode.NotFound);
             }
+            ValidateStoreAccess(offerSettings.StoreId);
             _offerSettingsService.Delete(offerSettings);
             return Request.CreateResponse(HttpStatusCode.OK);
         }
@@ -257,6 +262,7 @@
         /// A valid indicating whether or not the offer code is unique.
         /// </returns>
         [HttpGet]
+        [EnsureUserPermissionForStore("storeId")]
         public bool OfferCodeIsUnique(int storeId, string offerCode = "")
         {
             if (string.IsNullOrEmpty(offerCode)) return false;

@@ -832,7 +832,7 @@
                 .InnerJoin<CustomerIndexDto>(SqlSyntax)
                 .On<CustomerDto, CustomerIndexDto>(SqlSyntax, left => left.Key, right => right.CustomerKey);
 
-            if (_storeId != Constants.System.Root)
+            if (_storeId != Core.Constants.MultiStore.DefaultId)
             {
                 sql.Where<CustomerDto>(x => x.StoreId == _storeId, SqlSyntax);
             }
@@ -969,7 +969,7 @@
 
             var sql = new Sql();
             sql.Select("*").From<CustomerDto>(SqlSyntax);
-            if (_storeId != Constants.System.Root)
+            if (_storeId != Core.Constants.MultiStore.DefaultId)
             {
                 sql.Where<CustomerDto>(x => x.StoreId == _storeId, SqlSyntax);
             }

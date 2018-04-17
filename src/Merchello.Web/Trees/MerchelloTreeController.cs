@@ -24,6 +24,8 @@
     using Umbraco.Web.Mvc;
     using Umbraco.Web.Trees;
 
+    using UConstants = Umbraco.Core.Constants;
+
     /// <summary>
     /// The merchello tree controller.
     /// </summary>
@@ -174,6 +176,9 @@
             var menu = new MenuItemCollection();
             var splitId = new SplitRoutePath(id);
 
+            var startNodeIds = UmbracoContext.Current.Security.CurrentUser.CalculateContentStartNodeIds(ApplicationContext.Current.Services.EntityService);
+            var hasAccessToRoot = startNodeIds.Contains(UConstants.System.Root);
+
             // Products
             if (splitId.CollectionId == "products")
             {
@@ -186,11 +191,13 @@
                         _textService.Localize("merchelloVariant/newProduct", _culture));
                 //.NavigateToRoute("merchello/merchello/productedit/create");
 
-                menu.Items.Add<NewProductContentTypeAction>(
+                if (hasAccessToRoot)
+                {
+                    menu.Items.Add<NewProductContentTypeAction>(
                     _textService.Localize("merchelloDetachedContent/associateContentType", _culture),
                     false)
                     .LaunchDialogView(DialogsPath + "productcontenttype.add.html", _textService.Localize("merchelloDetachedContent/associateContentType", _culture));
-
+                }
             }
 
             if (splitId.CollectionId == "customers")

@@ -265,7 +265,7 @@ angular.module('merchello').controller('Merchello.Backoffice.SalesOverviewContro
              */
             function loadPaymentMethods() {
                 if ($scope.payments.length === 0) {
-                    var promise = paymentGatewayProviderResource.getAvailablePaymentMethods();
+                    var promise = paymentGatewayProviderResource.getAvailablePaymentMethods($routeParams.storeId);
                     promise.then(function (methods) {
                         $scope.paymentMethods = paymentMethodDisplayBuilder.transform(methods);
                         $scope.preValuesLoaded = true;
@@ -332,7 +332,7 @@ angular.module('merchello').controller('Merchello.Backoffice.SalesOverviewContro
                     We need to be able to swap out the editor depending on the provider here.
                 */
 
-                var promise = paymentResource.getPaymentMethod(dialogData.paymentMethodKey);
+                var promise = paymentResource.getPaymentMethod(dialogData.paymentMethodKey, $routeParams.storeId);
                 promise.then(function (paymentMethod) {
                     var pm = paymentMethodDisplayBuilder.transform(paymentMethod);
                     if (pm.capturePaymentEditorView.editorView !== '') {

@@ -233,9 +233,9 @@
         /// <returns>
         /// The <see cref="IEnumerable{IProductContent}"/>.
         /// </returns>
-        public IEnumerable<IProductContent> TypedProductContentFromCollection(Guid collectionKey)
+        public IEnumerable<IProductContent> TypedProductContentFromCollection(Guid collectionKey, int storeId)
         {
-            return TypedProductContentFromCollection(collectionKey, 1, long.MaxValue);
+            return TypedProductContentFromCollection(collectionKey, 1, long.MaxValue, storeId);
         }
 
         /// <summary>
@@ -263,10 +263,11 @@
             Guid collectionKey,
             long page,
             long itemsPerPage,
+            int storeId,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Ascending)
         {
-            return TypedProductContentPageFromCollection(collectionKey, page, itemsPerPage, sortBy, sortDirection).Items;
+            return TypedProductContentPageFromCollection(collectionKey, page, itemsPerPage, storeId, sortBy, sortDirection).Items;
         }
 
 
@@ -295,10 +296,11 @@
             Guid collectionKey,
             long page,
             long itemsPerPage,
+            int storeId,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Ascending)
         {
-            var pagedKeys = GetCollectionPagedKeys(collectionKey, page, itemsPerPage, sortBy, sortDirection);
+            var pagedKeys = GetCollectionPagedKeys(collectionKey, page, itemsPerPage, storeId, sortBy, sortDirection);
 
             return _cache.GetPagedCollectionByCacheKey(pagedKeys, sortBy);
         }

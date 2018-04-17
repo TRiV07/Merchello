@@ -1,5 +1,5 @@
 angular.module('merchello.directives').directive('merchelloDateRangeButton',
-    function($filter, settingsResource, dialogService, merchDateHelper) {
+    function ($routeParams, $filter, settingsResource, dialogService, merchDateHelper) {
 
         return {
             restrict: 'E',
@@ -33,7 +33,7 @@ angular.module('merchello.directives').directive('merchelloDateRangeButton',
                  * @description - Load the Merchello settings.
                  */
                 function loadSettings() {
-                    settingsResource.getAllCombined().then(function(combined) {
+                    settingsResource.getAllCombined($routeParams.storeId).then(function(combined) {
                         scope.settings = combined.settings;
                         setDefaultDates();
                         scope.loaded = true;
@@ -62,7 +62,8 @@ angular.module('merchello.directives').directive('merchelloDateRangeButton',
                 function openDateRangeDialog() {
                     var dialogData = {
                         startDate: scope.startDate,
-                        endDate: scope.endDate
+                        endDate: scope.endDate,
+                        storeId: $routeParams.storeId
                     };
 
                     dialogService.open({

@@ -19,6 +19,7 @@
     using Umbraco.Core.Persistence.SqlSyntax;
 
     using RepositoryFactory = Merchello.Core.Persistence.RepositoryFactory;
+    using MS = Merchello.Core.Constants.MultiStore;
 
     /// <summary>
     /// Represents the Customer Registry Service 
@@ -209,7 +210,7 @@
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreateItemCacheRepository(uow))
+                using (var repository = RepositoryFactory.CreateItemCacheRepository(uow, MS.DefaultId))
                 {
                     repository.AddOrUpdate(itemCache);
                     uow.Commit();
@@ -233,7 +234,7 @@
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreateItemCacheRepository(uow))
+                using (var repository = RepositoryFactory.CreateItemCacheRepository(uow, MS.DefaultId))
                 {
                     repository.AddOrUpdate(itemCache);
                     uow.Commit();
@@ -257,7 +258,7 @@
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreateItemCacheRepository(uow))
+                using (var repository = RepositoryFactory.CreateItemCacheRepository(uow, MS.DefaultId))
                 {
                     foreach (var basket in basketArray)
                     {
@@ -283,7 +284,7 @@
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreateItemCacheRepository(uow))
+                using (var repository = RepositoryFactory.CreateItemCacheRepository(uow, MS.DefaultId))
                 {
                     repository.Delete(itemCache);
                     uow.Commit();
@@ -306,7 +307,7 @@
             using (new WriteLock(Locker))
             {
                 var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreateItemCacheRepository(uow))
+                using (var repository = RepositoryFactory.CreateItemCacheRepository(uow, MS.DefaultId))
                 {
                     foreach (var basket in caches)
                     {
@@ -326,7 +327,7 @@
         /// <returns><see cref="IItemCache"/></returns>
         public IItemCache GetByKey(Guid key)
         {
-            using (var repository = RepositoryFactory.CreateItemCacheRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateItemCacheRepository(UowProvider.GetUnitOfWork(), MS.DefaultId))
             {
                 return repository.Get(key);
             }
@@ -336,7 +337,7 @@
         /// <inheritdoc/>
         public IEnumerable<IItemCache> GetItemCaches(Guid entityKey)
         {
-            using (var repository = RepositoryFactory.CreateItemCacheRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateItemCacheRepository(UowProvider.GetUnitOfWork(), MS.DefaultId))
             {
                 var query = Query<IItemCache>.Builder.Where(x => x.EntityKey == entityKey);
                 return repository.GetByQuery(query);
@@ -346,7 +347,7 @@
         /// <inheritdoc/>
         public IEnumerable<IItemCache> GetEntityItemCaches(Guid entityKey, Guid itemCacheTfKey)
         {
-            using (var repository = RepositoryFactory.CreateItemCacheRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateItemCacheRepository(UowProvider.GetUnitOfWork(), MS.DefaultId))
             {
                 var query = Query<IItemCache>.Builder.Where(x => x.EntityKey == entityKey && x.ItemCacheTfKey == itemCacheTfKey);
                 return repository.GetByQuery(query);
@@ -386,6 +387,7 @@
             DateTime endDate,
             long page,
             long itemsPerPage,
+            int storeId,
             string sortBy = "",
             SortDirection sortDirection = SortDirection.Descending)
         {
@@ -394,7 +396,7 @@
 
             var itemCacheTfKey = EnumTypeFieldConverter.ItemItemCache.GetTypeField(itemCacheType).TypeKey;
 
-            using (var repository = RepositoryFactory.CreateItemCacheRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateItemCacheRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 return repository.GetCustomerItemCachePage(itemCacheTfKey, startDate, endDate, page, itemsPerPage, sortBy, sortDirection);
             }
@@ -407,7 +409,7 @@
         /// <returns>The collection of <see cref="IItemCache"/></returns>
         public IEnumerable<IItemCache> GetByKeys(IEnumerable<Guid> keys)
         {
-            using (var repository = RepositoryFactory.CreateItemCacheRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateItemCacheRepository(UowProvider.GetUnitOfWork(), MS.DefaultId))
             {
                 return repository.GetAll(keys.ToArray());
             }
@@ -425,11 +427,11 @@
         /// <returns>
         /// The count of item caches.
         /// </returns>
-        public int Count(ItemCacheType itemCacheType, CustomerType customerType)
+        public int Count(ItemCacheType itemCacheType, CustomerType customerType, int storeId)
         {
             var dtMin = DateTime.MinValue.SqlDateTimeMinValueAsDateTimeMinValue();
             var dtMax = DateTime.MaxValue.SqlDateTimeMaxValueAsSqlDateTimeMaxValue();
-            return Count(itemCacheType, customerType, dtMin, dtMax);
+            return Count(itemCacheType, customerType, storeId, dtMin, dtMax);
         }
 
         /// <summary>
@@ -450,11 +452,11 @@
         /// <returns>
         /// The count of item caches.
         /// </returns>
-        public int Count(ItemCacheType itemCacheType, CustomerType customerType, DateTime startDate, DateTime endDate)
+        public int Count(ItemCacheType itemCacheType, CustomerType customerType, int storeId, DateTime startDate, DateTime endDate)
         {
             var tfkey = EnumTypeFieldConverter.ItemItemCache.GetTypeField(itemCacheType).TypeKey;
 
-            using (var repository = RepositoryFactory.CreateItemCacheRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateItemCacheRepository(UowProvider.GetUnitOfWork(), storeId))
             {
                 return repository.Count(tfkey, customerType, startDate, endDate);
             }
@@ -489,7 +491,7 @@
         /// </returns>
         public IEnumerable<IItemCache> GetItemCacheByCustomer(ICustomerBase customer)
         {
-            using (var repository = RepositoryFactory.CreateItemCacheRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateItemCacheRepository(UowProvider.GetUnitOfWork(), MS.DefaultId))
             {
                 var query = Query<IItemCache>.Builder.Where(x => x.EntityKey == customer.Key);
                 return repository.GetByQuery(query);
@@ -510,7 +512,7 @@
         /// </returns>
         public IItemCache GetItemCacheByCustomer(ICustomerBase customer, Guid itemCacheTfKey)
         {
-            using (var repository = RepositoryFactory.CreateItemCacheRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateItemCacheRepository(UowProvider.GetUnitOfWork(), MS.DefaultId))
             {
                 var query = Query<IItemCache>.Builder.Where(x => x.EntityKey == customer.Key && x.ItemCacheTfKey == itemCacheTfKey);
                 return repository.GetByQuery(query).FirstOrDefault();
@@ -525,7 +527,7 @@
         /// </returns>
         public IEnumerable<IItemCache> GetAll()
         {
-            using (var repository = RepositoryFactory.CreateItemCacheRepository(UowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateItemCacheRepository(UowProvider.GetUnitOfWork(), MS.DefaultId))
             {
                 return repository.GetAll();
             }

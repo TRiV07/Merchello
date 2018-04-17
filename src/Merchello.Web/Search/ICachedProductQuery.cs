@@ -59,7 +59,7 @@
         /// <returns>
         /// The <see cref="IEnumerable{IProductContent}"/>.
         /// </returns>
-        IEnumerable<IProductContent> TypedProductContentFromCollection(Guid collectionKey);
+        IEnumerable<IProductContent> TypedProductContentFromCollection(Guid collectionKey, int storeId);
 
         /// <summary>
         /// Gets the typed <see cref="IProductContent"/> for a collection.
@@ -82,7 +82,7 @@
         /// <returns>
         /// The <see cref="IEnumerable{IProductContent}"/>.
         /// </returns>
-        IEnumerable<IProductContent> TypedProductContentFromCollection(Guid collectionKey, long page, long itemsPerPage, string sortBy = "", SortDirection sortDirection = SortDirection.Ascending);
+        IEnumerable<IProductContent> TypedProductContentFromCollection(Guid collectionKey, long page, long itemsPerPage, int storeId, string sortBy = "", SortDirection sortDirection = SortDirection.Ascending);
 
         /// <summary>
         /// Gets a <see cref="PagedCollection{IProductContent}"/>.
@@ -105,7 +105,7 @@
         /// <returns>
         /// The <see cref="PagedCollection"/>.
         /// </returns>
-        PagedCollection<IProductContent> TypedProductContentPageFromCollection(Guid collectionKey, long page, long itemsPerPage, string sortBy = "", SortDirection sortDirection = SortDirection.Ascending);
+        PagedCollection<IProductContent> TypedProductContentPageFromCollection(Guid collectionKey, long page, long itemsPerPage, int storeId, string sortBy = "", SortDirection sortDirection = SortDirection.Ascending);
 
         /// <summary>
         /// Search returning an <see cref="IProductContent"/> collection.

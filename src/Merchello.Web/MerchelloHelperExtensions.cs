@@ -136,9 +136,9 @@
         /// <returns>
         /// The <see cref="IEnumerable{IProductContent}"/>.
         /// </returns>
-        public static IEnumerable<IProductContent> TypedProductContentFromCollection(this MerchelloHelper merchello, Guid collectionKey)
+        public static IEnumerable<IProductContent> TypedProductContentFromCollection(this MerchelloHelper merchello, Guid collectionKey, int storeId)
         {
-            return merchello.Query.Product.TypedProductContentFromCollection(collectionKey);
+            return merchello.Query.Product.TypedProductContentFromCollection(collectionKey, storeId);
         }
 
         /// <summary>
@@ -165,11 +165,11 @@
         /// <returns>
         /// The <see cref="IEnumerable{IProductContent}"/>.
         /// </returns>
-        public static IEnumerable<IProductContent> TypedProductContentFromCollection(this MerchelloHelper merchello, Guid collectionKey, long page, long itemsPerPage, string sortBy = "", SortDirection sortDirection = SortDirection.Ascending)
+        public static IEnumerable<IProductContent> TypedProductContentFromCollection(this MerchelloHelper merchello, Guid collectionKey, long page, long itemsPerPage, int storeId, string sortBy = "", SortDirection sortDirection = SortDirection.Ascending)
         {
             if (page <= 0) page = 1;
 
-            return merchello.Query.Product.TypedProductContentFromCollection(collectionKey, page, itemsPerPage, sortBy, sortDirection);
+            return merchello.Query.Product.TypedProductContentFromCollection(collectionKey, page, itemsPerPage, storeId, sortBy, sortDirection);
         }
 
         #endregion

@@ -94,14 +94,14 @@
         /// The <see cref="QueryResultDisplay"/>.
         /// </returns>
         [HttpGet]
-        public override QueryResultDisplay GetDefaultReportData()
+        public override QueryResultDisplay GetDefaultReportData(int storeId)
         {
             var today = DateTime.Today;
             var endOfMonth = GetEndOfMonth(today);
             var startMonth = endOfMonth.AddMonths(-11);
             var startOfYear = GetFirstOfMonth(startMonth);
 
-            return BuildResult(startOfYear, endOfMonth);
+            return BuildResult(startOfYear, endOfMonth, storeId);
         }
 
         /// <summary>
@@ -118,7 +118,7 @@
             var isDateSearch = invoiceDateStart != null && !string.IsNullOrEmpty(invoiceDateStart.Value) &&
                invoiceDateEnd != null && !string.IsNullOrEmpty(invoiceDateEnd.Value);
 
-            if (!isDateSearch) return GetDefaultReportData();
+            if (!isDateSearch) return GetDefaultReportData(query.StoreId);
 
             DateTime startDate;
 
@@ -130,18 +130,18 @@
                 if (DateTime.TryParse(invoiceDateEnd.Value, out endDate))
                 {
                     //// Return the default report if startDate >= endDate
-                    if (startDate >= endDate) return GetDefaultReportData();
+                    if (startDate >= endDate) return GetDefaultReportData(query.StoreId);
 
                     var endOfMonth = GetEndOfMonth(endDate);
                     var startOfYear = GetFirstOfMonth(startDate);
 
-                    return BuildResult(startOfYear, endOfMonth);
+                    return BuildResult(startOfYear, endOfMonth, query.StoreId);
                 }
 
-                return GetDefaultReportData();
+                return GetDefaultReportData(query.StoreId);
             }
 
-            return GetDefaultReportData();
+            return GetDefaultReportData(query.StoreId);
         }
 
         /// <summary>
@@ -181,7 +181,7 @@
                 var endDate = currentDate.AddDays(1).AddMilliseconds(-1);
 
                 count++;
-                results.Add(GetResults(currentDate, endDate));
+                results.Add(GetResults(currentDate, endDate, query.StoreId));
                 currentDate = currentDate.AddDays(1);
             }
 
@@ -207,7 +207,7 @@
         /// <returns>
         /// The <see cref="QueryResultDisplay"/>.
         /// </returns>
-        protected override QueryResultDisplay BuildResult(DateTime startDate, DateTime endDate)
+        protected override QueryResultDisplay BuildResult(DateTime startDate, DateTime endDate, int storeId)
         {
             var count = 0;
 
@@ -218,7 +218,7 @@
             {
                 var monthEnd = currentDate.AddMonths(1).AddMilliseconds(-1);
                 count++;
-                results.Add(this.GetResults(currentDate, monthEnd));
+                results.Add(this.GetResults(currentDate, monthEnd, storeId));
                 currentDate = currentDate.AddMonths(1);
             }
 
@@ -244,16 +244,16 @@
         /// <returns>
         /// The <see cref="SalesOverTimeResult"/>.
         /// </returns>
-        protected override SalesOverTimeResult GetResults(DateTime startDate, DateTime endDate)
+        protected override SalesOverTimeResult GetResults(DateTime startDate, DateTime endDate, int storeId)
         {
             var monthName = _textService.GetLocalizedMonthName(_culture, startDate.Month);
 
-            var count = _invoiceService.CountInvoices(startDate, endDate, -1);//TODOMS
+            var count = _invoiceService.CountInvoices(startDate, endDate, storeId);
 
             var totals = this.ActiveCurrencies.Select(c => new ResultCurrencyValue()
             {
                 Currency = c.ToCurrencyDisplay(),
-                Value = startDate > DateTime.Today ? 0M : this._invoiceService.SumInvoiceTotals(startDate, endDate, c.CurrencyCode, -1)//TODOMS
+                Value = startDate > DateTime.Today ? 0M : this._invoiceService.SumInvoiceTotals(startDate, endDate, c.CurrencyCode, storeId)
             }).ToList();
 
             return new SalesOverTimeResult()

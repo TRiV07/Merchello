@@ -109,13 +109,13 @@
         /// The <see cref="QueryResultDisplay"/>.
         /// </returns>
         [HttpGet]
-        public override QueryResultDisplay GetDefaultReportData()
+        public override QueryResultDisplay GetDefaultReportData(int storeId)
         {
             var today = DateTime.Today;
             var endDate = today;
             var startDate = today.AddMonths(-1);
 
-            return BuildResult(startDate, endDate);
+            return BuildResult(startDate, endDate, storeId);
         }
 
         /// <summary>
@@ -130,9 +130,9 @@
         /// <returns>
         /// The <see cref="QueryResultDisplay"/>.
         /// </returns>
-        protected override QueryResultDisplay BuildResult(DateTime startDate, DateTime endDate)
+        protected override QueryResultDisplay BuildResult(DateTime startDate, DateTime endDate, int storeId)
         {
-            var results = this.GetResults(startDate, endDate).ToArray();
+            var results = this.GetResults(startDate, endDate, storeId).ToArray();
 
             return new QueryResultDisplay()
             {
@@ -156,14 +156,14 @@
         /// <returns>
         /// The typed result.
         /// </returns>
-        protected override IEnumerable<SalesByItemResult> GetResults(DateTime startDate, DateTime endDate)
+        protected override IEnumerable<SalesByItemResult> GetResults(DateTime startDate, DateTime endDate, int storeId)
         {
             // determine the top 5 items within the date range
             var database = ApplicationContext.DatabaseContext.Database;
 
             // We're using an internal helper here so we can keep all of our report SQL queries in a single location
             // in case we want to refactor to some sort of service at a later date.
-            var sql = ReportSqlHelper.SalesByItem.GetSkuSaleCountSql(startDate, endDate, _productLineItemTfKey);
+            var sql = ReportSqlHelper.SalesByItem.GetSkuSaleCountSql(startDate, endDate, _productLineItemTfKey, storeId);
 
             var dtos = database.Query<SkuSaleCountDto>(sql).ToArray();
 
@@ -177,8 +177,7 @@
             // ReSharper disable once LoopCanBeConvertedToQuery
             foreach (var dto in dtos)
             {
-                //TODOMS
-                var variant = GetProductVariant(dto.Sku, -1);
+                var variant = GetProductVariant(dto.Sku, storeId);
 
                 if (variant != null)
                 {
@@ -194,7 +193,7 @@
                             Totals = this.ActiveCurrencies.Select(c => new ResultCurrencyValue()
                             {
                                 Currency = c.ToCurrencyDisplay(),
-                                Value = this._invoiceService.SumLineItemTotalsBySku(startDate, endDate, c.CurrencyCode, dto.Sku, -1)//TODOMS
+                                Value = this._invoiceService.SumLineItemTotalsBySku(startDate, endDate, c.CurrencyCode, dto.Sku, storeId)
                             }).ToList()
                         };
 

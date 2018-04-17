@@ -19,7 +19,7 @@
                 hideFilterButton: '='
             },
             templateUrl: '/App_Plugins/Merchello/Backoffice/Merchello/directives/filterbydaterange.tpl.html',
-            controller: function($scope, $element, $q, assetsService, angularHelper, notificationsService, settingsResource, settingDisplayBuilder) {
+            controller: function ($scope, $routeParams, $element, $q, assetsService, angularHelper, notificationsService, settingsResource, settingDisplayBuilder) {
 
                 $scope.settings = {};
 
@@ -64,7 +64,7 @@
                 }
 
                 function loadSettings() {
-                    var promise = settingsResource.getAllSettings();
+                    var promise = settingsResource.getAllSettings($routeParams.storeId);
                     return promise.then(function(allSettings) {
                         $scope.settings = settingDisplayBuilder.transform(allSettings);
                     }, function(reason) {

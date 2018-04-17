@@ -1,6 +1,6 @@
 angular.module('merchello.directives').directive('reportWidgetAbandonedBasketRadar',
-    ['$q', '$filter', 'assetsService', 'localizationService', 'settingsResource', 'invoiceHelper', 'abandonedBasketResource',
-    function($q, $filter, assetsService, localizationService, settingsResource, invoiceHelper, abandonedBasketResource) {
+    ['$q', '$routeParams', '$filter', 'assetsService', 'localizationService', 'settingsResource', 'invoiceHelper', 'abandonedBasketResource',
+        function ($q, $routeParams, $filter, assetsService, localizationService, settingsResource, invoiceHelper, abandonedBasketResource) {
 
         return {
             restrict: 'E',
@@ -40,8 +40,8 @@ angular.module('merchello.directives').directive('reportWidgetAbandonedBasketRad
                         localizationService.localize('merchelloReports_customerCheckouts'),
                         localizationService.localize('merchelloReports_anonymousCheckoutPercent'),
                         localizationService.localize('merchelloReports_customerCheckoutPercent'),
-                        abandonedBasketResource.getDefaultReportData(),
-                        settingsResource.getAllSettings()
+                        abandonedBasketResource.getDefaultReportData($routeParams.storeId),
+                        settingsResource.getAllSettings($routeParams.storeId)
 
                     ]).then(function(data) {
 

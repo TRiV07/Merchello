@@ -1,17 +1,22 @@
 angular.module('merchello').controller('Merchello.Backoffice.ProductContentTypeListController',
-    ['$scope', 'merchelloTabsFactory',
-    function($scope, merchelloTabsFactory) {
+    ['$scope', 'merchelloTabsFactory', 'userService',
+        function ($scope, merchelloTabsFactory, userService) {
 
-        $scope.loaded = true;
-        $scope.preValuesLoaded = true;
-        $scope.tabs = {};
+            $scope.loaded = true;
+            $scope.preValuesLoaded = true;
+            $scope.tabs = {};
 
-        function init() {
-            $scope.tabs = merchelloTabsFactory.createProductListTabs();
-            $scope.tabs.setActive('contentTypeList');
-        }
+            function init() {
+                userService.getCurrentUser().then(function (user) {
+                    var isMainAdmin = _.find(user.startContentIds, function (id) {
+                        if (id == -1) return id;
+                    }) == -1;
+                    $scope.tabs = merchelloTabsFactory.createProductListTabs(isMainAdmin);
+                    $scope.tabs.setActive('contentTypeList');
+                });
+            }
 
 
-        // Initializes the controller
-        init();
-    }]);
+            // Initializes the controller
+            init();
+        }]);

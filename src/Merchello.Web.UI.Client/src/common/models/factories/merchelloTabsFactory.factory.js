@@ -1,6 +1,6 @@
 angular.module('merchello.models').factory('merchelloTabsFactory',
-    ['MerchelloTabCollection', 'merchelloListViewHelper', '$routeParams',
-        function (MerchelloTabCollection, merchelloListViewHelper, $routeParams) {
+    ['MerchelloTabCollection', 'merchelloListViewHelper', '$routeParams', 'userService',
+        function (MerchelloTabCollection, merchelloListViewHelper, $routeParams, userService) {
 
             var Constructor = MerchelloTabCollection;
 
@@ -9,7 +9,7 @@ angular.module('merchello.models').factory('merchelloTabsFactory',
             }
 
             // creates tabs for the product listing page
-            function createProductListTabs() {
+            function createProductListTabs(isMainAdmin) {
                 var entityType = 'Product';
                 var settings = getCacheSettings(entityType);
                 var tabs = new Constructor();
@@ -18,9 +18,13 @@ angular.module('merchello.models').factory('merchelloTabsFactory',
                 } else {
                     tabs.addTab('productlist', 'merchelloTabs_productListing', '#/merchello/merchello/productlist/manage' + '/store/' + $routeParams.storeId);
                 }
-                tabs.addTab('sharedoptions', 'merchelloTabs_sharedProductOptions', '#/merchello/merchello/sharedoptions/manage' + '/store/' + $routeParams.storeId);
-                tabs.addTab('filtergroups', 'merchelloTabs_filterGroups', '#/merchello/merchello/productfiltergroups/manage' + '/store/' + $routeParams.storeId);
-                tabs.addTab('contentTypeList', 'merchelloTabs_contentTypes', '#/merchello/merchello/productcontenttypelist/manage' + '/store/' + $routeParams.storeId);
+
+                if (isMainAdmin) {
+                    //tabs.addTab('sharedoptions', 'merchelloTabs_sharedProductOptions', '#/merchello/merchello/sharedoptions/manage' + '/store/' + $routeParams.storeId); //TODOMS removing for now. no need this
+                    //tabs.addTab('filtergroups', 'merchelloTabs_filterGroups', '#/merchello/merchello/productfiltergroups/manage' + '/store/' + $routeParams.storeId); //TODOMS removing for now. no need this
+                    tabs.addTab('contentTypeList', 'merchelloTabs_contentTypes', '#/merchello/merchello/productcontenttypelist/manage' + '/store/' + $routeParams.storeId);
+                };
+                
                 return tabs;
             }
 
@@ -53,7 +57,7 @@ angular.module('merchello.models').factory('merchelloTabsFactory',
                 }
                 tabs.addTab('productedit', 'merchelloTabs_product', '#/merchello/merchello/productedit/' + productKey + '/store/' + $routeParams.storeId);
                 tabs.addTab('productcontent', 'merchelloTabs_detachedContent', '#/merchello/merchello/productdetachedcontent/' + productKey + '/store/' + $routeParams.storeId);
-                tabs.addTab('optionslist', 'merchelloTabs_productOptions', '#/merchello/merchello/productoptionsmanager/' + productKey + '/store/' + $routeParams.storeId);
+                //tabs.addTab('optionslist', 'merchelloTabs_productOptions', '#/merchello/merchello/productoptionsmanager/' + productKey + '/store/' + $routeParams.storeId); //TODOMS removing for now. no need this
                 return tabs;
             }
 
@@ -75,8 +79,8 @@ angular.module('merchello.models').factory('merchelloTabsFactory',
                 }
                 tabs.addTab('productedit', 'merchelloTabs_product', '#/merchello/merchello/productedit/' + productKey);
                 tabs.addTab('productcontent', 'merchelloTabs_detachedContent', '#/merchello/merchello/productdetachedcontent/' + productKey + '/store/' + $routeParams.storeId);
-                tabs.addTab('variantlist', 'merchelloTabs_productVariants', '#/merchello/merchello/producteditwithoptions/' + productKey + '/store/' + $routeParams.storeId);
-                tabs.addTab('optionslist', 'merchelloTabs_productOptions', '#/merchello/merchello/productoptionsmanager/' + productKey + '/store/' + $routeParams.storeId);
+                //tabs.addTab('variantlist', 'merchelloTabs_productVariants', '#/merchello/merchello/producteditwithoptions/' + productKey + '/store/' + $routeParams.storeId); //TODOMS removing for now. no need this
+                //tabs.addTab('optionslist', 'merchelloTabs_productOptions', '#/merchello/merchello/productoptionsmanager/' + productKey + '/store/' + $routeParams.storeId); //TODOMS removing for now. no need this
                 return tabs;
             }
 

@@ -42,7 +42,7 @@
             var isDateSearch = invoiceDateStart != null && !string.IsNullOrEmpty(invoiceDateStart.Value) &&
                invoiceDateEnd != null && !string.IsNullOrEmpty(invoiceDateEnd.Value);
 
-            if (!isDateSearch) return GetDefaultReportData();
+            if (!isDateSearch) return GetDefaultReportData(query.StoreId);
 
             DateTime startDate;
             //// Assert the start date
@@ -53,18 +53,18 @@
                 if (DateTime.TryParse(invoiceDateEnd.Value, out endDate))
                 {
                     //// Return the default report if startDate >= endDate
-                    if (startDate >= endDate) return GetDefaultReportData();
+                    if (startDate >= endDate) return GetDefaultReportData(query.StoreId);
 
                     var day = endDate.Day;
 
-                    return BuildResult(startDate, endDate);
+                    return BuildResult(startDate, endDate, query.StoreId);
 
                 }
 
-                return GetDefaultReportData();
+                return GetDefaultReportData(query.StoreId);
             }
 
-            return GetDefaultReportData();
+            return GetDefaultReportData(query.StoreId);
         }
 
         /// <summary>
@@ -107,7 +107,7 @@
         /// <returns>
         /// The <see cref="QueryResultDisplay"/>.
         /// </returns>
-        protected abstract QueryResultDisplay BuildResult(DateTime startDate, DateTime endDate);
+        protected abstract QueryResultDisplay BuildResult(DateTime startDate, DateTime endDate, int storeId);
 
         /// <summary>
         /// Performs the actual work of querying for the results.
@@ -121,6 +121,6 @@
         /// <returns>
         /// The typed result.
         /// </returns>
-        protected abstract TResult GetResults(DateTime startDate, DateTime endDate);
+        protected abstract TResult GetResults(DateTime startDate, DateTime endDate, int storeId);
     }
 }

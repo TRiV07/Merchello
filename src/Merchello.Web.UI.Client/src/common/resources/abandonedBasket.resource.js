@@ -5,14 +5,15 @@ angular.module('merchello.resources').factory('abandonedBasketResource',
         var baseUrl = Umbraco.Sys.ServerVariables['merchelloUrls']['merchelloAbandonedBasketApiBaseUrl'];
 
         return {
-            getDefaultReportData : function() {
+            getDefaultReportData: function (storeId) {
 
                 var deferred = $q.defer();
                 $q.all([
                         umbRequestHelper.resourcePromise(
                             $http({
                                 url: baseUrl + 'GetDefaultReportData',
-                                method: "GET"
+                            method: "GET",
+                            params: { storeId: storeId }
                             }),
                             'Failed to retreive default report data')])
                     .then(function(data) {

@@ -274,9 +274,9 @@
         /// </summary>
         /// <param name="uow">The <see cref="IDatabaseUnitOfWork"/></param>
         /// <returns>The <see cref="IItemCacheRepository"/></returns>        
-        internal virtual IItemCacheRepository CreateItemCacheRepository(IDatabaseUnitOfWork uow)
+        internal virtual IItemCacheRepository CreateItemCacheRepository(IDatabaseUnitOfWork uow, int storeId)
         {
-            return new ItemCacheRepository(uow, CreateCacheLineItemRespository(uow), _logger, _sqlSyntax);
+            return new ItemCacheRepository(uow, storeId, CreateCacheLineItemRespository(uow), _logger, _sqlSyntax);
         }
 
         /// <summary>

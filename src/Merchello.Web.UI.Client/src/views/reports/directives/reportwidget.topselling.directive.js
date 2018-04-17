@@ -1,6 +1,6 @@
 angular.module('merchello.directives').directive('reportWidgetTopSelling',
-    ['$log', '$filter', 'assetsService', 'localizationService', 'eventsService', 'salesByItemResource', 'settingsResource', 'queryDisplayBuilder',
-    function($log, $filter, assetsService, localizationService, eventsService, salesByItemResource, settingsResource, queryDisplayBuilder) {
+    ['$log', '$routeParams', '$filter', 'assetsService', 'localizationService', 'eventsService', 'salesByItemResource', 'settingsResource', 'queryDisplayBuilder',
+        function ($log, $routeParams, $filter, assetsService, localizationService, eventsService, salesByItemResource, settingsResource, queryDisplayBuilder) {
 
     return {
         restrict: 'E',
@@ -41,6 +41,7 @@ angular.module('merchello.directives').directive('reportWidgetTopSelling',
                 var query = queryDisplayBuilder.createDefault();
                 query.addInvoiceDateParam($filter('date')(scope.startDate, 'yyyy-MM-dd'), 'start');
                 query.addInvoiceDateParam($filter('date')(scope.endDate, 'yyyy-MM-dd'), 'end');
+                query.storeId = $routeParams.storeId;
 
                 salesByItemResource.getCustomReportData(query).then(function(results) {
 

@@ -161,7 +161,7 @@
         /// <returns>
         /// The <see cref="Page{IItemCache}"/>.
         /// </returns>
-        Page<IItemCache> GetCustomerItemCachePage(ItemCacheType itemCacheType, DateTime startDate, DateTime endDate, long page, long itemsPerPage, string sortBy = "", SortDirection sortDirection = SortDirection.Descending);  
+        Page<IItemCache> GetCustomerItemCachePage(ItemCacheType itemCacheType, DateTime startDate, DateTime endDate, long page, long itemsPerPage, int storeId, string sortBy = "", SortDirection sortDirection = SortDirection.Descending);  
 
         /// <summary>
         /// Gets list of <see cref="IItemCache"/> objects given a list of Keys
@@ -182,7 +182,7 @@
         /// <returns>
         /// The count of item caches.
         /// </returns>
-        int Count(ItemCacheType itemCacheType, CustomerType customerType);
+        int Count(ItemCacheType itemCacheType, CustomerType customerType, int storeId);
 
         /// <summary>
         /// Gets the count of of item caches for a customer type for a given date range.
@@ -202,6 +202,6 @@
         /// <returns>
         /// The count of item caches.
         /// </returns>
-        int Count(ItemCacheType itemCacheType, CustomerType customerType, DateTime startDate, DateTime endDate);
+        int Count(ItemCacheType itemCacheType, CustomerType customerType, int storeId, DateTime startDate, DateTime endDate);
     }
 }

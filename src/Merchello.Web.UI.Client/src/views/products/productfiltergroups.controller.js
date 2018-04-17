@@ -1,6 +1,6 @@
 angular.module('merchello').controller('Merchello.Backoffice.ProductFilterGroupsController',
-    ['$scope', '$routeParams', 'entityCollectionResource', 'merchelloTabsFactory',
-        function ($scope, $routeParams, entityCollectionResource, merchelloTabsFactory) {
+    ['$scope', '$routeParams', 'entityCollectionResource', 'merchelloTabsFactory', 'userService',
+        function ($scope, $routeParams, entityCollectionResource, merchelloTabsFactory, userService) {
 
             $scope.loaded = false;
             $scope.preValuesLoaded = false;
@@ -25,11 +25,17 @@ angular.module('merchello').controller('Merchello.Backoffice.ProductFilterGroups
 
             function init() {
 
-                $scope.tabs = merchelloTabsFactory.createProductListTabs();
-                $scope.tabs.setActive('filtergroups');
+                userService.getCurrentUser().then(function (user) {
+                    var isMainAdmin = _.find(user.startContentIds, function (id) {
+                        if (id == -1) return id;
+                    }) == -1;
 
-                $scope.loaded = true;
-                $scope.preValuesLoaded = true;
+                    $scope.tabs = merchelloTabsFactory.createProductListTabs(isMainAdmin);
+                    $scope.tabs.setActive('filtergroups');
+
+                    $scope.loaded = true;
+                    $scope.preValuesLoaded = true;
+                });
             }
 
             init();

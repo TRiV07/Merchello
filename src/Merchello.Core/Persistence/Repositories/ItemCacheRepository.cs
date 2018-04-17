@@ -16,12 +16,18 @@
     using Umbraco.Core.Persistence.SqlSyntax;
 
     using IDatabaseUnitOfWork = UnitOfWork.IDatabaseUnitOfWork;
+    using MS = Core.Constants.MultiStore;
 
     /// <summary>
     /// The item cache repository.
     /// </summary>
     internal class ItemCacheRepository : MerchelloPetaPocoRepositoryBase<IItemCache>, IItemCacheRepository
     {
+        /// <summary>
+        /// The domain root structure ID.
+        /// </summary>
+        private readonly int _storeId;
+
         /// <summary>
         /// The <see cref="IItemCacheLineItemRepository"/>.
         /// </summary>
@@ -42,10 +48,11 @@
         /// <param name="sqlSyntax">
         /// The SQL syntax.
         /// </param>
-        public ItemCacheRepository(IDatabaseUnitOfWork work, IItemCacheLineItemRepository itemCacheLineItemRepository, ILogger logger, ISqlSyntaxProvider sqlSyntax)
+        public ItemCacheRepository(IDatabaseUnitOfWork work, int storeId, IItemCacheLineItemRepository itemCacheLineItemRepository, ILogger logger, ISqlSyntaxProvider sqlSyntax)
             : base(work, logger, sqlSyntax)
         {
             _itemCacheLineItemRepository = itemCacheLineItemRepository;
+            _storeId = storeId;
         }
 
 
@@ -88,13 +95,13 @@
             var p = GetPageKeys(itemCacheTfKey, startDate, endDate, page, itemsPerPage, orderExpression, sortDirection);
 
             return new Page<IItemCache>()
-                {
-                    Items = p.Items.Select(x => this.Get(x.ItemCacheKey)).ToList(),
-                    ItemsPerPage = p.ItemsPerPage,
-                    TotalItems = p.TotalItems,
-                    TotalPages = p.TotalPages,
-                    CurrentPage = p.CurrentPage,
-                };
+            {
+                Items = p.Items.Select(x => this.Get(x.ItemCacheKey)).ToList(),
+                ItemsPerPage = p.ItemsPerPage,
+                TotalItems = p.TotalItems,
+                TotalPages = p.TotalPages,
+                CurrentPage = p.CurrentPage,
+            };
         }
 
         /// <summary>
@@ -124,7 +131,7 @@
                 INNER JOIN (
 	                SELECT	pk
 	                FROM " + table + @"
-	                WHERE	lastActivityDate BETWEEN @start AND @end
+	                WHERE	lastActivityDate BETWEEN @start AND @end" + (_storeId != MS.DefaultId ? " AND storeId = @storeId" : "") + @"
                 ) Q1 ON T1.entityKey = Q1.pk
                 INNER JOIN (
 	                SELECT	COUNT(*) AS itemCount,
@@ -137,7 +144,7 @@
 
             var sql = new Sql(
                 querySql,
-                new { @table = table, @start = startDate, @end = endDate, @tfKey = itemCacheTfKey });
+                new { @table = table, @start = startDate, @end = endDate, @tfKey = itemCacheTfKey, @storeId = _storeId });
 
             return Database.ExecuteScalar<int>(sql);
         }
@@ -168,7 +175,7 @@
             var itemCache = factory.BuildEntity(dto);
 
 
-            ((ItemCache) itemCache).Items = GetLineItemCollection(itemCache.Key);
+            ((ItemCache)itemCache).Items = GetLineItemCollection(itemCache.Key);
 
             itemCache.ResetDirtyProperties();
 
@@ -198,6 +205,8 @@
                 {
                     dtos.AddRange(Database.Fetch<ItemCacheDto>(GetBaseQuery(false).WhereIn<ItemCacheDto>(x => x.Key, keyList, SqlSyntax)));
                 }
+
+                dtos = keys.Select(k => dtos.FirstOrDefault(x => x.Key == k)).ToList();
             }
             else
             {
@@ -236,7 +245,7 @@
         }
 
         #endregion
-      
+
 
         #region Overrides of MerchelloPetaPocoRepositoryBase<IItemCache>
 
@@ -252,8 +261,20 @@
         protected override Sql GetBaseQuery(bool isCount)
         {
             var sql = new Sql();
-            sql.Select(isCount ? "COUNT(*)" : "*")
-               .From<ItemCacheDto>(SqlSyntax);
+            sql.Select(isCount ? "COUNT(*)" : "*");
+            sql.From<ItemCacheDto>(SqlSyntax);
+
+            //if (_storeId != Core.Constants.MultiStore.DefaultId)
+            //{
+            //    sql.From<ItemCacheDto>(SqlSyntax)
+            //       .InnerJoin<CustomerDto>(SqlSyntax)
+            //       .On<ItemCacheDto, CustomerDto>(SqlSyntax, left => left.EntityKey, right => right.Key)
+            //       .Where<CustomerDto>(x => x.StoreId == _storeId, SqlSyntax);
+            //}
+            //else
+            //{
+            //    sql.From<ItemCacheDto>(SqlSyntax);
+            //}
 
             return sql;
         }
@@ -402,6 +423,10 @@
             sql.Append("SELECT T1.pk AS itemCacheKey");
             sql.Append("FROM [merchItemCache] T1");
             sql.Append("INNER JOIN [merchCustomer] T2 ON T1.entityKey = T2.pk");
+            if (_storeId != Core.Constants.MultiStore.DefaultId)
+            {
+                sql.Append("AND T2.[storeId] = @storeId", new { @storeId = _storeId });
+            }
             sql.Append("INNER JOIN (");
             sql.Append("SELECT	itemCacheKey,");
             sql.Append("COUNT(*) AS itemCount");
@@ -411,6 +436,8 @@
             sql.Append("WHERE T1.itemCacheTfKey = @tfkey", new { @tfkey = itemCacheTfKey });
             sql.Append("AND	T2.lastActivityDate BETWEEN @start AND @end", new { @start = startDate, @end = endDate });
             sql.Append("AND Q1.itemCount > 0");
+
+
 
             if (!string.IsNullOrEmpty(orderExpression))
             {
@@ -436,7 +463,7 @@
             var sql = new Sql();
             sql.Select("*")
                 .From<ItemCacheItemDto>(SqlSyntax)
-                .Where<ItemCacheItemDto>(x => x.ContainerKey == itemCacheKey);
+                .Where<ItemCacheItemDto>(x => x.ContainerKey == itemCacheKey, SqlSyntax);
 
             var dtos = Database.Fetch<ItemCacheItemDto>(sql);
 

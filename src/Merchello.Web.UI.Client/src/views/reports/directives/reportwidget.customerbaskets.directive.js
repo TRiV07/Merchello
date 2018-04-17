@@ -1,6 +1,6 @@
 angular.module('merchello.directives').directive('reportWidgetCustomerBaskets',
-    ['$q', '$compile', '$filter', 'assetsService', 'localizationService', 'settingsResource', 'queryDisplayBuilder', 'invoiceHelper', 'abandonedBasketResource',
-        function($q, $compile, $filter, assetsService, localizationService, settingsResource, queryDisplayBuilder, invoiceHelper, abandonedBasketResource) {
+    ['$q', '$routeParams', '$compile', '$filter', 'assetsService', 'localizationService', 'settingsResource', 'queryDisplayBuilder', 'invoiceHelper', 'abandonedBasketResource',
+        function ($q, $routeParams, $compile, $filter, assetsService, localizationService, settingsResource, queryDisplayBuilder, invoiceHelper, abandonedBasketResource) {
 
             return {
                 restrict: 'E',
@@ -31,13 +31,13 @@ angular.module('merchello.directives').directive('reportWidgetCustomerBaskets',
 
                     function init() {
                         $q.all([
-                            settingsResource.getAllCombined(),
+                            settingsResource.getAllCombined($routeParams.storeId),
                             localizationService.localize('merchelloGeneral_item'),
                             localizationService.localize('merchelloVariant_sku'),
                             localizationService.localize('merchelloGeneral_quantity'),
                             localizationService.localize('merchelloGeneral_price'),
                             localizationService.localize('merchelloGeneral_subTotal')
-                        ]).then(function(data) {
+                        ]).then(function (data) {
                             scope.settings = data[0].settings;
                             scope.currencySymbol = data[0].currencySymbol;
                             scope.itemLabel = data[1];
@@ -50,12 +50,12 @@ angular.module('merchello.directives').directive('reportWidgetCustomerBaskets',
 
                     }
 
-                      function getColumnValue(result, col) {
-                        switch(col.name) {
+                    function getColumnValue(result, col) {
+                        switch (col.name) {
                             case 'loginName':
                                 return '<a href="' + getEditUrl(result.customer) + '">' + result.customer.loginName + '</a>';
                             case 'firstName':
-                                return  '<a href="' + getEditUrl(result) + '">' + result.customer.firstName + ' ' + result.customer.lastName + '</a>';
+                                return '<a href="' + getEditUrl(result.customer) + '">' + result.customer.firstName + ' ' + result.customer.lastName + '</a>';
                             case 'lastActivityDate':
                                 return $filter('date')(result.customer.lastActivityDate, scope.settings.dateFormat);
                             case 'items':
@@ -67,14 +67,14 @@ angular.module('merchello.directives').directive('reportWidgetCustomerBaskets',
 
 
                     function getEditUrl(customer) {
-                        return baseUrl + customer.key;
+                        return baseUrl + customer.key + '/store/' + $routeParams.storeId;
                     }
 
                     function load(query) {
                         scope.setLoaded()(false);
                         var deferred = $q.defer();
 
-                        abandonedBasketResource.getCustomerSavedBasketsLegacy(query).then(function(results) {
+                        abandonedBasketResource.getCustomerSavedBasketsLegacy(query).then(function (results) {
                             console.info(results);
                             deferred.resolve(results);
                         });
@@ -92,13 +92,13 @@ angular.module('merchello.directives').directive('reportWidgetCustomerBaskets',
                         html += '<th>' + scope.subTotalLabel + '</th>';
                         html += '</tr></thead>'
                         html += '<tbody>';
-                        angular.forEach(items, function(item) {
+                        angular.forEach(items, function (item) {
                             html += '<tr>';
                             html += '<th>' + item.name + '</th>';
                             html += '<th>' + item.sku + '</th>';
                             html += '<th>' + item.quantity + '</th>';
-                            html += '<th>' + $filter('currency')(item.price, scope.currencySymbol ) + '</th>';
-                            html += '<th>' + $filter('currency')(item.price * item.quantity, scope.currencySymbol ) + '</th>';
+                            html += '<th>' + $filter('currency')(item.price, scope.currencySymbol) + '</th>';
+                            html += '<th>' + $filter('currency')(item.price * item.quantity, scope.currencySymbol) + '</th>';
                             html += '</tr>';
                         });
                         html += '</tbody></table>';

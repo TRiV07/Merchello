@@ -75,7 +75,7 @@ angular.module('merchello').controller('Merchello.Backoffice.ProductOptionsManag
 
             var key = $routeParams.id;
             $q.all([
-                settingsResource.getCurrencySymbol(),
+                settingsResource.getCurrencySymbol($routeParams.storeId),
                 loadProduct(key)
             ]).then(function(data) {
                 $scope.currencySymbol = data[0];

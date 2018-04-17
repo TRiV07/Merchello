@@ -14,6 +14,7 @@
         var self = this;
         self.currentPage = 0;
         self.itemsPerPage = 25;
+        self.storeId = 0;
         self.parameters = [];
         self.sortBy = '';
         self.sortDirection = 'Ascending'; // valid options are 'Ascending' and 'Descending'

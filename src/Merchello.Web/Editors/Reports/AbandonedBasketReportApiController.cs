@@ -97,12 +97,12 @@
         /// The <see cref="QueryResultDisplay"/>.
         /// </returns>
         [HttpGet]
-        public override QueryResultDisplay GetDefaultReportData()
+        public override QueryResultDisplay GetDefaultReportData(int storeId)
         {
-            var anonymousBasketCount = _itemCacheService.Count(this._itemCacheType, CustomerType.Anonymous, _startDate, _endDate);
-            var anonymousCheckoutCount = _invoiceService.CountInvoices(_startDate, _endDate, CustomerType.Anonymous, -1);//TODOMS
-            var customerBasketCount = _itemCacheService.Count(this._itemCacheType, CustomerType.Customer, _startDate, _endDate);
-            var customerCheckoutCount = _invoiceService.CountInvoices(_startDate, _endDate, CustomerType.Customer, -1);//TODOMS
+            var anonymousBasketCount = _itemCacheService.Count(this._itemCacheType, CustomerType.Anonymous, storeId, _startDate, _endDate);
+            var anonymousCheckoutCount = _invoiceService.CountInvoices(_startDate, _endDate, CustomerType.Anonymous, storeId);
+            var customerBasketCount = _itemCacheService.Count(this._itemCacheType, CustomerType.Customer, storeId, _startDate, _endDate);
+            var customerCheckoutCount = _invoiceService.CountInvoices(_startDate, _endDate, CustomerType.Customer, storeId);
 
 
             var result = new QueryResultDisplay()
@@ -149,6 +149,7 @@
                 _endDate.AddDays(2),
                 query.CurrentPage + 1,
                 query.ItemsPerPage,
+                query.StoreId,
                 query.SortBy,
                 query.SortDirection);
 
