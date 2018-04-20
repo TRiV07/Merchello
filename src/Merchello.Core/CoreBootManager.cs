@@ -373,6 +373,7 @@
                 GatewayProviderResolver.Current = new GatewayProviderResolver(
                 PluginManager.Current.ResolveGatewayProviders(),
                 serviceContext.GatewayProviderService,
+                serviceContext.StoreService,
                 cache.RuntimeCache);
         }
 

@@ -404,15 +404,19 @@
         /// </summary>
         private void Initialize()
         {
-            var domains = ApplicationContext.Current.Services.DomainService
-                .GetAllFromCache()
-                .Where(x => x.RootContentId.HasValue)
-                .Select(x => x.RootContentId.Value)
-                .Distinct();
-
-            foreach(var domain in domains)
+            IEnumerable<int> storesIds;
+            try
             {
-                var collections = _merchelloContext.Services.EntityCollectionService.GetAll(domain).ToArray();
+                storesIds = _merchelloContext.Services.StoreService.CachedAllStoresIds();
+            }
+            catch
+            {
+                return;
+            }
+
+            foreach(var storeId in storesIds)
+            {
+                var collections = _merchelloContext.Services.EntityCollectionService.GetAll(storeId).ToArray();
 
                 foreach (var collection in collections)
                 {
@@ -441,13 +445,13 @@
                 {
                     var att = reg.GetCustomAttribute<EntityCollectionProviderAttribute>(false);
 
-                    if (EnusureUniqueProvider(att.Key, domain))
+                    if (EnusureUniqueProvider(att.Key, storeId))
                     {
                         var collection = ((EntityCollectionService)_merchelloContext.Services.EntityCollectionService).CreateEntityCollection(
                             att.EntityTfKey,
                             att.Key,
                             att.Name,
-                            domain);
+                            storeId);
 
                         if (typeof(IEntityFilterGroupProvider).IsAssignableFrom(reg)) collection.IsFilter = true;
                         _merchelloContext.Services.EntityCollectionService.Save(collection);

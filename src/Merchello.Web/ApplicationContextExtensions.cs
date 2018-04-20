@@ -42,6 +42,10 @@
         {
             return MerchelloContext.Current.Services.CustomerService;
         }
+        public static IStoreService StoreService(this ServiceContext context)
+        {
+            return MerchelloContext.Current.Services.StoreService;
+        }
 
         #endregion
     }

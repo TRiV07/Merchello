@@ -53,7 +53,7 @@
         /// <param name="items">
         /// The items.
         /// </param>
-        public static void AddUpdatedItems(this UpdateQuantityAsyncResponse resp, IEnumerable<ILineItem> items)
+        public static void AddUpdatedItems(this UpdateQuantityAsyncResponse resp, IEnumerable<ILineItem> items, int storeId)
         {
             foreach (var item in items)
             {
@@ -62,7 +62,7 @@
                         {
                             Key = item.Key,
                             Quantity = item.Quantity,
-                            FormattedTotal = item.TotalPrice.AsFormattedCurrency(ApplicationContext.Current.Services.DomainService.CurrentDomain().RootContentId.Value)
+                            FormattedTotal = item.TotalPrice.AsFormattedCurrency(storeId)
                         });
             }
         }

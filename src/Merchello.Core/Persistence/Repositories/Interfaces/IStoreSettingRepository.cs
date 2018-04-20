@@ -6,12 +6,13 @@
     using Merchello.Core.Models;
     using Merchello.Core.Models.TypeFields;
     using Merchello.Core.Persistence.Repositories.Interfaces;
+    using Merchello.Core.Persistence.UnitOfWork;
     using Umbraco.Core.Persistence.Repositories;
 
     /// <summary>
     /// Defines the StoreSettingRepository
     /// </summary>
-    internal interface IStoreSettingRepository : IRepository<Guid, IStoreSetting>
+    internal interface IStoreSettingRepository : IRepository<Guid, IStoreSetting>, IUnitOfWorkRepository
     {
         /// <summary>
         /// Gets the next invoice number

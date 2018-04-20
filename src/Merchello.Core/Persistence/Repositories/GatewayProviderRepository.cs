@@ -62,13 +62,19 @@
         {
             var sql = new Sql();
 
-            sql.Append("SELECT [merchGatewayProviderSettings].[pk]")
+            sql.Append("SELECT *")
                 .Append("FROM [merchGatewayProviderSettings]")
                 .Append("INNER JOIN [merchShipMethod] ON [merchGatewayProviderSettings].[pk] = [merchShipMethod].[providerKey] AND [merchGatewayProviderSettings].[storeId] = [merchShipMethod].[storeId]")
                 .Append("WHERE [merchShipMethod].[shipCountryKey] = @ShipCountryKey", new { ShipCountryKey = shipCountryKey });
 
-            var keys = Database.Fetch<Guid>(sql);
-            return keys.Distinct().Select(key => Get(key));
+            var dtos = Database.Fetch<GatewayProviderSettingsDto, ShipMethodDto>(sql).ToArray();
+            dtos = dtos.DistinctBy(x => x.Key).ToArray();
+
+            var factory = new GatewayProviderSettingsFactory();
+            foreach (var dto in dtos)
+            {
+                yield return factory.BuildEntity(dto);
+            }
         }
         public IEnumerable<int> GetAllStoresIds()
         {

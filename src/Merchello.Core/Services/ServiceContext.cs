@@ -143,6 +143,11 @@
         private Lazy<IStoreSettingService> _storeSettingsService;
 
         /// <summary>
+        /// The store service.
+        /// </summary>
+        private Lazy<IStoreService> _storeService;
+
+        /// <summary>
         /// The ship country service.
         /// </summary>
         private Lazy<IShipCountryService> _shipCountryService;
@@ -354,6 +359,14 @@
         }
 
         /// <summary>
+        /// Gets the <see cref="IStoreSettingService"/>
+        /// </summary>
+        public IStoreService StoreService
+        {
+            get { return _storeService.Value; }
+        }
+
+        /// <summary>
         /// Gets the <see cref="IShipCountryService"/>
         /// </summary>
         public IShipCountryService ShipCountryService
@@ -562,6 +575,9 @@
 
             if (_storeSettingsService == null)
                 _storeSettingsService = new Lazy<IStoreSettingService>(() => new StoreSettingService(dbDatabaseUnitOfWorkProvider, repositoryFactory, logger, eventMessagesFactory));
+
+            if (_storeService == null)
+                _storeService = new Lazy<IStoreService>(() => new StoreService(dbDatabaseUnitOfWorkProvider, repositoryFactory, logger, eventMessagesFactory, _storeSettingsService.Value));
 
             if (_shipCountryService == null)
                 _shipCountryService = new Lazy<IShipCountryService>(() => new ShipCountryService(dbDatabaseUnitOfWorkProvider, repositoryFactory, logger, eventMessagesFactory, _storeSettingsService.Value));

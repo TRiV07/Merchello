@@ -24,6 +24,7 @@
     using Umbraco.Core.Services;
 
     using MS = Merchello.Core.Constants.MultiStore;
+    using MConstants = Merchello.Core.Constants;
 
     /// <summary>
     /// Represents the Store Settings Service
@@ -56,7 +57,7 @@
         /// </summary>
         public StoreSettingService()
             : this(LoggerResolver.Current.Logger)
-        {            
+        {
         }
 
         /// <summary>
@@ -237,8 +238,8 @@
                         .Cast<CurrencyFormatElement>()
                         .FirstOrDefault(cf => cf.CurrencyCode.Equals(currency.CurrencyCode, StringComparison.OrdinalIgnoreCase));
 
-            return query != null ? 
-                new CurrencyFormat(query.Format, query.Symbol) : 
+            return query != null ?
+                new CurrencyFormat(query.Format, query.Symbol) :
                 CurrencyFormat.CreateDefault(currency.Symbol);
         }
 
@@ -261,7 +262,7 @@
                 Name = name,
                 Value = value,
                 TypeName = typeName,
-                StoreId = _domainService.CurrentDomain()?.RootContentId ?? 0
+                StoreId = storeId
             };
 
             if (raiseEvents)
@@ -282,9 +283,55 @@
             }
 
             if (raiseEvents)
-                Created.RaiseEvent(new Events.NewEventArgs<IStoreSetting>(storeSetting), this);            
+                Created.RaiseEvent(new Events.NewEventArgs<IStoreSetting>(storeSetting), this);
 
             return storeSetting;
+        }
+
+        internal void CreateStoreSettings(int storeId, bool raiseEvents)
+        {
+            List<StoreSetting> settings = new List<StoreSetting>();
+            settings.AddRange(new[] {
+                new StoreSetting { Key = MConstants.StoreSetting.CurrencyCodeKey, StoreId = storeId, Name = "currencyCode", Value = "USD", TypeName = "System.String" },
+                new StoreSetting { Key = MConstants.StoreSetting.NextOrderNumberKey, StoreId = storeId, Name = "nextOrderNumber", Value = "1", TypeName = "System.Int32" },
+                new StoreSetting { Key = MConstants.StoreSetting.NextInvoiceNumberKey, StoreId = storeId, Name = "nextInvoiceNumber", Value = "1", TypeName = "System.Int32" },
+                new StoreSetting { Key = MConstants.StoreSetting.NextShipmentNumberKey, StoreId = storeId, Name = "nextShipmentNumber", Value = "1", TypeName = "System.Int32" },
+                new StoreSetting { Key = MConstants.StoreSetting.DateFormatKey, StoreId = storeId, Name = "dateFormat", Value = "dd-MM-yyyy", TypeName = "System.String" },
+                new StoreSetting { Key = MConstants.StoreSetting.TimeFormatKey, StoreId = storeId, Name = "timeFormat", Value = "am-pm", TypeName = "System.String" },
+                new StoreSetting { Key = MConstants.StoreSetting.UnitSystemKey, StoreId = storeId, Name = "unitSystem", Value = "Imperial", TypeName = "System.String" },
+                new StoreSetting { Key = MConstants.StoreSetting.GlobalShippableKey, StoreId = storeId, Name = "globalShippable", Value = "true", TypeName = "System.Boolean" },
+                new StoreSetting { Key = MConstants.StoreSetting.GlobalTaxableKey, StoreId = storeId, Name = "globalTaxable", Value = "true", TypeName = "System.Boolean" },
+                new StoreSetting { Key = MConstants.StoreSetting.GlobalTrackInventoryKey, StoreId = storeId, Name = "globalTrackInventory", Value = "false", TypeName = "System.Boolean" },
+                new StoreSetting { Key = MConstants.StoreSetting.GlobalShippingIsTaxableKey, StoreId = storeId, Name = "globalShippingIsTaxable", Value = "false", TypeName = "System.Boolean" },
+                new StoreSetting { Key = MConstants.StoreSetting.MigrationKey, StoreId = storeId, Name = "migration", Value = Guid.NewGuid().ToString(), TypeName = "System.Guid" },
+                new StoreSetting { Key = MConstants.StoreSetting.GlobalTaxationApplicationKey, StoreId = storeId, Name = "globalTaxationApplication", Value = "Invoice", TypeName = "System.String" },
+                new StoreSetting { Key = MConstants.StoreSetting.DefaultExtendedContentCulture, StoreId = storeId, Name = "defaultExtendedContentCulture", Value = "en-US", TypeName = "System.String" },
+                new StoreSetting { Key = MConstants.StoreSetting.HasDomainRecordKey, StoreId = storeId, Name = "hasDomainRecord", Value = "false", TypeName = "System.Boolean" },
+            });
+
+            foreach (var storeSetting in settings)
+            {
+                if (raiseEvents)
+                    if (Creating.IsRaisedEventCancelled(new Events.NewEventArgs<IStoreSetting>(storeSetting), this))
+                    {
+                        storeSetting.WasCancelled = true;
+                        continue;
+                    }
+
+                using (new WriteLock(Locker))
+                {
+                    var uow = UowProvider.GetUnitOfWork();
+                    using (var repository = RepositoryFactory.CreateStoreSettingRepository(uow, storeId))
+                    {
+                        //repository.AddOrUpdate(storeSetting);
+                        uow.RegisterAdded(storeSetting, repository);
+                        uow.Commit();
+                    }
+                }
+
+                if (raiseEvents)
+                    Created.RaiseEvent(new Events.NewEventArgs<IStoreSetting>(storeSetting), this);
+            }
         }
 
         /// <summary>
@@ -396,7 +443,7 @@
                 using (var repository = RepositoryFactory.CreateStoreSettingRepository(uow, storeId))
                 {
                     using (var validationRepository = RepositoryFactory.CreateInvoiceRepository(uow, storeId))
-                    { 
+                    {
                         invoiceNumber = repository.GetNextInvoiceNumber(Core.Constants.StoreSetting.NextInvoiceNumberKey, validationRepository.GetMaxDocumentNumber, invoicesCount);
                     }
 

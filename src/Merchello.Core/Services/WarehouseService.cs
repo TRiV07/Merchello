@@ -361,13 +361,14 @@
         /// <returns>
         /// The <see cref="IWarehouse"/>.
         /// </returns>
-        internal IWarehouse CreateWarehouse(string name)
+        internal IWarehouse CreateWarehouse(string name, int storeId)
         {
             Mandate.ParameterNotNull(name, "name");
 
             var warehouse = new Warehouse()
             {
-                Name = name
+                Name = name,
+                StoreId = storeId
             };
 
             Created.RaiseEvent(new Events.NewEventArgs<IWarehouse>(warehouse), this);

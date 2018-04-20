@@ -426,6 +426,11 @@
             return new OrderRepository(uow, storeId, CreateOrderLineItemRepository(uow), _logger, _sqlSyntax);
         }
 
+        internal virtual IStoreRepository CreateStoreRepository(IDatabaseUnitOfWork uow)
+        {
+            return new StoreRepository(uow, _logger, _sqlSyntax);
+        }
+
         /// <summary>
         /// Gets an instance of the <see cref="IOrderLineItemRepository"/>
         /// </summary>

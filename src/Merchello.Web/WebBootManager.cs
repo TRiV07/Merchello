@@ -86,6 +86,10 @@
             {
                 Logger.Info<WebBootManager>("Merchello database tables installed");
             }
+
+            //LogHelper.Info<UmbracoApplicationEventHandler>("Verifying Merchello Version.");
+            //manager.EnsureMerchelloVersion();
+            //manager.EnsureMerchelloMSVersion();
         }
 
         /// <summary>

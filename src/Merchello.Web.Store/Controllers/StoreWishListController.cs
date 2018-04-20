@@ -55,8 +55,8 @@
                 var resp = new UpdateQuantityAsyncResponse { Success = true };
                 try
                 {
-                    resp.AddUpdatedItems(this.WishList.Items);
-                    resp.FormattedTotal = this.WishList.TotalWishListPrice.AsFormattedCurrency(Services.DomainService.CurrentDomain().RootContentId.Value);
+                    resp.AddUpdatedItems(this.WishList.Items, CurrentCustomer.StoreId);
+                    resp.FormattedTotal = this.WishList.TotalWishListPrice.AsFormattedCurrency(CurrentCustomer.StoreId);
                     resp.ItemCount = this.GetWishListItemCountForDisplay();
                     return this.Json(resp);
                 }

@@ -113,7 +113,7 @@
                                 //var code =
                                 //    ((InvoiceService)MerchelloContext.Services.InvoiceService).GetDefaultCurrencyCode();
 
-                                currencyCodes.AddRange(Services.DomainService.GetRootIds().Select(x =>
+                                currencyCodes.AddRange(Services.StoreService().CachedAllStoresIds().Select(x =>
                                     ((InvoiceService)MerchelloContext.Services.InvoiceService).GetDefaultCurrencyCode(x)));
                             }
                             return currencyCodes.Select(c => this.MerchelloContext.Services.StoreSettingService.GetCurrencyByCode(c)).ToList();

@@ -76,7 +76,8 @@
             { 46, typeof(ProductVariantDetachedContentDto) },
             { 47, typeof(NoteDto) },
             { 48, typeof(ProductOptionAttributeShareDto) },
-            { 49, typeof(DigitalMediaDto) }
+            { 49, typeof(DigitalMediaDto) },
+            { 50, typeof(StoreDto) }
         };
 
         /// <summary>

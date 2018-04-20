@@ -477,7 +477,7 @@
         /// </remarks>
         private void MemberServiceOnSaving(IMemberService sender, SaveEventArgs<IMember> saveEventArgs)
         {
-            var domains = ApplicationContext.Current.Services.DomainService.GetRootIds();
+            var domains = ApplicationContext.Current.Services.StoreService().CachedAllStoresIds();
 
             foreach (var member in saveEventArgs.SavedEntities)
             {

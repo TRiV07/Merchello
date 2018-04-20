@@ -9,6 +9,7 @@
     using Core.Configuration.Outline;
     using Merchello.Core.EntityCollections;
     using Merchello.Core.EntityCollections.Providers;
+    using Merchello.Core.Models.MultiStore;
     using Merchello.Core.MultiStore;
     using Merchello.Web.Models.ContentEditing.Collections;
     using Merchello.Web.Reporting;
@@ -121,7 +122,16 @@
 
             if (id == "-1")
             {
-                var storesTree = _contentService.GetAllStores(_domainService.GetAllFromCache());
+                //UmbracoContext.Current.ContentCache.GetById(display.StoreId)
+                //var storesTree = _contentService.GetAllStores(_domainService.GetAllFromCache());
+
+                var storesTree = _contentService
+                    .GetByIds(Services.StoreService().CachedAllStoresIds())
+                    .Select(x => new StoreTreeDisplay()
+                    {
+                        Id = x.Id,
+                        Name = x.Name
+                    });
 
                 var startNodeIds = Security.CurrentUser.CalculateContentStartNodeIds(Services.EntityService);
                 var hasAccessToRoot = startNodeIds.Contains(Constants.System.Root);
@@ -132,7 +142,8 @@
                         CreateTreeNode($"store_{x.Id}",
                         null,
                         queryStrings,
-                        $"{x.Name} ({x.Domain})",
+                        //$"{x.Name} ({x.Domain})",
+                        x.Name,
                         "icon-shopping-basket-alt",
                         true,
                         $"merchello/merchello/settings/manage/store/{x.Id}"));

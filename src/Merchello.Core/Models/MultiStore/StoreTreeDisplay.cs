@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Merchello.Core.Models.MultiStore
 {
-    public class StoreDisplay
+    public class StoreTreeDisplay
     {
         public int Id { get; set; }
         public string Name { get; set; }

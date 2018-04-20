@@ -122,8 +122,8 @@
                 var resp = new UpdateQuantityAsyncResponse { Success = true };
                 try
                 {
-                    resp.AddUpdatedItems(this.Basket.Items);
-                    resp.FormattedTotal = this.Basket.TotalBasketPrice.AsFormattedCurrency(Services.DomainService.CurrentDomain().RootContentId.Value);
+                    resp.AddUpdatedItems(this.Basket.Items, CurrentCustomer.StoreId);
+                    resp.FormattedTotal = this.Basket.TotalBasketPrice.AsFormattedCurrency(CurrentCustomer.StoreId);
                     resp.ItemCount = this.GetBasketItemCountForDisplay();
                     return this.Json(resp);
                 }

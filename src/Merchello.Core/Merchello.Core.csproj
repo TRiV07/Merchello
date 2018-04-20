@@ -437,7 +437,11 @@
       <DependentUpon>Extensions.cs</DependentUpon>
     </Compile>
     <Compile Include="Models\Interfaces\IHasDomainRoot.cs" />
-    <Compile Include="MultiStore\Extensions.IContentService.cs" />
+    <Compile Include="Models\Interfaces\IStore.cs" />
+    <Compile Include="Models\Rdbms\StoreDto.cs" />
+    <Compile Include="Models\Rdbms\KeyStoreDto.cs" />
+    <Compile Include="Models\Store.cs" />
+    <Compile Include="MultiStore\Extensions.IStoreService.cs" />
     <Compile Include="MultiStore\Extensions.IDomainService.cs" />
     <Compile Include="Extensions.IEntityCollection.cs">
       <DependentUpon>Extensions.cs</DependentUpon>
@@ -514,17 +518,20 @@
     <Compile Include="Models\Interfaces\IDeepCloneable.cs" />
     <Compile Include="Models\Interfaces\IShallowClone.cs" />
     <Compile Include="Models\InvoiceAdjustmentResult.cs" />
-    <Compile Include="Models\MultiStore\StoreDisplay.cs" />
+    <Compile Include="Models\MultiStore\StoreTreeDisplay.cs" />
     <Compile Include="Models\Querying\QueryBuilderParameter.cs" />
     <Compile Include="Models\Querying\FieldMatchCondition.cs" />
     <Compile Include="Models\Rdbms\CountDto.cs" />
     <Compile Include="Models\Rdbms\DigitalMediaDto.cs" />
     <Compile Include="Models\Rdbms\UserGroup2AppDto.cs" />
     <Compile Include="PagedCollection.cs" />
+    <Compile Include="Persistence\Factories\StoreFactory.cs" />
+    <Compile Include="Persistence\Mappers\StoreMapper.cs" />
     <Compile Include="Persistence\Migrations\UpgradesMS\TargetVersionOneZeroFive\CreateGatewayProviderSettingsForeignKeys.cs" />
     <Compile Include="Persistence\Migrations\UpgradesMS\TargetVersionOneZeroFive\DeleteGatewayProviderSettingsForeignKeys.cs" />
     <Compile Include="Persistence\Migrations\UpgradesMS\TargetVersionOneZeroFive\UpdateData.cs" />
     <Compile Include="Persistence\Migrations\UpgradesMS\TargetVersionOneZeroFive\UpdateGatewayProviderSettingsTable.cs" />
+    <Compile Include="Persistence\Migrations\UpgradesMS\TargetVersionOneOneZero\CreateStoreTable.cs" />
     <Compile Include="Persistence\Migrations\UpgradesMS\TargetVersionOneZeroSix\UpdateOfferSettingsTable.cs" />
     <Compile Include="Persistence\Migrations\UpgradesMS\TargetVersionOneZeroFour\UpdateShipmentTable.cs" />
     <Compile Include="Persistence\Migrations\UpgradesMS\TargetVersionOneZeroFour\UpdateInvoiceTable.cs" />
@@ -543,6 +550,7 @@
     <Compile Include="Persistence\Repositories\Interfaces\IMSRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IProductBackOfficeRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IPortForwardProductRepository.cs" />
+    <Compile Include="Persistence\Repositories\Interfaces\IStoreRepository.cs" />
     <Compile Include="Persistence\Repositories\MerchelloMSPetaPocoRepositoryBase.cs" />
     <Compile Include="Persistence\Repositories\PagedMSRepositoryBase.cs" />
     <Compile Include="Persistence\Repositories\ProductRepository.BackOffice.cs">
@@ -551,6 +559,9 @@
     <Compile Include="Persistence\Repositories\ProductRepository.PortForward.cs">
       <DependentUpon>ProductRepository.cs</DependentUpon>
     </Compile>
+    <Compile Include="Persistence\Repositories\StoreRepository.cs" />
+    <Compile Include="Services\StoreService.cs" />
+    <Compile Include="Services\Interfaces\IStoreService.cs" />
     <Compile Include="Services\Interfaces\IPageCachedMSService.cs" />
     <Compile Include="Services\Interfaces\IProductQueryService.cs" />
     <Compile Include="Services\Interfaces\IProductServicePortForward.cs" />

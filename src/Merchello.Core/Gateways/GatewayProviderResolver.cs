@@ -40,6 +40,8 @@
         /// </summary>
         private readonly IGatewayProviderService _gatewayProviderService;
 
+        private readonly IStoreService _storeService;
+
         /// <summary>
         /// The runtime cache.
         /// </summary>
@@ -57,13 +59,14 @@
         /// <param name="runtimeCache">
         /// The runtime cache.
         /// </param>
-        internal GatewayProviderResolver(IEnumerable<Type> values, IGatewayProviderService gatewayProviderService, IRuntimeCacheProvider runtimeCache)
+        internal GatewayProviderResolver(IEnumerable<Type> values, IGatewayProviderService gatewayProviderService, IStoreService storeService, IRuntimeCacheProvider runtimeCache)
             : base(values)
         {
             Mandate.ParameterNotNull(gatewayProviderService, "gatewayProviderService");
             Mandate.ParameterNotNull(runtimeCache, "runtimeCache");
 
             _gatewayProviderService = gatewayProviderService;
+            _storeService = storeService;
             _runtimeCache = runtimeCache;
 
             BuildActivatedGatewayProviderCache();
@@ -77,9 +80,7 @@
             get
             {
                 //TOCHECKMS
-                var storesIds = ApplicationContext.Current.Services.DomainService != null
-                    ? ApplicationContext.Current.Services.DomainService.GetRootIds()
-                    : _gatewayProviderService.GetAllStoresIds();
+                var storesIds = _storeService.CachedAllStoresIds();
 
                 if (_activatedGatewayProviderCache.Count == InstanceTypes.Count() * storesIds.Count())
                     return _activatedGatewayProviderCache.Values;

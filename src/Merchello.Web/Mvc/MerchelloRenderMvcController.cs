@@ -120,7 +120,7 @@
             {
                 var storeSettingsService = this._merchelloContext.Services.StoreSettingService;
                 return storeSettingsService.GetCurrencyByCode(
-                    storeSettingsService.GetByKey(Core.Constants.StoreSetting.CurrencyCodeKey, Services.DomainService.CurrentDomain().RootContentId.Value).Value
+                    storeSettingsService.GetByKey(Core.Constants.StoreSetting.CurrencyCodeKey, CurrentCustomer.StoreId).Value
                 );
             }
         }

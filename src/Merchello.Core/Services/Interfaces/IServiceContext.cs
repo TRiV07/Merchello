@@ -91,6 +91,8 @@
         /// </summary>
         IStoreSettingService StoreSettingService { get; }
 
+        IStoreService StoreService { get; }
+
         /// <summary>
         /// Gets the <see cref="IShipmentService"/>
         /// </summary>

@@ -8,6 +8,11 @@
             {
                 get { return "_umDomainsList"; }
             }
+
+            public static string StoresList
+            {
+                get { return "_umStoresList"; }
+            }
         }
     }
 }
