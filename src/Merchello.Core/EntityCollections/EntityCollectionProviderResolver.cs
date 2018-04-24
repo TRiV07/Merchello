@@ -328,6 +328,12 @@
             if (!IsInitialized) this.Initialize();
         }
 
+        internal void ReInitialize()
+        {
+            IsInitialized = false;
+            this.Initialize();
+        }
+
         /// <summary>
         /// Gets the provider attributes of providers with matching types
         /// </summary>

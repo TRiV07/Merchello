@@ -127,6 +127,7 @@
 
                 var storesTree = _contentService
                     .GetByIds(Services.StoreService().CachedAllStoresIds())
+                    .OrderBy(x => x.SortOrder)
                     .Select(x => new StoreTreeDisplay()
                     {
                         Id = x.Id,

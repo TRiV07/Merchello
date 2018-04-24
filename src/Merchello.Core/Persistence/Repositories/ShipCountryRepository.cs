@@ -66,7 +66,7 @@
 
             var keys = Database.Fetch<Guid>(sql).ToArray();
 
-            return GetAll(keys);
+            return keys.Length > 0 ? GetAll(keys) : new List<IShipCountry>();
         }
 
         /// <summary>

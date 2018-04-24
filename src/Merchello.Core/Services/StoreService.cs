@@ -4,7 +4,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading;
-
+    using Merchello.Core.EntityCollections;
     using Merchello.Core.Events;
     using Merchello.Core.Models;
     using Merchello.Core.Models.Interfaces;
@@ -172,6 +172,8 @@
                 MerchelloContext.Current.Services.WarehouseService.Save(warehouse);
                 MerchelloContext.Current.Services.WarehouseService.CreateWarehouseCatalogWithKey(warehouse.Key, $"Catalog {storeId}");
             }
+
+            EntityCollectionProviderResolver.Current.ReInitialize();
 
             return store;
         }
