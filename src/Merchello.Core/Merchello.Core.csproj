@@ -527,6 +527,7 @@
     <Compile Include="PagedCollection.cs" />
     <Compile Include="Persistence\Factories\StoreFactory.cs" />
     <Compile Include="Persistence\Mappers\StoreMapper.cs" />
+    <Compile Include="Persistence\Migrations\UpgradesMS\TargetVersionOneOneOne\CreateStoreForeignKeys.cs" />
     <Compile Include="Persistence\Migrations\UpgradesMS\TargetVersionOneZeroFive\CreateGatewayProviderSettingsForeignKeys.cs" />
     <Compile Include="Persistence\Migrations\UpgradesMS\TargetVersionOneZeroFive\DeleteGatewayProviderSettingsForeignKeys.cs" />
     <Compile Include="Persistence\Migrations\UpgradesMS\TargetVersionOneZeroFive\UpdateData.cs" />

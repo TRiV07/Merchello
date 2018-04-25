@@ -202,6 +202,8 @@
             }
 
             if (raiseEvents) Saved.RaiseEvent(new SaveEventArgs<IStore>(store), this);
+
+            EntityCollectionProviderResolver.Current.ReInitialize();
         }
 
         /// <summary>
@@ -235,6 +237,8 @@
             }
 
             if (raiseEvents) Saved.RaiseEvent(new SaveEventArgs<IStore>(storeArray), this);
+
+            EntityCollectionProviderResolver.Current.ReInitialize();
         }
 
         /// <summary>
@@ -261,6 +265,8 @@
             }
 
             if (raiseEvents) Deleted.RaiseEvent(new DeleteEventArgs<IStore>(store), this);
+
+            EntityCollectionProviderResolver.Current.ReInitialize();
         }
 
         /// <summary>
@@ -293,6 +299,8 @@
             }
 
             if (raiseEvents) Deleted.RaiseEvent(new DeleteEventArgs<IStore>(storeArray), this);
+
+            EntityCollectionProviderResolver.Current.ReInitialize();
         }
 
         /// <summary>

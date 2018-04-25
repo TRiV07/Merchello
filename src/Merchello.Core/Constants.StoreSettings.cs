@@ -142,6 +142,14 @@
                     return new Guid("84FC6354-5E84-495F-9CB4-1C753D612AF7");
                 }
             }
+
+            public static Guid DeliveryEnabled
+            {
+                get
+                {
+                    return new Guid("A71CF5E6-A8E6-4E06-B1DB-CC2F1045FC8D");
+                }
+            }
         }
     }
 }

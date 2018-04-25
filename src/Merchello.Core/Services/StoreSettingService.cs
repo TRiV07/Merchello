@@ -217,7 +217,6 @@
         /// <returns>A collection of <see cref="IProvince"/></returns>
         public static IEnumerable<IProvince> GetProvincesByCountryCode(string countryCode)
         {
-
             var country = GetCountryFromConfig(countryCode);
 
             return country == null ? Enumerable.Empty<IProvince>() : country.Provinces;
@@ -307,6 +306,7 @@
                 new StoreSetting { Key = MConstants.StoreSetting.GlobalTaxationApplicationKey, StoreId = storeId, Name = "globalTaxationApplication", Value = "Invoice", TypeName = "System.String" },
                 new StoreSetting { Key = MConstants.StoreSetting.DefaultExtendedContentCulture, StoreId = storeId, Name = "defaultExtendedContentCulture", Value = "en-US", TypeName = "System.String" },
                 new StoreSetting { Key = MConstants.StoreSetting.HasDomainRecordKey, StoreId = storeId, Name = "hasDomainRecord", Value = "false", TypeName = "System.Boolean" },
+                new StoreSetting { Key = MConstants.StoreSetting.DeliveryEnabled, StoreId = storeId, Name = "deliveryEnabled", Value = "true", TypeName = "System.Boolean" },
             });
 
             foreach (var storeSetting in settings)

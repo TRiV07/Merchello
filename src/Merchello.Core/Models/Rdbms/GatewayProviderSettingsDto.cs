@@ -17,6 +17,7 @@ namespace Merchello.Core.Models.Rdbms
 
         [Column("storeId")]
         [Constraint(Default = Constants.MultiStore.DefaultId)]
+        [ForeignKey(typeof(StoreDto), Name = "FK_merchGatewayProviderSettings_merchStore", Column = "storeId")]
         public int StoreId { get; set; }
 
         [Column("providerTfKey")]

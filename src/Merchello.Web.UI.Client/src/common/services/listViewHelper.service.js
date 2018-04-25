@@ -96,6 +96,11 @@ angular.module('merchello.services').service('merchelloListViewHelper',
 
         };
 
+        this.addConfig = function (name, value) {
+            var ensure = name.toLowerCase();
+            return configs[ensure] = value;
+        };
+
         this.getConfig = function(listViewType) {
             var ensure = listViewType.toLowerCase();
             return configs[ensure];

@@ -31,6 +31,7 @@
 
         [Column("storeId")]
         [Constraint(Default = Constants.MultiStore.DefaultId)]
+        [ForeignKey(typeof(StoreDto), Name = "FK_merchTaxMethod_merchStore", Column = "storeId")]
         public int StoreId { get; set; }
 
         /// <summary>

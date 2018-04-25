@@ -26,7 +26,8 @@
         /// Gets or sets domain root structure ID
         /// </summary>
         [Column("storeId")]
-        [Constraint(Default = "-1")]
+        [Constraint(Default = Constants.MultiStore.DefaultId)]
+        [ForeignKey(typeof(StoreDto), Name = "FK_merchWarehouse_merchStore", Column = "storeId")]
         public int StoreId { get; set; }
 
         /// <summary>
