@@ -24,7 +24,7 @@ angular.module('merchello')
         }
 
         function checkboxDisabled() {
-            return $scope.dialogData.shipment.shipmentStatus.name === 'Shipped' || $scope.dialogData.shipment.shipmentStatus.name === 'Delivered'
+            return $scope.dialogData.shipment.shipmentStatus.key === 'b37be101-cec9-4608-9330-54e56fa0537a' || $scope.dialogData.shipment.shipmentStatus.key === '3a279633-4919-485d-8c3b-479848a053d9' || $scope.dialogData.shipment.shipmentStatus.key === '5f22d354-81a4-4356-bee4-aa8c0f717438'
         }
 
         function save() {

@@ -104,6 +104,13 @@ namespace Merchello.Web.Models.ContentEditing
 				        }
 				        settingDisplay.HasDomainRecord = boolValue;
                         break;
+                    case "deliveryEnabled":
+				        if (!bool.TryParse(setting.Value, out boolValue))
+				        {
+                            boolValue = false;
+				        }
+				        settingDisplay.DeliveryEnabled = boolValue;
+                        break;
                     case "migration":
 				        Guid migrationKey;
 				        try
@@ -174,6 +181,9 @@ namespace Merchello.Web.Models.ContentEditing
 				        break;
                     case "defaultExtendedContentCulture":
 				        setting.Value = settingDisplay.DefaultExtendedContentCulture;
+				        break;
+                    case "deliveryEnabled":
+				        //setting.Value = settingDisplay.DeliveryEnabled.ToString();
 				        break;
 					default:
 						setting.Value = string.Empty;		 

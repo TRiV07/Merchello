@@ -1,6 +1,6 @@
 angular.module('merchello.models').factory('merchelloTabsFactory',
-    ['MerchelloTabCollection', 'merchelloListViewHelper', '$routeParams', 'userService',
-        function (MerchelloTabCollection, merchelloListViewHelper, $routeParams, userService) {
+    ['MerchelloTabCollection', 'merchelloListViewHelper', '$routeParams', 'settingsResource',
+        function (MerchelloTabCollection, merchelloListViewHelper, $routeParams, settingsResource) {
 
             var Constructor = MerchelloTabCollection;
 
@@ -117,7 +117,7 @@ angular.module('merchello.models').factory('merchelloTabsFactory',
             }
 
             // creates the tabs for sales overview section
-            function createSalesTabs(invoiceKey) {
+            function createSalesTabs(invoiceKey, setTabName) {
                 var entityType = 'Invoice';
                 var settings = getCacheSettings(entityType);
                 var tabs = new Constructor();
@@ -126,9 +126,17 @@ angular.module('merchello.models').factory('merchelloTabsFactory',
                 } else {
                     tabs.addTab('saleslist', 'merchelloTabs_salesListing', '#/merchello/merchello/saleslist/manage' + '/store/' + $routeParams.storeId);
                 }
-                tabs.addTab('overview', 'merchelloTabs_sales', '#/merchello/merchello/saleoverview/' + invoiceKey + '/store/' + $routeParams.storeId);
-                tabs.addTab('payments', 'merchelloTabs_payments', '#/merchello/merchello/invoicepayments/' + invoiceKey + '/store/' + $routeParams.storeId);
-                tabs.addTab('shipments', 'merchelloTabs_shipments', '#/merchello/merchello/ordershipments/' + invoiceKey + '/store/' + $routeParams.storeId);
+                settingsResource.getAllCombined($routeParams.storeId).then(function (combined) {
+                    if (combined.settings.deliveryEnabled) {
+                        tabs.addTab('overview', 'merchelloTabs_sales', '#/merchello/merchello/delivery.saleoverview/' + invoiceKey + '/store/' + $routeParams.storeId);
+                    } else {
+                        tabs.addTab('overview', 'merchelloTabs_sales', '#/merchello/merchello/saleoverview/' + invoiceKey + '/store/' + $routeParams.storeId);
+                    }
+                    tabs.addTab('payments', 'merchelloTabs_payments', '#/merchello/merchello/invoicepayments/' + invoiceKey + '/store/' + $routeParams.storeId);
+                    tabs.addTab('shipments', 'merchelloTabs_shipments', '#/merchello/merchello/ordershipments/' + invoiceKey + '/store/' + $routeParams.storeId);
+                    tabs.setActive(setTabName);
+                });
+                
                 return tabs;
             }
 

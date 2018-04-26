@@ -338,7 +338,10 @@
             }
 
             function getEditUrl(invoice) {
-                return baseUrl + invoice.key + '/store/' + $routeParams.storeId;
+                return ($scope.settings.deliveryEnabled
+                    ? '#/merchello/merchello/delivery.saleoverview/'
+                    : '#/merchello/merchello/saleoverview/')
+                    + invoice.key + '/store/' + $routeParams.storeId;
             }
 
             /**

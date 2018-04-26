@@ -71,6 +71,7 @@ angular.module('merchello').controller('Merchello.Backoffice.SalesListController
                     $scope.settings = local[6].settings;
                     allCurrencies = local[6].currencies;
                     globalCurrency = local[6].currencySymbol;
+
                     $scope.loaded = true;
                     $scope.preValuesLoaded = true;
                 });
@@ -97,6 +98,8 @@ angular.module('merchello').controller('Merchello.Backoffice.SalesListController
                         return $filter('date')(result.invoiceDate, $scope.settings.dateFormat);
                     case 'paymentStatus':
                         return getPaymentStatus(result);
+                    case 'orderType':
+                        return getOrderType(result);
                     case 'fulfillmentStatus':
                         return getFulfillmentStatus(result);
                     case 'total':
@@ -132,6 +135,21 @@ angular.module('merchello').controller('Merchello.Backoffice.SalesListController
                         break;
                 }
                 return label.replace('%0', icon).replace('%1', text);
+            }
+
+            function getOrderType(invoice) {
+                var shippingLineItems = invoice.getShippingLineItems();
+                var first = shippingLineItems[0];
+                if (first != null) {
+                    var result = /^.+-(.+?)-.+$/g.exec(first.name);
+                    if (result && result.length > 1) {
+                        return result[1];
+                    } else {
+                        return first.name
+                    }
+                } else {
+                    return 'Not set!';
+                }
             }
 
             function getFulfillmentStatus(invoice) {
@@ -188,7 +206,10 @@ angular.module('merchello').controller('Merchello.Backoffice.SalesListController
             }
 
             function getEditUrl(invoice) {
-                return baseUrl + invoice.key + '/store/' + $routeParams.storeId;
+                return ($scope.settings.deliveryEnabled
+                    ? '#/merchello/merchello/delivery.saleoverview/'
+                    : '#/merchello/merchello/saleoverview/')
+                    + invoice.key + '/store/' + $routeParams.storeId;
             }
 
             init();

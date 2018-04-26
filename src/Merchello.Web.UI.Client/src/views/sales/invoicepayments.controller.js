@@ -59,8 +59,7 @@ angular.module('merchello').controller('Merchello.Backoffice.InvoicePaymentsCont
             function init() {
                 var key = $routeParams.id;
                 loadInvoice(key);
-                $scope.tabs = merchelloTabsFactory.createSalesTabs(key);
-                $scope.tabs.setActive('payments');
+                $scope.tabs = merchelloTabsFactory.createSalesTabs(key, 'payments');
             }
 
             /**

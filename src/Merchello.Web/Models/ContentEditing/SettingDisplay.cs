@@ -86,6 +86,8 @@
         /// </remarks>
         public bool HasDomainRecord { get; set; }
 
+        public bool DeliveryEnabled { get; set; }
+
         /// <summary>
         /// Gets or sets the how taxes should be applied globally.
         /// </summary>

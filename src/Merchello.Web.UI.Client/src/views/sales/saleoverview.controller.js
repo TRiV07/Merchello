@@ -9,11 +9,13 @@
 angular.module('merchello').controller('Merchello.Backoffice.SalesOverviewController',
     ['$scope', '$routeParams', '$timeout', '$log', '$location', 'assetsService', 'dialogService', 'localizationService', 'notificationsService', 'invoiceHelper',
         'auditLogResource', 'noteResource', 'invoiceResource', 'settingsResource', 'paymentResource', 'shipmentResource', 'paymentGatewayProviderResource',
-        'orderResource', 'dialogDataFactory', 'merchelloTabsFactory', 'addressDisplayBuilder', 'countryDisplayBuilder', 'salesHistoryDisplayBuilder', 'noteDisplayBuilder',
-        'invoiceDisplayBuilder', 'paymentDisplayBuilder', 'paymentMethodDisplayBuilder', 'shipMethodsQueryDisplayBuilder', 'noteDisplayBuilder',
+        'orderResource', 'storeApiResource', 'dialogDataFactory', 'merchelloTabsFactory', 'addressDisplayBuilder', 'countryDisplayBuilder', 'salesHistoryDisplayBuilder', 'noteDisplayBuilder',
+        'invoiceDisplayBuilder', 'paymentDisplayBuilder', 'paymentMethodDisplayBuilder', 'shipMethodsQueryDisplayBuilder', 'noteDisplayBuilder', 'shipmentDisplayBuilder',
         function ($scope, $routeParams, $timeout, $log, $location, assetsService, dialogService, localizationService, notificationsService, invoiceHelper,
-            auditLogResource, noteResource, invoiceResource, settingsResource, paymentResource, shipmentResource, paymentGatewayProviderResource, orderResource, dialogDataFactory,
-            merchelloTabsFactory, addressDisplayBuilder, countryDisplayBuilder, salesHistoryDisplayBuilder, noteDisplayBuilder, invoiceDisplayBuilder, paymentDisplayBuilder, paymentMethodDisplayBuilder, shipMethodsQueryDisplayBuilder, noteDisplayBuilder) {
+            auditLogResource, noteResource, invoiceResource, settingsResource, paymentResource, shipmentResource, paymentGatewayProviderResource, orderResource, storeApiResource, dialogDataFactory,
+            merchelloTabsFactory, addressDisplayBuilder, countryDisplayBuilder, salesHistoryDisplayBuilder, noteDisplayBuilder, invoiceDisplayBuilder, paymentDisplayBuilder, paymentMethodDisplayBuilder, shipMethodsQueryDisplayBuilder, noteDisplayBuilder, shipmentDisplayBuilder) {
+
+            //var storeApiResource;
 
             // exposed properties
             $scope.loaded = false;
@@ -37,6 +39,14 @@ angular.module('merchello').controller('Merchello.Backoffice.SalesOverviewContro
             $scope.newPaymentOpen = false;
             $scope.entityType = 'Invoice';
 
+            $scope.orderStatus = {
+                shipment: undefined,
+                step: 1,
+                shipmentStatusName: 'Pending Assignment',
+                couriers: [],
+                currentCourier: undefined
+            };
+
             $scope.canAddLineItems = true;
 
             $scope.remainingBalance = 0;
@@ -47,9 +57,12 @@ angular.module('merchello').controller('Merchello.Backoffice.SalesOverviewContro
             $scope.showFulfill = true;
             $scope.openDeleteInvoiceDialog = openDeleteInvoiceDialog;
             $scope.cancelInvoice = cancelInvoice;
-            $scope.processDeleteInvoiceDialog = processDeleteInvoiceDialog,
-                $scope.openFulfillShipmentDialog = openFulfillShipmentDialog;
+            $scope.processDeleteInvoiceDialog = processDeleteInvoiceDialog;
+            $scope.openFulfillShipmentDialog = openFulfillShipmentDialog;
             $scope.processFulfillShipmentDialog = processFulfillShipmentDialog;
+
+            $scope.openShipmentDialog = openShipmentDialog;
+            $scope.processUpdateShipment = processUpdateShipment;
 
             $scope.toggleNewPaymentOpen = toggleNewPaymentOpen;
             $scope.reload = init;
@@ -79,8 +92,7 @@ angular.module('merchello').controller('Merchello.Backoffice.SalesOverviewContro
                 $scope.preValuesLoaded = false;
                 $scope.newPaymentOpen = false;
                 loadInvoice($routeParams.id);
-                $scope.tabs = merchelloTabsFactory.createSalesTabs($routeParams.id);
-                $scope.tabs.setActive('overview');
+                $scope.tabs = merchelloTabsFactory.createSalesTabs($routeParams.id, 'overview');
                 if (Umbraco.Sys.ServerVariables.isDebuggingEnabled) {
                     $scope.debugAllowDelete = true;
                 }
@@ -226,6 +238,78 @@ angular.module('merchello').controller('Merchello.Backoffice.SalesOverviewContro
                         }
                     } else {
                         $scope.currencySymbol = $scope.invoice.currency.symbol;
+                    }
+
+                    if ($scope.settings.deliveryEnabled) {
+                        //storeApiResource = angular.module('umCommerce.resources').factory('storeApiResource');
+
+                        var shipmentsPromise = shipmentResource.getShipmentsByInvoice($scope.invoice);
+                        shipmentsPromise.then(function (shipments) {
+                            $scope.shipments = shipmentDisplayBuilder.transform(shipments);
+                            $scope.orderStatus.shipment = $scope.shipments[0];
+
+                            if ($scope.orderStatus.shipment) {
+
+                                $scope.orderStatus.shipmentStatusName = $scope.orderStatus.shipment.shipmentStatus.name;
+
+                                switch ($scope.orderStatus.shipment.shipmentStatus.alias) {
+                                    case 'pendingAssignment':
+                                        {
+                                            $scope.orderStatus.step = 1;
+                                            break;
+                                        }
+                                    case 'pendingAcceptance':
+                                        {
+                                            $scope.orderStatus.step = 2;
+                                            break;
+                                        }
+                                    case 'orderAccepted':
+                                        {
+                                            $scope.orderStatus.step = 3;
+                                            break;
+                                        }
+                                    case 'deliveryEnRoute':
+                                        {
+                                            $scope.orderStatus.step = 4;
+                                            break;
+                                        }
+                                    case 'orderDelivered':
+                                        {
+                                            $scope.orderStatus.step = 5;
+                                            break;
+                                        }
+                                    case 'completedAndMoneyCollected':
+                                        {
+                                            $scope.orderStatus.step = 6;
+                                            break;
+                                        }
+                                    case 'completed':
+                                        {
+                                            $scope.orderStatus.step = 6;
+                                            break;
+                                        }
+                                }
+
+                                if ($scope.orderStatus.shipment.carrier) {
+                                    storeApiResource.getCouriers($routeParams.storeId, 'all').then(function (data) {
+                                        $scope.orderStatus.couriers = data.items;
+                                        angular.forEach($scope.orderStatus.couriers, function (c) {
+                                            if (c.id.toString() == $scope.orderStatus.shipment.carrier) {
+                                                angular.forEach(c.properties, function (p) {
+                                                    if (p.alias == 'phone') {
+                                                        c.phone = p.value;
+                                                    }
+                                                });
+
+                                                $scope.orderStatus.currentCourier = c;
+                                            }
+                                        });
+                                    });
+
+                                }
+                            }
+
+                        });
                     }
                 });
             }
@@ -432,7 +516,7 @@ angular.module('merchello').controller('Merchello.Backoffice.SalesOverviewContro
                     data.currencySymbol = $scope.currencySymbol;
 
                     // packaging
-                    var quotedKey = '7342dcd6-8113-44b6-bfd0-4555b82f9503';
+                    var quotedKey = '6fa425a9-7802-4da0-bd33-083c100e30f3';
                     data.shipmentStatus = _.find(data.shipmentStatuses, function (status) {
                         return status.key === quotedKey;
                     });
@@ -451,15 +535,85 @@ angular.module('merchello').controller('Merchello.Backoffice.SalesOverviewContro
                                 return method.key === shipMethodKey;
                             });
 
-                            dialogService.open({
-                                template: '/App_Plugins/Merchello/Backoffice/Merchello/Dialogs/sales.create.shipment.html',
-                                show: true,
-                                callback: $scope.processFulfillShipmentDialog,
-                                dialogData: data
-                            });
+                            storeApiResource.getCouriers($routeParams.storeId, 'all')
+                                .then(function (couriersData) {
+
+                                    var couriers = [];
+                                    _.each(couriersData.items, function (c) {
+                                        var prop = _.find(c.properties, function (property) {
+                                            return property.alias === 'activeOrders';
+                                        });
+                                        var activeOrders = prop && prop.value ? prop.value : 0;
+                                        couriers.push({ name: c.name + ' - Currently Assigned (' + activeOrders + ')', id: c.id.toString() });
+                                    });
+
+                                    data.couriers = couriers;
+
+                                    dialogService.open({
+                                        template: $scope.settings.deliveryEnabled
+                                            ? '/App_Plugins/Merchello/Backoffice/Merchello/Dialogs/delivery.sales.create.shipment.html'
+                                            : '/App_Plugins/Merchello/Backoffice/Merchello/Dialogs/sales.create.shipment.html',
+                                        show: true,
+                                        callback: $scope.processFulfillShipmentDialog,
+                                        dialogData: data
+                                    });
+
+                                });
 
                         });
                     }
+                });
+            }
+
+            function openShipmentDialog(shipment) {
+                var promiseStatuses = shipmentResource.getAllShipmentStatuses();
+                promiseStatuses.then(function (statuses) {
+
+                    storeApiResource.getCouriers($routeParams.storeId, 'all')
+                        .then(function (data) {
+                            var couriers = [];
+                            _.each(data.items, function (c) {
+                                var prop = _.find(c.properties, function (property) {
+                                    return property.alias === 'activeOrders';
+                                });
+                                var activeOrders = prop && prop.value ? prop.value : 0;
+                                couriers.push({ name: c.name + ' - Currently Assigned (' + activeOrders + ')', id: c.id.toString() });
+                            });
+
+                            var dialogData = dialogDataFactory.createEditShipmentDialogData();
+                            dialogData.couriers = couriers;
+                            dialogData.shipment = shipment;
+                            dialogData.shipmentStatuses = statuses;
+                            dialogData.shipment.shipmentStatus = _.find(statuses, function (status) {
+                                return status.key === dialogData.shipment.shipmentStatus.key;
+                            });
+
+                            dialogService.open({
+                                template: '/App_Plugins/Merchello/Backoffice/Merchello/Dialogs/delivery.sales.edit.shipment.html',
+                                show: true,
+                                callback: $scope.processUpdateShipment,
+                                dialogData: dialogData
+                            });
+                        });
+
+                });
+            }
+
+            function processUpdateShipment(dialogData) {
+                $scope.preValuesLoaded = false;
+                if (dialogData.shipment.items.length > 0) {
+                    saveShipment(dialogData.shipment);
+                } else {
+                    notificationsService.warning('Cannot remove all items from the shipment.  Instead, consider deleting the shipment.');
+                    loadInvoice($scope.invoice.key);
+                };
+            }
+
+            function saveShipment(shipment) {
+
+                var promise = shipmentResource.saveShipment(shipment);
+                promise.then(function (shipment) {
+                    loadInvoice($scope.invoice.key);
                 });
             }
 
