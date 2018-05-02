@@ -156,6 +156,8 @@
         /// </summary>
         private string _carrier;
 
+        private Guid? _carrierKey;
+
         /// <summary>
         /// The tracking code.
         /// </summary>
@@ -292,7 +294,7 @@
 
             set
             {
-                SetPropertyValueAndDetectChanges(value, ref _shipmentNumber, _ps.Value.ShipmentNumberSelector); 
+                SetPropertyValueAndDetectChanges(value, ref _shipmentNumber, _ps.Value.ShipmentNumberSelector);
             }
         }
 
@@ -303,7 +305,7 @@
             get
             {
                 return _shipmentStatus.Key;
-            }  
+            }
         }
 
         /// <inheritdoc/>
@@ -458,7 +460,7 @@
 
         /// <inheritdoc/>
         [DataMember]
-        public bool FromIsCommercial 
+        public bool FromIsCommercial
         {
             get
             {
@@ -473,7 +475,7 @@
 
         /// <inheritdoc/>
         [DataMember]
-        public string ToOrganization 
+        public string ToOrganization
         {
             get
             {
@@ -510,9 +512,9 @@
                 return _toAddress1;
             }
 
-            set 
-            { 
-                SetPropertyValueAndDetectChanges(value, ref _toAddress1, _ps.Value.ToAddress1Selector); 
+            set
+            {
+                SetPropertyValueAndDetectChanges(value, ref _toAddress1, _ps.Value.ToAddress1Selector);
             }
         }
 
@@ -525,9 +527,9 @@
                 return _toAddress2;
             }
 
-            set 
-            { 
-                SetPropertyValueAndDetectChanges(value, ref _toAddress2, _ps.Value.ToAddress2Selector); 
+            set
+            {
+                SetPropertyValueAndDetectChanges(value, ref _toAddress2, _ps.Value.ToAddress2Selector);
             }
         }
 
@@ -540,9 +542,9 @@
                 return _toLocality;
             }
 
-            set 
-            { 
-                SetPropertyValueAndDetectChanges(value, ref _toLocality, _ps.Value.ToLocalitySelector); 
+            set
+            {
+                SetPropertyValueAndDetectChanges(value, ref _toLocality, _ps.Value.ToLocalitySelector);
             }
         }
 
@@ -555,9 +557,9 @@
                 return _toRegion;
             }
 
-            set 
-            { 
-                SetPropertyValueAndDetectChanges(value, ref _toRegion, _ps.Value.ToRegionSelector); 
+            set
+            {
+                SetPropertyValueAndDetectChanges(value, ref _toRegion, _ps.Value.ToRegionSelector);
             }
         }
 
@@ -570,9 +572,9 @@
                 return _toPostalCode;
             }
 
-            set 
-            { 
-                SetPropertyValueAndDetectChanges(value, ref _toPostalCode, _ps.Value.ToPostalCodeSelector); 
+            set
+            {
+                SetPropertyValueAndDetectChanges(value, ref _toPostalCode, _ps.Value.ToPostalCodeSelector);
             }
         }
 
@@ -585,15 +587,15 @@
                 return _toCountryCode;
             }
 
-            set 
-            { 
-                SetPropertyValueAndDetectChanges(value, ref _toCountryCode, _ps.Value.ToCountryCodeSelector); 
+            set
+            {
+                SetPropertyValueAndDetectChanges(value, ref _toCountryCode, _ps.Value.ToCountryCodeSelector);
             }
         }
 
         /// <inheritdoc/>
         [DataMember]
-        public bool ToIsCommercial 
+        public bool ToIsCommercial
         {
             get
             {
@@ -602,7 +604,7 @@
 
             set
             {
-                SetPropertyValueAndDetectChanges(value, ref _toIsCommercial, _ps.Value.ToIsCommercialSelector); 
+                SetPropertyValueAndDetectChanges(value, ref _toIsCommercial, _ps.Value.ToIsCommercialSelector);
             }
         }
 
@@ -630,9 +632,9 @@
                 return _phone;
             }
 
-            set 
-            { 
-                SetPropertyValueAndDetectChanges(value, ref _phone, _ps.Value.PhoneSelector); 
+            set
+            {
+                SetPropertyValueAndDetectChanges(value, ref _phone, _ps.Value.PhoneSelector);
             }
         }
 
@@ -663,6 +665,21 @@
             set
             {
                 SetPropertyValueAndDetectChanges(value, ref _carrier, _ps.Value.CarrierSelector);
+            }
+        }
+
+        /// <inheritdoc/>
+        [DataMember]
+        public Guid? CarrierKey
+        {
+            get
+            {
+                return _carrierKey;
+            }
+
+            set
+            {
+                SetPropertyValueAndDetectChanges(value, ref _carrierKey, _ps.Value.CarrierKeySelector);
             }
         }
 
@@ -705,7 +722,7 @@
                 return _items;
             }
 
-            internal 
+            internal
                 set
             {
                 _items = value;
@@ -862,6 +879,8 @@
             /// The carrier selector.
             /// </summary>
             public readonly PropertyInfo CarrierSelector = ExpressionHelper.GetPropertyInfo<Shipment, string>(x => x.Carrier);
+
+            public readonly PropertyInfo CarrierKeySelector = ExpressionHelper.GetPropertyInfo<Shipment, Guid?>(x => x.CarrierKey);
 
             /// <summary>
             /// The domain root structure ID selector.

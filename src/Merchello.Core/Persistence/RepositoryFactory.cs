@@ -199,6 +199,11 @@
             return new CustomerRepository(uow, storeId, CreateCustomerAddressRepository(uow), CreateNoteRepository(uow), _logger, _sqlSyntax);
         }
 
+        internal virtual ICarrierRepository CreateCarrierRepository(IDatabaseUnitOfWork uow, int storeId)
+        {
+            return new CarrierRepository(uow, storeId, _logger, _sqlSyntax);
+        }
+
         /// <summary>
         /// Returns an instance of the <see cref="IAnonymousCustomerRepository"/>
         /// </summary>

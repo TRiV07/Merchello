@@ -40,6 +40,8 @@
     using Task = System.Threading.Tasks.Task;
     using Merchello.Core.MultiStore;
 
+    using MConstants = Merchello.Core.Constants;
+
     /// <summary>
     /// Handles the Umbraco Application "Starting" and "Started" event and initiates the Merchello startup
     /// </summary>
@@ -479,43 +481,78 @@
         {
             var domains = ApplicationContext.Current.Services.StoreService().CachedAllStoresIds();
 
+            var customerService = MerchelloContext.Current.Services.CustomerService;
+            var carrierService = MerchelloContext.Current.Services.CarrierService;
+
             foreach (var member in saveEventArgs.SavedEntities)
             {
-                if (MerchelloConfiguration.Current.CustomerMemberTypes.Any(x => x == member.ContentTypeAlias))
+                if (MerchelloConfiguration.Current.CustomerMemberTypes.Any(x => x == member.ContentTypeAlias)
+                    || MConstants.Delivery.CarrierContentTypeAlias == member.ContentTypeAlias)
                 {
                     var original = ApplicationContext.Current.Services.MemberService.GetByKey(member.Key);
 
-                    var customerService = MerchelloContext.Current.Services.CustomerService;
-
-                    foreach(var domain in domains)
+                    foreach (var domain in domains)
                     {
-                        ICustomer customer;
-                        if (original == null)
+                        if (MConstants.Delivery.CarrierContentTypeAlias == member.ContentTypeAlias)
                         {
-                            // assert there is not already a customer with the login name
-                            customer = customerService.GetByLoginName(member.Username, domain);
-
-                            if (customer != null)
+                            ICarrier carrier;
+                            if (original == null)
                             {
-                                MultiLogHelper.Info<UmbracoApplicationEventHandler>("A customer already exists with the loginName of: " + member.Username + " -- ABORTING customer creation");
+                                // assert there is not already a carrier with the login name
+                                carrier = carrierService.GetByLoginName(member.Username, domain);
+
+                                if (carrier != null)
+                                {
+                                    MultiLogHelper.Info<UmbracoApplicationEventHandler>("A carrier already exists with the loginName of: " + member.Username + " -- ABORTING carrier creation");
+                                    continue;
+                                }
+
+                                carrierService.CreateCarrierWithKey(member.Username, domain, string.Empty, string.Empty, member.Email);
+
                                 continue;
                             }
 
-                            customerService.CreateCustomerWithKey(member.Username, domain, string.Empty, string.Empty, member.Email);
+                            if (original.Username == member.Username && original.Email == member.Email) continue;
 
-                            continue;
+                            carrier = carrierService.GetByLoginName(original.Username, domain);
+
+                            if (carrier == null) continue;
+
+                            ((Carrier)carrier).LoginName = member.Username;
+                            carrier.Email = member.Email;
+
+                            carrierService.Save(carrier);
                         }
+                        else
+                        {
+                            ICustomer customer;
+                            if (original == null)
+                            {
+                                // assert there is not already a customer with the login name
+                                customer = customerService.GetByLoginName(member.Username, domain);
 
-                        if (original.Username == member.Username && original.Email == member.Email) continue;
+                                if (customer != null)
+                                {
+                                    MultiLogHelper.Info<UmbracoApplicationEventHandler>("A customer already exists with the loginName of: " + member.Username + " -- ABORTING customer creation");
+                                    continue;
+                                }
 
-                        customer = customerService.GetByLoginName(original.Username, domain);
+                                customerService.CreateCustomerWithKey(member.Username, domain, string.Empty, string.Empty, member.Email);
 
-                        if (customer == null) continue;
+                                continue;
+                            }
 
-                        ((Customer)customer).LoginName = member.Username;
-                        customer.Email = member.Email;
+                            if (original.Username == member.Username && original.Email == member.Email) continue;
 
-                        customerService.Save(customer);
+                            customer = customerService.GetByLoginName(original.Username, domain);
+
+                            if (customer == null) continue;
+
+                            ((Customer)customer).LoginName = member.Username;
+                            customer.Email = member.Email;
+
+                            customerService.Save(customer);
+                        }
                     }
                 }
             }

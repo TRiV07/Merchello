@@ -57,6 +57,8 @@
         /// </summary>
         private Lazy<ICustomerService> _customerService;
 
+        private Lazy<ICarrierService> _carrierService;
+
         /// <summary>
         /// The detached content type service.
         /// </summary>
@@ -239,6 +241,11 @@
         public ICustomerService CustomerService
         {
             get { return _customerService.Value;  }
+        }
+
+        public ICarrierService CarrierService
+        {
+            get { return _carrierService.Value;  }
         }
 
         /// <summary>
@@ -533,6 +540,9 @@
 
             if (_customerService == null)
                 _customerService = new Lazy<ICustomerService>(() => new CustomerService(dbDatabaseUnitOfWorkProvider, repositoryFactory, logger, eventMessagesFactory, _anonymousCustomerService.Value, _customerAddressService.Value, _invoiceService.Value, _paymentService.Value));
+
+            if (_carrierService == null)
+                _carrierService = new Lazy<ICarrierService>(() => new CarrierService(dbDatabaseUnitOfWorkProvider, repositoryFactory, logger, eventMessagesFactory, _invoiceService.Value, _paymentService.Value));
 
             if (_detachedContentTypeService == null)
                 _detachedContentTypeService = new Lazy<IDetachedContentTypeService>(() => new DetachedContentTypeService(dbDatabaseUnitOfWorkProvider, repositoryFactory, logger, eventMessagesFactory));

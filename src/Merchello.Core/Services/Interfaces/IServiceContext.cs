@@ -21,6 +21,8 @@
         /// </summary>
         ICustomerService CustomerService { get; }
 
+        ICarrierService CarrierService { get; }
+
         /// <summary>
         /// Gets the <see cref="IDetachedContentTypeService"/>.
         /// </summary>

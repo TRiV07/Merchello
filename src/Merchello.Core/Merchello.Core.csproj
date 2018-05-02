@@ -348,6 +348,7 @@
     <Compile Include="Configuration\Sections\IMerchelloCountriesSection.cs" />
     <Compile Include="Configuration\Sections\MerchelloCountriesSection.cs" />
     <Compile Include="Configuration\Sections\MerchelloSection.cs" />
+    <Compile Include="Constants.Delivery.cs" />
     <Compile Include="Constants.MultiStore.cs" />
     <Compile Include="Constants.Cache.cs" />
     <Compile Include="Constants.CountryCodes.cs">
@@ -436,8 +437,11 @@
     <Compile Include="Extensions.IDataModifierData.cs">
       <DependentUpon>Extensions.cs</DependentUpon>
     </Compile>
+    <Compile Include="Models\Carrier.cs" />
+    <Compile Include="Models\Interfaces\ICarrier.cs" />
     <Compile Include="Models\Interfaces\IHasDomainRoot.cs" />
     <Compile Include="Models\Interfaces\IStore.cs" />
+    <Compile Include="Models\Rdbms\CarrierDto.cs" />
     <Compile Include="Models\Rdbms\StoreDto.cs" />
     <Compile Include="Models\Rdbms\KeyStoreDto.cs" />
     <Compile Include="Models\Store.cs" />
@@ -525,8 +529,12 @@
     <Compile Include="Models\Rdbms\DigitalMediaDto.cs" />
     <Compile Include="Models\Rdbms\UserGroup2AppDto.cs" />
     <Compile Include="PagedCollection.cs" />
+    <Compile Include="Persistence\Factories\CarrierFactory.cs" />
     <Compile Include="Persistence\Factories\StoreFactory.cs" />
+    <Compile Include="Persistence\Mappers\CarrierMapper.cs" />
     <Compile Include="Persistence\Mappers\StoreMapper.cs" />
+    <Compile Include="Persistence\Migrations\UpgradesMS\TargetVersionOneOneTwo\UpdateShipmentTable.cs" />
+    <Compile Include="Persistence\Migrations\UpgradesMS\TargetVersionOneOneTwo\CrateCarrierTable.cs" />
     <Compile Include="Persistence\Migrations\UpgradesMS\TargetVersionOneOneOne\CreateStoreForeignKeys.cs" />
     <Compile Include="Persistence\Migrations\UpgradesMS\TargetVersionOneZeroFive\CreateGatewayProviderSettingsForeignKeys.cs" />
     <Compile Include="Persistence\Migrations\UpgradesMS\TargetVersionOneZeroFive\DeleteGatewayProviderSettingsForeignKeys.cs" />
@@ -548,6 +556,8 @@
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionTwoFiveZero\AddIndexesToProductVariant.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionTwoFourZero\AddShipmentTrackingUrlColumns.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionTwoThreeOne\AlterProductAttributeColumnToNtext.cs" />
+    <Compile Include="Persistence\Repositories\CarrierRepository.cs" />
+    <Compile Include="Persistence\Repositories\Interfaces\ICarrierRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IMSRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IProductBackOfficeRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IPortForwardProductRepository.cs" />
@@ -561,6 +571,8 @@
       <DependentUpon>ProductRepository.cs</DependentUpon>
     </Compile>
     <Compile Include="Persistence\Repositories\StoreRepository.cs" />
+    <Compile Include="Services\CarrierService.cs" />
+    <Compile Include="Services\Interfaces\ICarrierService.cs" />
     <Compile Include="Services\StoreService.cs" />
     <Compile Include="Services\Interfaces\IStoreService.cs" />
     <Compile Include="Services\Interfaces\IPageCachedMSService.cs" />

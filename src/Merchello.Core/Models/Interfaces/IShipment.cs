@@ -148,6 +148,8 @@
         /// </summary>
         string Carrier { get; set; }
 
+        Guid? CarrierKey { get; set; }
+
         /// <summary>
         /// Gets or sets the tracking code associated with this shipment
         /// </summary>

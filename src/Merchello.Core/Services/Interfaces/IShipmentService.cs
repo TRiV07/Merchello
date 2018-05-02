@@ -113,6 +113,8 @@
 
         IEnumerable<IShipment> GetShipmentsByCarrier(string carrier, int storeId);
 
+        IEnumerable<IShipment> GetShipmentsByCarrierKey(Guid carrierKey);
+
         IEnumerable<IShipment> GetShipmentsByCustomer(Guid customer, int storeId);
 
 

@@ -476,6 +476,16 @@
             }
         }
 
+        public IEnumerable<IShipment> GetShipmentsByCarrierKey(Guid carrierKey)
+        {
+            using (var repository = RepositoryFactory.CreateShipmentRepository(UowProvider.GetUnitOfWork(), MS.DefaultId))
+            {
+                var query = Query<IShipment>.Builder.Where(x => x.CarrierKey == carrierKey);
+
+                return repository.GetByQuery(query);
+            }
+        }
+
         public IEnumerable<IShipment> GetShipmentsByCustomer(Guid customer, int storeId)
         {
             using (var repository = RepositoryFactory.CreateShipmentRepository(UowProvider.GetUnitOfWork(), storeId))

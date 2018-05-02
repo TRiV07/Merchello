@@ -7,12 +7,12 @@
     using Umbraco.Core.Persistence.DatabaseAnnotations;
 
     /// <summary>
-    /// The customer dto.
+    /// The Carrier dto.
     /// </summary>
-    [TableName("merchCustomer")]
+    [TableName("merchCarrier")]
     [PrimaryKey("pk", autoIncrement = false)]
     [ExplicitColumns]
-    internal class CustomerDto : IPageableDto, IHasDomainRoot
+    internal class CarrierDto : IPageableDto, IHasDomainRoot
     {
         /// <summary>
         /// Gets or sets the key.
@@ -27,14 +27,14 @@
         /// </summary>
         [Column("storeId")]
         [Constraint(Default = Constants.MultiStore.DefaultId)]
-        [ForeignKey(typeof(StoreDto), Name = "FK_merchCustomer_merchStore", Column = "storeId")]
+        [ForeignKey(typeof(StoreDto), Name = "FK_merchCarrier_merchStore", Column = "storeId")]
         public int StoreId { get; set; }
 
         /// <summary>
         /// Gets or sets the login name.
         /// </summary>
         [Column("loginName")]
-        [IndexAttribute(IndexTypes.NonClustered, Name = "IX_merchCustomerLoginName")]
+        [IndexAttribute(IndexTypes.UniqueNonClustered, Name = "IX_merchCarrierLoginName", ForColumns = "loginName, storeId")]
         public string LoginName { get; set; }
 
         /// <summary>
@@ -55,11 +55,14 @@
         [Column("email")]
         public string Email { get; set; }
 
-        /// <summary>
-        /// Gets or sets a value indicating whether tax exempt.
-        /// </summary>
-        [Column("taxExempt")]
-        public bool TaxExempt { get; set; }
+        [Column("isDisabled")]
+        public bool IsDisabled { get; set; }
+
+        [Column("isOnDuty")]
+        public bool IsOnDuty { get; set; }
+
+        [Column("activeOrders")]
+        public int ActiveOrders { get; set; }
 
         /// <summary>
         /// Gets or sets the last activity date.
@@ -77,14 +80,6 @@
         public string ExtendedData { get; set; }
 
         /// <summary>
-        /// Gets or sets the extended data.
-        /// </summary>
-        [Column("notes")]
-        [NullSetting(NullSetting = NullSettings.Null)]
-        [SpecialDbType(SpecialDbTypes.NTEXT)]
-        public string Notes { get; set; }
-
-        /// <summary>
         /// Gets or sets the update date.
         /// </summary>
         [Column("updateDate")]
@@ -97,11 +92,5 @@
         [Column("createDate")]
         [Constraint(Default = "getdate()")]
         public DateTime CreateDate { get; set; }
-
-        /// <summary>
-        /// Gets or sets the customer index dto.
-        /// </summary>
-        [ResultColumn]
-        public CustomerIndexDto CustomerIndexDto { get; set; }
     }
 }

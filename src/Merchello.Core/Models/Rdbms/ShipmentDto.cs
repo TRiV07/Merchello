@@ -217,6 +217,11 @@
         [NullSetting(NullSetting = NullSettings.Null)]
         public string Carrier { get; set; }
 
+        [Column("carrierKey")]
+        [ForeignKey(typeof(CarrierDto), Name = "FK_merchShipment_merchCarrier", Column = "pk")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        public Guid? CarrierKey { get; set; }
+
         /// <summary>
         /// Gets or sets the tracking code.
         /// </summary>

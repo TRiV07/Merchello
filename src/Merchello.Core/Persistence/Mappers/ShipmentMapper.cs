@@ -46,6 +46,7 @@ namespace Merchello.Core.Persistence.Mappers
             CacheMap<Shipment, ShipmentDto>(src => src.Email, dto => dto.Email);
             CacheMap<Shipment, ShipmentDto>(src => src.Email, dto => dto.Email);
             CacheMap<Shipment, ShipmentDto>(src => src.Carrier, dto => dto.Carrier);
+            CacheMap<Shipment, ShipmentDto>(src => src.CarrierKey, dto => dto.CarrierKey);
             CacheMap<Shipment, ShipmentDto>(src => src.TrackingCode, dto => dto.TrackingCode);
             CacheMap<Shipment, ShipmentDto>(src => src.UpdateDate, dto => dto.UpdateDate);
             CacheMap<Shipment, ShipmentDto>(src => src.CreateDate, dto => dto.CreateDate);
