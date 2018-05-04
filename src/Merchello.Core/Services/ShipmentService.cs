@@ -486,6 +486,26 @@
             }
         }
 
+        public IEnumerable<IShipment> GetShipmentsByCarrierKeyAndDate(Guid carrierKey, DateTime date)
+        {
+            using (var repository = RepositoryFactory.CreateShipmentRepository(UowProvider.GetUnitOfWork(), MS.DefaultId))
+            {
+                var fromDate = date.Date;
+                var toDate = fromDate.AddDays(1);
+                var query = Query<IShipment>.Builder.Where(x => x.CarrierKey == carrierKey && fromDate <= x.ShippedDate && x.ShippedDate < toDate);
+
+                return repository.GetByQuery(query);
+            }
+        }
+
+        public IEnumerable<IShipment> GetShipmentsByCarrierKeyAndStatus(Guid carrierKey, params Guid[] statusKeys)
+        {
+            using (var repository = RepositoryFactory.CreateShipmentRepository(UowProvider.GetUnitOfWork(), MS.DefaultId))
+            {
+                return repository.GetShipmentsByCarrierKeyAndStatus(carrierKey, statusKeys);
+            }
+        }
+
         public IEnumerable<IShipment> GetShipmentsByCustomer(Guid customer, int storeId)
         {
             using (var repository = RepositoryFactory.CreateShipmentRepository(UowProvider.GetUnitOfWork(), storeId))

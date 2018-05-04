@@ -36,27 +36,27 @@
 
         private void StoreService_Created(IStoreService sender, Events.NewEventArgs<Models.IStore> e)
         {
-            UmbracoContext.Current.HttpContext.Cache[Constants.Cache.StoresList] = null;
+            UmbracoContext.Current.HttpContext.Cache.Remove(Constants.Cache.StoresList);
         }
 
         private void StoreService_Saved(IStoreService sender, Umbraco.Core.Events.SaveEventArgs<Models.IStore> e)
         {
-            UmbracoContext.Current.HttpContext.Cache[Constants.Cache.StoresList] = null;
+            UmbracoContext.Current.HttpContext.Cache.Remove(Constants.Cache.StoresList);
         }
 
         private void StoreService_Deleted(IStoreService sender, Umbraco.Core.Events.DeleteEventArgs<Models.IStore> e)
         {
-            UmbracoContext.Current.HttpContext.Cache[Constants.Cache.StoresList] = null;
+            UmbracoContext.Current.HttpContext.Cache.Remove(Constants.Cache.StoresList);
         }
 
         private void DomainService_Saved(IDomainService sender, Umbraco.Core.Events.SaveEventArgs<Umbraco.Core.Models.IDomain> e)
         {
-            UmbracoContext.Current.HttpContext.Cache[Constants.Cache.DomainsList] = null;
+            UmbracoContext.Current.HttpContext.Cache.Remove(Constants.Cache.DomainsList);
         }
 
         private void DomainService_Deleted(IDomainService sender, Umbraco.Core.Events.DeleteEventArgs<Umbraco.Core.Models.IDomain> e)
         {
-            UmbracoContext.Current.HttpContext.Cache[Constants.Cache.DomainsList] = null;
+            UmbracoContext.Current.HttpContext.Cache.Remove(Constants.Cache.DomainsList);
         }
 
         /// <summary>

@@ -95,6 +95,25 @@
             return GetAll(keys.ToArray());
         }
 
+        public IEnumerable<IShipment> GetShipmentsByCarrierKeyAndStatus(Guid carrierKey, params Guid[] statusKeys)
+        {
+            var sql = new Sql();
+            sql.Select("[merchShipment].[pk]")
+                .From<ShipmentDto>(SqlSyntax)
+                .InnerJoin<ShipmentStatusDto>(SqlSyntax)
+                .On<ShipmentDto, ShipmentStatusDto>(SqlSyntax, left => left.ShipmentStatusKey, right => right.Key)
+                .Where<ShipmentDto>(x => x.CarrierKey == carrierKey, SqlSyntax);
+
+            if (statusKeys.Any())
+            {
+                sql.WhereIn<ShipmentDto>(x => x.ShipmentStatusKey, statusKeys, SqlSyntax);
+            }
+
+            var keys = Database.Fetch<Guid>(sql);
+
+            return GetAll(keys.ToArray());
+        }
+
 
         /// <summary>
         /// Gets a shipment by it's key

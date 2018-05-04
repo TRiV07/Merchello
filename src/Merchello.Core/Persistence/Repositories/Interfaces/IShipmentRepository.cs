@@ -11,5 +11,6 @@
     internal interface IShipmentRepository : IRepositoryQueryable<Guid, IShipment>, IAssertsMaxDocumentNumber
     {
         IEnumerable<IShipment> GetShipmentsByCustomer(Guid customer);
+        IEnumerable<IShipment> GetShipmentsByCarrierKeyAndStatus(Guid carrierKey, params Guid[] statusKeys);
     }
 }

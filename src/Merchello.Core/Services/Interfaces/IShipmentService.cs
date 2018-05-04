@@ -115,6 +115,10 @@
 
         IEnumerable<IShipment> GetShipmentsByCarrierKey(Guid carrierKey);
 
+        IEnumerable<IShipment> GetShipmentsByCarrierKeyAndDate(Guid carrierKey, DateTime date);
+
+        IEnumerable<IShipment> GetShipmentsByCarrierKeyAndStatus(Guid carrierKey, params Guid[] statusKeys);
+
         IEnumerable<IShipment> GetShipmentsByCustomer(Guid customer, int storeId);
 
 
